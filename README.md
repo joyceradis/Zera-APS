@@ -45,6 +45,7 @@ Para testar a interface de fato com Chromium/Playwright:
 python3 -m pip install playwright
 python3 -m playwright install chromium
 python3 tests/test_ui.py
+python3 tests/test_auth_ui.py
 ~~~
 
 Este teste não foi confirmado em navegador real nesta rodada e exige revisão de screenshots, navegação por teclado e dispositivos. O teste Node é automatizado, mas não substitui essa etapa.
@@ -57,7 +58,7 @@ Este teste não foi confirmado em navegador real nesta rodada e exige revisão d
 - `data/regras-aps-2026.json` — conteúdo clínico preliminar; `data/regras.js` é gerado a partir dele por `python3 tools/gerar-base.py`.
 - `tests/server.test.mjs` — suíte de identidade, privacidade e 50 sessões concorrentes **em ambiente local**.
 - `tools/audit-rules.mjs` — auditoria **estrutural** do JSON, sem validar clinicamente códigos ou indicadores.\n- `tests/test_static.mjs` — smoke test sem dependências de navegador.
-- `tests/test_ui.py` — testes e capturas no Chromium (execução local a confirmar).
+- `tests/test_ui.py` — testes e capturas no Chromium (execução local a confirmar).\n- `tests/test_auth_ui.py` — teste de ponta a ponta de convites, login, favoritos e logout no Chromium (ainda não executado).
 - `docs/IMPLANTACAO-E-SEGURANCA.md` — implantação e limites de segurança.
 - `docs/PLANO-PILOTO-50.md` — roadmap de produto e critérios de aceite.
 - `docs/ESPECIFICACAO-CLINICO-FUNCIONAL.md` — requisitos clínico-funcionais iniciais.
