@@ -43,6 +43,10 @@ export function createStore(filename, maxDoctors = 50) {
     expires_at INTEGER NOT NULL, created_by TEXT, used_at INTEGER,
     FOREIGN KEY(created_by) REFERENCES users(id)
   );
+  CREATE TABLE IF NOT EXISTS password_resets (
+    token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires_at INTEGER NOT NULL, used_at INTEGER, created_by TEXT,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(created_by) REFERENCES users(id)
+  );
   CREATE TABLE IF NOT EXISTS sessions (
     token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, csrf_token TEXT NOT NULL,
     expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL,
@@ -115,6 +119,29 @@ export function createStore(filename, maxDoctors = 50) {
     exec('DELETE FROM login_attempts WHERE key=?',key);
     return {status:'ok',user:{id:user.id,email:user.email,role:user.role}};
   }
+  function createReset(userId,createdBy=null,ttlMs=60*60*1000) {
+    return transaction(()=>{
+      const user=one('SELECT id,email FROM users WHERE id=? AND active=1',userId);
+      if(!user)throw new Error('NOT_FOUND');
+      const value=token();
+      exec('DELETE FROM password_resets WHERE user_id=? AND used_at IS NULL',userId);
+      exec('INSERT INTO password_resets(token_hash,user_id,expires_at,created_by) VALUES(?,?,?,?)',hashToken(value),userId,now()+ttlMs,createdBy);
+      return {token:value,email:user.email,expiresAt:now()+ttlMs};
+    });
+  }
+  function redeemReset(value,email,password) {
+    email=normalizeEmail(email);
+    if(!email||typeof value!=='string'||value.length>128||typeof password!=='string'||password.length<passwordMinLength||password.length>128)throw new Error('INVALID_RESET');
+    return transaction(()=>{
+      const item=one('SELECT r.user_id,u.email,u.role FROM password_resets r JOIN users u ON u.id=r.user_id WHERE r.token_hash=? AND r.used_at IS NULL AND r.expires_at>? AND u.active=1',hashToken(value),now());
+      if(!item||item.email!==email)throw new Error('INVALID_RESET');
+      const encoded=passwordHash(password);
+      exec('UPDATE users SET password_hash=? WHERE id=?',encoded,item.user_id);
+      exec('DELETE FROM sessions WHERE user_id=?',item.user_id);
+      exec('UPDATE password_resets SET used_at=? WHERE token_hash=?',now(),hashToken(value));
+      return {id:item.user_id,email:item.email,role:item.role};
+    });
+  }
   function sessionFor(userId,ttlMs=8*60*60*1000) {
     const value=token(), csrf=token(), expiry=now()+ttlMs;
     exec('INSERT INTO sessions(token_hash,user_id,csrf_token,expires_at,created_at) VALUES(?,?,?,?,?)',hashToken(value),userId,csrf,expiry,now());
@@ -139,6 +166,6 @@ export function createStore(filename, maxDoctors = 50) {
     else exec('DELETE FROM bookmarks WHERE user_id=? AND rule_id=?',userId,ruleId);
   }
   function getBookmarks(userId){return many('SELECT rule_id FROM bookmarks WHERE user_id=? ORDER BY rule_id',userId).map(x=>x.rule_id);}
-  function sweep(){const time=now();exec('DELETE FROM sessions WHERE expires_at<=?',time);exec('DELETE FROM invites WHERE expires_at<=? OR used_at IS NOT NULL',time);exec('DELETE FROM login_attempts WHERE until_at<=?',time);}
-  return {db,countSeats,createInvite,redeemInvite,authenticate,sessionFor,readSession,revoke,listUsers,disableUser,setBookmark,getBookmarks,sweep};
+  function sweep(){const time=now();exec('DELETE FROM sessions WHERE expires_at<=?',time);exec('DELETE FROM invites WHERE expires_at<=? OR used_at IS NOT NULL',time);exec('DELETE FROM login_attempts WHERE until_at<=?',time);exec('DELETE FROM password_resets WHERE expires_at<=? OR used_at IS NOT NULL',time);}
+  return {db,countSeats,createInvite,redeemInvite,createReset,redeemReset,authenticate,sessionFor,readSession,revoke,listUsers,disableUser,setBookmark,getBookmarks,sweep};
 }
