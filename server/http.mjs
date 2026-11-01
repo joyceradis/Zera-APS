@@ -79,6 +79,16 @@ export function createApp({root=resolve(import.meta.dirname,'..'),filename='./ru
         return encoded(res,201,{ok:true,csrf:created.csrf,user});
       }catch{return fail(res,400,'INVITE_INVALID_OR_EXPIRED');}
     }
+    if(path==='/api/reset/accept'&&req.method==='POST'){
+      try{
+        const b=await receive(req);
+        const user=store.redeemReset(b.token,b.email,b.password);
+        if(rawToken)store.revoke(rawToken);
+        const created=store.sessionFor(user.id);
+        res.setHeader('Set-Cookie',`${cookieName}=${created.token}; ${cookieAttrs}`);
+        return encoded(res,200,{ok:true,csrf:created.csrf,user});
+      }catch{return fail(res,400,'RESET_INVALID_OR_EXPIRED');}
+    }
     if(path==='/'||path==='/index.html'){
       if(!session){res.writeHead(303,{Location:'/login','Cache-Control':'no-store'});return res.end();}
       if(req.method!=='GET')return fail(res,405,'METHOD_NOT_ALLOWED');
@@ -123,6 +133,14 @@ export function createApp({root=resolve(import.meta.dirname,'..'),filename='./ru
           const invite=store.createInvite(b.email,b.role,me.id);
           return encoded(res,201,{email:invite.email,role:invite.role,expiresAt:invite.expiresAt,link:publicOrigin+'/login#convite='+encodeURIComponent(invite.token)});
         }catch(err){return fail(res,400,err.message==='SEATS_FULL'?'SEATS_FULL':'INVITE_NOT_CREATED');}
+      }
+      if(path==='/api/team/reset'&&req.method==='POST'){
+        try{
+          const b=await receive(req);
+          if(typeof b.userId!=='string'||b.userId.length>128)throw Error();
+          const reset=store.createReset(b.userId,me.id);
+          return encoded(res,201,{email:reset.email,expiresAt:reset.expiresAt,link:publicOrigin+'/login#reset='+encodeURIComponent(reset.token)});
+        }catch{return fail(res,400,'RESET_NOT_CREATED');}
       }
       if(path==='/api/team/disable'&&req.method==='POST'){
         try{
