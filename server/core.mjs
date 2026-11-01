@@ -1,6 +1,6 @@
 import { DatabaseSync } from 'node:sqlite';
 import { randomBytes, createHash, scryptSync, timingSafeEqual } from 'node:crypto';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, chmodSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 export const cookieName = 'zera_session';
@@ -32,6 +32,7 @@ export function createStore(filename, maxDoctors = 50) {
   const dbFile = filename === ':memory:' ? filename : resolve(filename);
   if (dbFile !== ':memory:') mkdirSync(dirname(dbFile), {recursive:true, mode:0o700});
   const db = new DatabaseSync(dbFile);
+  if(dbFile!==':memory:')chmodSync(dbFile,0o600);
   db.exec('PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;');
   db.exec(`CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, role TEXT NOT NULL CHECK(role IN ('admin','editor','doctor')),
