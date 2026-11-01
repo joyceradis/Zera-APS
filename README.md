@@ -1,80 +1,71 @@
 # ZERA-APS
 
-Plataforma de orientação de registros no e-SUS APS (PEC), em desenvolvimento. **A base clínica é preliminar e não homologada; a interface não substitui prontuário, decisão clínica ou regras oficiais de financiamento.**
+**Plataforma de apoio à conferência do registro na Atenção Primária à Saúde (e-SUS PEC).** Reduz a busca por códigos, prazos, campos e referências, sem substituir o prontuário ou a decisão clínica.
+
+**Estado em 01/11/2026:** beta técnico v0.3, não homologado e não publicado. O código está isolado em uma branch para revisão, enquanto a versão zero e a main permanecem intactas.
 
 ## Versões
 
-| Linha | Referência | Estado |
-| --- | --- | --- |
-| v0.1 congelada | archive/v0.1-frozen-2026-11-01 | Reprodução integral da versão inicial |
-| v0.2 interface piloto | feat/pilot-ui-v02 | Design desktop-first, busca, fluxos, biblioteca e plano de arquitetura |
-| Produção | main | Permanece sem alterações até revisão/merge |
+| Versão | Referência | Estado |
+|---|---|---|
+| v0.1 original | `archive/v0.1-frozen-2026-11-01` | Imutável, commit `3a2c11effd9fb39e0a31a4e84f9d9752be2b5ccc` |
+| v0.3 beta técnico | `feat/pilot-ui-v02` | Interface profissional + backend de acesso individual em desenvolvimento |
+| Produção | `main` | Não alterada; nenhum merge ou deploy |
 
-**Atenção:** o repositório é público. Não suba senhas, dados pessoais, prontuários ou arquivos reais de municípios.
+## O que foi implementado
 
-## Executar a interface
+**Interface:** navegação desktop-first responsiva, cinco linhas de cuidado (Hipertensão, Diabetes, Gestante/puerpério, Saúde da mulher e Saúde mental ainda sem regras), busca global com Ctrl/Cmd+K, biblioteca de códigos, referências, campos do PEC e alertas. Códigos são copiados para conferência, não lançados automaticamente. Favoritos por usuário quando conectado ao servidor.
 
-No branch de trabalho v0.2, abra index.html em um navegador moderno ou execute um servidor HTTP local. Não exige contas, pacotes npm nem contratação de hospedagem. A base continua em data/regras.js, derivada de data/regras-aps-2026.json.
+**Backend piloto:** execução Node.js sem dependências npm; SQLite persistente; convites individuais com prazo e uso único; contas e sessões segregadas; autenticação por senha com scrypt; cookies HttpOnly; proteção CSRF/Origin; perfis administrador/editor/médico; controle de até 50 vagas médicas (ativos + convites pendentes); administração básica de convites, usuários e desativação de contas. O backend não recebe dados clínicos de pacientes.
 
-A versão 0.2 oferece quatro áreas: Espaço de trabalho; Biblioteca de códigos; Fontes e limites; Preparação do piloto. Os cinco módulos clínicos são Hipertensão, Diabetes, Gestante e puerpério, Saúde da mulher e Saúde mental (pendente).
+**Importante:** a base documental é parcial (21 componentes em 4 linhas de cuidado). As regras exigem auditoria clínica/normativa e não calculam indicadores nem faturamento oficial.
 
-Fluxo:
-1. Selecionar módulo.
-2. Expandir uma orientação e conferir campo PEC, janela temporal e ressalvas.
-3. Copiar o código **apenas se clinicamente pertinente**.
-4. Usar a revisão de leitura como apoio temporário, jamais como indicador cumprido.
-5. Pressionar Ctrl+K ou Cmd+K para busca em orientações e códigos.
+## Executar localmente — Estevão
 
-**Não há sessão médica, backend, cálculo oficial, gravação de pacientes ou integração ao PEC.** As revisões desaparecem ao atualizar a página.
-
-## Arquivos de maior relevância
-
-- index.html — estrutura e navegação.
-- styles.css — design system responsivo.
-- app.js — interface, busca global, código contextual e filtros de revisão.
-- data/regras-aps-2026.json — base clínica parcial, com ressalvas.
-- data/regras.js — versão JS gerada a partir do JSON.
-- docs/ESPECIFICACAO-CLINICO-FUNCIONAL.md — escopo e cenários.
-- docs/PLANO-PILOTO-50.md — arquitetura server-backed proposta, gestão de contas e critérios de aceite de 50 médicos.
-- tests/test_static.mjs — validação de base, DOM e inicialização sem dependências externas.
-- tests/test_ui.py — testes automatizados de interface para Chromium/Playwright.
-
-## Desenvolvedor — Estevão
-
-Para regenerar a base após alterar JSON:
+Requer **Node.js 22.13+** (preferencialmente Node 24) em Mac, Linux ou Windows com suporte a SQLite nativo. Sem necessidade de instalar bibliotecas npm.
 
 ~~~sh
-python3 tools/gerar-base.py
+npm test
+npm start
 ~~~
 
-Para validar a inicialização sem instalar dependências extras, e depois conferir a interface no navegador:
+Em outro terminal, para criar o primeiro acesso administrativo:
 
 ~~~sh
-node --check app.js
-node tests/test_static.mjs
+npm run bootstrap-admin -- admin@seudominio.com.br
+~~~
+
+O comando exibe um **convite único e sigiloso**. Abra o link no navegador, defina senha de no mínimo 12 caracteres e entre no servidor local em `http://localhost:8787`. Pelo botão de perfil, o administrador pode convidar médicos, copiar o link e desativar contas. O servidor **não envia e-mails**. Não enviar convites reais antes de validar o ambiente.
+
+O backend usa SQLite em `runtime/zeraaps.sqlite` (não publicar esse arquivo). `.env.example` documenta PORT, APP_ORIGIN, HOST, ZERA_DB_PATH e ZERA_MAX_DOCTORS. Execução de desenvolvimento escuta somente `127.0.0.1`.
+
+Para testar a interface de fato com Chromium/Playwright:
+
+~~~sh
 python3 -m pip install playwright
 python3 -m playwright install chromium
 python3 tests/test_ui.py
 ~~~
 
-O teste Python detecta Chromium no Linux e usa o navegador instalado pelo Playwright em macOS. Os arquivos de imagem de prévia são gerados localmente em `tests/preview-desktop.png` e `tests/preview-mobile.png` após uma execução bem-sucedida; não são entregas já verificadas por esta sessão. O smoke test Node é independente de navegador, mas não substitui a inspeção visual.
+Este teste não foi confirmado em navegador real nesta rodada e exige revisão de screenshots, navegação por teclado e dispositivos. O teste Node é automatizado, mas não substitui essa etapa.
 
-### Antes de demonstrar a médicos externos
+## Estrutura
 
-1. Revisar e homologar regras e códigos contra a versão vigente das fontes oficiais.
-2. Testar com dados fictícios, especialmente HAS/DM, gestação, multimorbidade e versões PEC.
-3. Não anunciar capacidade autenticada para 50 usuários sem implantação e teste de carga.
-4. Implementar autenticação, autorização, segregação de contas e sessões seguras **no servidor**.
-5. Tratar LGPD, segurança, direitos de uso, termos e responsabilidade antes de comercializar.
-6. Planejar domínio, deploy e custos **antes** de contratar qualquer coisa.
+- `index.html`, `styles.css`, `app.js` — interface e fluxo clínico.
+- `login.html`, `login.css`, `login.js`, `client-auth.js` — experiência de acesso e administração.
+- `server/core.mjs`, `server/http.mjs`, `server/launch.mjs`, `server/cli.mjs` — contas, persistência, API, sessões e bootstrap.
+- `data/regras-aps-2026.json` — conteúdo clínico preliminar; `data/regras.js` é gerado a partir dele por `python3 tools/gerar-base.py`.
+- `tests/server.test.mjs` — suíte de identidade, privacidade e 50 sessões concorrentes **em ambiente local**.
+- `tests/test_static.mjs` — smoke test sem dependências de navegador.
+- `tests/test_ui.py` — testes e capturas no Chromium (execução local a confirmar).
+- `docs/IMPLANTACAO-E-SEGURANCA.md` — implantação e limites de segurança.
+- `docs/PLANO-PILOTO-50.md` — roadmap de produto e critérios de aceite.
+- `docs/ESPECIFICACAO-CLINICO-FUNCIONAL.md` — requisitos clínico-funcionais iniciais.
 
-A arquitetura futura **não obriga** um provedor específico. A interface pode ser migrada sem reescrever o conteúdo editorial.
+## Antes de usar com até 50 médicos
 
-## Limites funcionais
+Faltam revisão visual em navegador real, teste de carga na infraestrutura escolhida, auditoria de segurança, recuperação de contas, operação de backup/restauração, proteção de dados, escolha de hospedagem persistente, avaliação jurídica/regulatória e homologação clínica das regras.
 
-O ZERA-APS **não confirma** que uma orientação foi seguida, que um SIGTAP foi registrado, que um indicador foi atingido, que houve transmissão de dados ao SISAB ou que houve repasse de recursos. Uma marcação na interface é somente leitura manual. As ações de saúde devem corresponder ao que efetivamente foi realizado pelo profissional responsável.
+**Não houve deploy, custos, compra de domínio, criação de contas reais, publicação em produção ou conexão ao PEC.** O repositório continua público: jamais colocar dados pessoais identificáveis de pacientes, segredos, tokens, convites ou bancos de produção.
 
-## Referências iniciais
-
-- Guia e-SUS APS: https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/
-- Fichas técnicas da APS: https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia
+O ZERA-APS não verifica se uma medição foi realizada, se um código foi registrado no PEC, se houve transmissão ao SISAB ou se um indicador foi atingido. O profissional deve documentar apenas atos efetivamente realizados.
