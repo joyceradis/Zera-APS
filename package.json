@@ -15,6 +15,7 @@
     "test:static": "node tests/test_static.mjs",
     "test:browser": "python3 tests/test_ui.py",
     "test": "node --test tests/server.test.mjs && node tests/test_static.mjs && node tools/audit-rules.mjs",
-    "test:rules": "node tools/audit-rules.mjs"
+    "test:rules": "node tools/audit-rules.mjs",
+    "recover-account": "node server/cli.mjs recover-account"
   }
 }
