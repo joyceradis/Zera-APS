@@ -69,3 +69,30 @@ test('HTTP sessions, csrf, origin, role access, 50 seat concept and disable',asy
   assert.equal((await request('/api/team','GET',null,null,cookie)).status,200);
  }finally{await new Promise(resolve=>server.close(resolve));store.db.close();rmSync(dir,{recursive:true,force:true});}
 });
+
+test('50 isolated physician accounts and concurrent HTTP session reads',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'zera-load-'));
+ writeFileSync(join(dir,'index.html'),'PROTECTED');
+ const {server,store}=createApp({root:dir,filename:':memory:',origin:'http://127.0.0.1:8799',maxDoctors:50});
+ await new Promise(resolve=>server.listen(8799,'127.0.0.1',resolve));
+ try{
+   const cookies=[];
+   for(let i=0;i<50;i++){
+     const email=mail(i);
+     const inv=store.createInvite(email,'doctor');
+     const doctor=store.redeemInvite(inv.token,email,'passphrase-very-strong-'+i);
+     cookies.push({email,cookie:'zera_session='+store.sessionFor(doctor.id).token});
+   }
+   const seats=store.countSeats();
+   assert.equal(seats.active,50);assert.equal(seats.pending,0);assert.equal(seats.free,0);
+   assert.throws(()=>store.createInvite('extra@example.test','doctor'),/SEATS_FULL/);
+   const started=performance.now();
+   const results=await Promise.all(cookies.map(async ({email,cookie})=>{
+     const response=await fetch('http://127.0.0.1:8799/api/session',{headers:{cookie},cache:'no-store'});
+     const body=await response.json();
+     return {status:response.status,match:body.user?.email===email};
+   }));
+   assert.equal(results.filter(r=>r.status===200&&r.match).length,50);
+   console.log('Local concurrent 50-session exercise:',Math.round(performance.now()-started),'ms (not a production load benchmark)');
+ }finally{await new Promise(resolve=>server.close(resolve));store.db.close();rmSync(dir,{recursive:true,force:true});}
+});
