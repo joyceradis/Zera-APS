@@ -17,12 +17,12 @@ vm.runInNewContext(js,sandbox);
 assert.equal(JSON.stringify(sandbox.window.ZERA_APS_DATA),JSON.stringify(source),'Base JSON e bundle local diferentes');
 
 assert.ok(Array.isArray(source.cards)&&source.cards.length>=5);
-assert.match(source.version,/^\\d+\\.\\d+\\.\\d+$/);
+assert.match(source.version,/^\d+\.\d+\.\d+$/);
 assert.ok(Array.isArray(source.verified_sources)&&source.verified_sources.length>0);
 const knownSystems={
-  SIGTAP:/^\\d{2}\\.\\d{2}\\.\\d{2}\\.\\d{3}-\\d$/,
-  'CID-10':/^[A-Z]\\d{2}(?:\\.[0-9A-Z]{1,2})?$/,
-  'CIAP-2':/^[A-Z]\\d{2}$/
+  SIGTAP:/^\d{2}\.\d{2}\.\d{2}\.\d{3}-\d$/,
+  'CID-10':/^[A-Z]\d{2}(?:\.[0-9A-Z]{1,2})?$/,
+  'CIAP-2':/^[A-Z]\d{2}$/
 };
 const cardIds=new Set();
 const ruleIds=new Set();
