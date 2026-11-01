@@ -64,14 +64,14 @@ with sync_playwright() as playwright:
     page.locator("#code-search").fill("I10")
     assert page.locator("#code-library .library-row").count() >= 1
 
-    page.locator('button[data-view="fontes"]').last.click()
+    page.locator('button[data-view="fontes"]').first.click()
     assert "Limitações" in page.locator("#view-fontes").inner_text()
-    page.locator('button[data-view="piloto"]').last.click()
+    page.locator('button[data-view="piloto"]').first.click()
     assert "Contas" in page.locator("#view-piloto").inner_text() or "contas" in page.locator("#view-piloto").inner_text()
 
     assert not errors, errors
 
-    page.locator('button[data-view="trabalho"]').last.click()
+    page.locator('button[data-view="trabalho"]').first.click()
     page.screenshot(path=str(root / "tests" / "preview-desktop.png"), full_page=True)
 
     phone = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
