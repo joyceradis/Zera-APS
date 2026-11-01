@@ -1,0 +1,601 @@
+/* Base estática local. Não armazena informações de pacientes. */
+window.ZERA_APS_DATA = {
+  "project": "Zera-APS — base clínica inicial (pré-validação)",
+  "version": "0.1.0",
+  "prepared_on": "2026-10-31",
+  "verified_sources": [
+    "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+    "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia"
+  ],
+  "scope": "parcial; não cobre integralmente todas as linhas de cuidado e exceções",
+  "security": {
+    "offline_first": true,
+    "patient_identifiers": false,
+    "real_pec_automation": false,
+    "copy_code_only": true
+  },
+  "rules_engine_contract": {
+    "rule_schema": [
+      "id",
+      "title",
+      "goal",
+      "window",
+      "actor",
+      "pec_location",
+      "codes",
+      "cautions",
+      "conditionals",
+      "source",
+      "verification"
+    ],
+    "case_flags": [
+      "has_hypertension_active",
+      "has_diabetes_active",
+      "is_pregnant",
+      "is_puerperal",
+      "age_in_years",
+      "pec_version",
+      "visit_kind",
+      "patient_data_available_authorized"
+    ],
+    "status_values": [
+      "confirmed_in_official_esus_2026_guide",
+      "pending_verification"
+    ],
+    "warning": "O protótipo independente não verifica registros nem calcula pontuação real dos pacientes."
+  },
+  "cards": [
+    {
+      "id": "has",
+      "title": "Hipertensão",
+      "indicator": "C5",
+      "status": "partial_2026_rules_verified",
+      "codes": {
+        "ciap2": [
+          "K86",
+          "K87"
+        ],
+        "cid10": [
+          "I10",
+          "I11",
+          "I11.0",
+          "I11.9",
+          "I12",
+          "I12.0",
+          "I12.9",
+          "I13",
+          "I13.0",
+          "I13.1",
+          "I13.2",
+          "I13.9",
+          "I15",
+          "I15.0",
+          "I15.1",
+          "I15.2",
+          "I15.8",
+          "I15.9",
+          "O10",
+          "O10.0",
+          "O10.1",
+          "O10.2",
+          "O10.3",
+          "O10.4",
+          "O10.9",
+          "O11"
+        ]
+      },
+      "rules": [
+        {
+          "id": "C5-A",
+          "title": "Consulta médica/enfermagem",
+          "goal": "≥1 consulta",
+          "window": "últimos 6 meses",
+          "actor": "médico ou enfermeiro",
+          "pec_location": "Atendimento individual / SOAP → Avaliação → condição correspondente e LPC ativa",
+          "codes": [],
+          "cautions": [
+            "Não escolher código apenas para pontuar; deve corresponder ao diagnóstico.",
+            "PEC ≥5.4.5 habilita inclusão à LPC ao selecionar código; versões anteriores exigem seleção manual da opção.",
+            "Teleconsulta: registrar forma de participação e, quando aplicável, SIGTAP 03.01.01.025-0 em Procedimentos administrativos."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C5-B",
+          "title": "Aferição da pressão arterial",
+          "goal": "≥1 registro",
+          "window": "últimos 6 meses",
+          "actor": "profissional habilitado conforme modelo de informação",
+          "pec_location": "SOAP → Objetivo → Antropometria, sinais vitais e glicemia capilar → Pressão arterial (mmHg)",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "03.01.10.003-9"
+            }
+          ],
+          "cautions": [
+            "Registro do valor no campo nativo pode gerar automaticamente SIGTAP.",
+            "Não substituir registro estruturado da PA por texto solto ou mera cópia do código."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C5-C",
+          "title": "Peso e altura simultâneos",
+          "goal": "≥1 par de registros no mesmo dia",
+          "window": "últimos 12 meses",
+          "actor": "profissional habilitado conforme modelo de informação",
+          "pec_location": "SOAP → Objetivo → Antropometria → Peso e Altura",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "01.01.04.008-3",
+              "label": "peso"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "01.01.04.007-5",
+              "label": "altura"
+            }
+          ],
+          "cautions": [
+            "Peso e altura precisam ter a mesma data.",
+            "O PEC pode incluir os códigos automaticamente ao registrar nos campos."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C5-D",
+          "title": "Visitas domiciliares",
+          "goal": "≥2 visitas com intervalo ≥30 dias",
+          "window": "últimos 12 meses",
+          "actor": "ACS/TACS",
+          "pec_location": "Aplicativo e-SUS Território → visita ao cidadão → motivo da visita",
+          "codes": [],
+          "cautions": [
+            "Não é tarefa que o médico possa marcar como realizada em nome do ACS.",
+            "Sem integração com prontuário, o app apenas informa a regra e não comprova execução."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        }
+      ]
+    },
+    {
+      "id": "dm",
+      "title": "Diabetes",
+      "indicator": "C4",
+      "status": "partial_2026_rules_verified",
+      "codes": {
+        "ciap2": [
+          "T89",
+          "T90"
+        ],
+        "cid10": [
+          "E10",
+          "E11",
+          "E14"
+        ]
+      },
+      "rules": [
+        {
+          "id": "C4-A",
+          "title": "Consulta médica/enfermagem",
+          "goal": "≥1 consulta",
+          "window": "últimos 6 meses",
+          "actor": "médico ou enfermeiro",
+          "pec_location": "Atendimento individual → SOAP → Avaliação → condição pertinente e LPC",
+          "codes": [],
+          "cautions": [
+            "Código deve refletir o diagnóstico correto.",
+            "Diferenças de inclusão LPC conforme versão do PEC."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C4-B",
+          "title": "Pressão arterial",
+          "goal": "≥1 registro",
+          "window": "últimos 6 meses",
+          "actor": "profissional habilitado",
+          "pec_location": "SOAP → Objetivo → Sinais vitais → PA",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "03.01.10.003-9"
+            }
+          ],
+          "cautions": [],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C4-C",
+          "title": "Peso e altura simultâneos",
+          "goal": "≥1 par no mesmo dia",
+          "window": "últimos 12 meses",
+          "actor": "profissional habilitado",
+          "pec_location": "SOAP → Objetivo → Antropometria",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "01.01.04.008-3"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "01.01.04.007-5"
+            }
+          ],
+          "cautions": [],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C4-D",
+          "title": "Visita domiciliar",
+          "goal": "≥2 visitas separadas por ≥30 dias",
+          "window": "últimos 12 meses",
+          "actor": "ACS/TACS",
+          "pec_location": "e-SUS Território → visita ao cidadão",
+          "codes": [],
+          "cautions": [],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C4-E",
+          "title": "Solicitação OU avaliação de HbA1c",
+          "goal": "≥1 registro de solicitação ou avaliação",
+          "window": "últimos 12 meses",
+          "actor": "profissional autorizado",
+          "pec_location": "SOAP → Plano → Solicitação de exames OU SOAP → Objetivo → Resultados de exames",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "02.02.01.050-3"
+            }
+          ],
+          "cautions": [
+            "Solicitação: preencher justificativa; avaliação: resultado e data do exame; não presumir que exame foi realizado."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C4-F",
+          "title": "Exame dos pés",
+          "goal": "≥1 avaliação",
+          "window": "últimos 12 meses",
+          "actor": "profissional habilitado",
+          "pec_location": "SOAP → Objetivo → descrição clínica; SOAP → Plano → Intervenções/procedimentos realizados",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "03.01.04.009-5"
+            }
+          ],
+          "cautions": [
+            "O código não substitui o exame clínico efetivamente realizado e documentado."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        }
+      ]
+    },
+    {
+      "id": "prenatal",
+      "title": "Gestante e puerpério",
+      "indicator": "C3",
+      "status": "partial_2026_rules_verified",
+      "codes": {
+        "ciap2": [
+          "W03",
+          "W78",
+          "W79",
+          "W81",
+          "W84",
+          "W85"
+        ],
+        "cid10_examples": [
+          "Z34",
+          "Z35",
+          "O10",
+          "O24"
+        ]
+      },
+      "rules": [
+        {
+          "id": "C3-A",
+          "title": "Início oportuno do pré-natal",
+          "goal": "Primeira consulta até 12ª semana",
+          "window": "por gestação",
+          "actor": "médico ou enfermeiro",
+          "pec_location": "SOAP → Objetivo → DUM estruturada; SOAP → Avaliação → código gestacional e LPC",
+          "codes": [],
+          "cautions": [
+            "Idade gestacional deve ser calculada com informação clínica fidedigna.",
+            "Há lista mais ampla de códigos oficiais; exemplos fornecidos não são lista exaustiva."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C3-B",
+          "title": "Número de consultas",
+          "goal": "≥7 consultas",
+          "window": "ao longo da gestação",
+          "actor": "médico ou enfermeiro",
+          "pec_location": "SOAP → campos estruturados do pré-natal; em subsequentes: Objetivo → Habilitar campos de pré-natal",
+          "codes": [],
+          "cautions": [
+            "Não registrar consultas não realizadas."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C3-C",
+          "title": "Pressão arterial",
+          "goal": "≥7 aferições documentadas",
+          "window": "durante a gestação",
+          "actor": "profissional habilitado",
+          "pec_location": "SOAP → Objetivo → Sinais vitais → PA",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "03.01.10.003-9"
+            }
+          ],
+          "cautions": [],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C3-D",
+          "title": "Peso e altura",
+          "goal": "≥7 registros simultâneos",
+          "window": "durante a gestação",
+          "actor": "profissional habilitado",
+          "pec_location": "SOAP → Objetivo → Antropometria",
+          "codes": [],
+          "cautions": [
+            "Dados aferidos no mesmo dia."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C3-E",
+          "title": "Visitas ACS no pré-natal",
+          "goal": "≥3 visitas após a primeira consulta",
+          "window": "gestação",
+          "actor": "ACS/TACS",
+          "pec_location": "e-SUS Território → visita ao cidadão",
+          "codes": [],
+          "cautions": [],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C3-F",
+          "title": "Registro da dTpa",
+          "goal": "Registro a partir da 20ª semana",
+          "window": "cada gestação",
+          "actor": "profissional habilitado",
+          "pec_location": "PEC → Vacinação → Aplicar ou Transcrição de caderneta",
+          "codes": [],
+          "cautions": [
+            "Registro fiel à vacina administrada ou comprovada."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C3-G",
+          "title": "Acompanhamento puerperal",
+          "goal": "Consulta puerperal e visita ACS conforme critérios técnicos",
+          "window": "puerpério",
+          "actor": "médico/enfermeiro e ACS/TACS",
+          "pec_location": "SOAP para consulta / e-SUS Território para visita",
+          "codes": [],
+          "cautions": [
+            "A ficha C3 contém outros componentes de exames, saúde bucal e puerpério; não implementar como checklist completo com este arquivo."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        }
+      ]
+    },
+    {
+      "id": "mulher",
+      "title": "Saúde da mulher",
+      "indicator": "C7",
+      "status": "partial_2026_rules_verified",
+      "rules": [
+        {
+          "id": "C7-A",
+          "title": "Rastreamento de colo do útero",
+          "goal": "≥1 exame, conforme modalidade",
+          "window": "36 meses (citopatológico) / 60 meses (HPV molecular específico)",
+          "actor": "profissional habilitado",
+          "pec_location": "SOAP → Plano → Solicitação de exames/procedimentos OU Objetivo → Resultados de exames",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "02.03.01.008-6"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.02.10.025-1",
+              "label": "HPV molecular, janela específica"
+            }
+          ],
+          "cautions": [
+            "Critério da ficha técnica 2026: faixa de 25 a 64 anos para o componente.",
+            "A lista de códigos aceitos é mais ampla do que os exemplos."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C7-B",
+          "title": "Vacinação HPV",
+          "goal": "≥1 dose registrada",
+          "window": "faixa de 9 a 14 anos (componente)",
+          "actor": "profissional habilitado",
+          "pec_location": "PEC → Vacinação → Aplicar/Transcrição de caderneta",
+          "codes": [],
+          "cautions": [
+            "A elegibilidade clínica e o calendário vacinal vigente não se reduzem ao cálculo do indicador."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C7-C",
+          "title": "Saúde sexual/reprodutiva",
+          "goal": "≥1 atendimento",
+          "window": "últimos 12 meses; componente 14-69 anos",
+          "actor": "médico ou enfermeiro",
+          "pec_location": "SOAP → Avaliação → CID/CIAP/ABP apropriado",
+          "codes": [],
+          "cautions": [
+            "Diversos códigos aceitos; não selecionar automaticamente diagnóstico com base na idade."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        },
+        {
+          "id": "C7-D",
+          "title": "Rastreamento de mama",
+          "goal": "≥1 exame solicitado ou avaliado",
+          "window": "últimos 24 meses; componente 50-69 anos",
+          "actor": "médico ou enfermeiro",
+          "pec_location": "SOAP → Plano → Solicitação de exames OU Objetivo → Resultado",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "02.04.03.003-0"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.04.03.018-8"
+            }
+          ],
+          "cautions": [
+            "Critérios de financiamento não substituem diretrizes clínicas individualizadas."
+          ],
+          "conditionals": [],
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
+          "verification": "confirmed_in_official_esus_2026_guide"
+        }
+      ]
+    },
+    {
+      "id": "mental",
+      "title": "Saúde mental",
+      "indicator": null,
+      "status": "awaiting_specific_clinical_scope_and_source_validation",
+      "rules": [],
+      "warnings": [
+        "Não foi identificado indicador próprio de saúde mental entre os componentes C1-C7 da eSF/eAP no conjunto de fichas consultado.",
+        "Não inventar código padrão ou checklist para todas as condições psiquiátricas.",
+        "Módulo deve ser subdividido por condição, tipo de consulta e documentação clinicamente necessária antes de ativar."
+      ]
+    }
+  ],
+  "cross_cutting": [
+    {
+      "id": "C1-AGENDA",
+      "title": "Agendada vs espontânea",
+      "definition": "demanda programada depende de agendamento prévio no Módulo Agenda, inserção pela agenda e tipo de atendimento adequado na finalização",
+      "caution": "O guia federal consultado não estabelece prazo geral obrigatório de três dias de antecedência; não codificar prazo local como regra federal."
+    },
+    {
+      "id": "MULTICOND",
+      "title": "Multimorbidade",
+      "definition": "um caso pode ativar regras de mais de um módulo, sem duplicar uma única aferição/registro clínico"
+    },
+    {
+      "id": "VERSION",
+      "title": "Versões PEC",
+      "definition": "inclusão de condição na LPC pode variar conforme versão, exemplo marco 5.4.5"
+    },
+    {
+      "id": "EVIDENCE",
+      "title": "Dados desconhecidos",
+      "definition": "não exibir concluído sem evidência; usar status não verificado; na versão offline sempre é conferência manual"
+    },
+    {
+      "id": "NOT_CLINICAL",
+      "title": "Checklist de indicador != conduta clínica",
+      "definition": "não emitir diagnóstico ou prescrição automaticamente, nem sugerir registrar ações não realizadas"
+    }
+  ],
+  "acceptance_scenarios": [
+    {
+      "scenario": "HAS ativa, PA já medida e peso+altura já aferidos no mesmo dia",
+      "expected": "exibir itens e caminhos; permitir marcar verificado; não exigir repetir procedimentos sem necessidade clínica"
+    },
+    {
+      "scenario": "Pessoa com HAS e DM",
+      "expected": "mostrar regras dos dois módulos sem duplicar orientação de PA ou antropometria; diferentes componentes do C4 e C5 permanecem distintos"
+    },
+    {
+      "scenario": "Gestante com hipertensão",
+      "expected": "ativar contexto C3 e C5 apenas se hipertensão de fato diagnosticada; exigir codificação clínica apropriada; não usar I10 por padrão"
+    },
+    {
+      "scenario": "PEC anterior à 5.4.5",
+      "expected": "mostrar passo manual de inclusão na lista de problemas"
+    },
+    {
+      "scenario": "PEC 5.4.5 ou superior",
+      "expected": "mostrar que a opção de inclusão pode ser habilitada automaticamente; ainda conferir condição ativa"
+    },
+    {
+      "scenario": "PA registrada apenas em texto livre",
+      "expected": "alertar que o caminho estruturado é prioritário e que copiar SIGTAP não equivale a registrar valor aferido"
+    },
+    {
+      "scenario": "Duas visitas ACS com intervalo menor que 30 dias",
+      "expected": "não declarar cumprido o componente de visitas do C5"
+    },
+    {
+      "scenario": "Sem acesso aos registros históricos do PEC",
+      "expected": "exibir status não verificável pelo app, não uma pontuação presumida"
+    },
+    {
+      "scenario": "Paciente sem HAS confirmada",
+      "expected": "não auto selecionar CID I10/CIAP K86"
+    },
+    {
+      "scenario": "Saúde mental sem escopo especificado",
+      "expected": "mostrar card desabilitado ou rascunho; não inventar regra C1-C7"
+    }
+  ]
+};
