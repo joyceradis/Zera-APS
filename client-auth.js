@@ -91,4 +91,8 @@
   const pilot=document.querySelector('.pilot-state h2');if(pilot)pilot.textContent='Contas e sessões individuais habilitadas neste ambiente.';
   const pilotDescription=document.querySelector('.pilot-state p');if(pilotDescription)pilotDescription.textContent='Autenticação por convite e separação de contas disponíveis em execução local. O piloto real requer hospedagem persistente, revisão de segurança e homologação clínica antes de convidar médicos externos.';
   const pilotBadge=document.querySelector('.pilot-badge');if(pilotBadge)pilotBadge.textContent='BETA RESTRITO';
+  const stageTwo=document.querySelectorAll('.pilot-stage')[1];
+  if(stageTwo){const status=stageTwo.querySelector('.stage-status');if(status){status.textContent='Implementado (beta)';status.classList.add('ready');}}
+  const sideDescription=document.querySelector('.side-note strong');if(sideDescription)sideDescription.textContent='Ambiente com acesso individual';
+  const sideHint=document.querySelector('.side-note small');if(sideHint)sideHint.textContent='Piloto técnico sem dados de pacientes';
 })();
