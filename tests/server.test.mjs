@@ -28,6 +28,14 @@ test('stores, seat limits, invite replay and isolation',()=>{
  s.setBookmark(u.id,'C5-A',true);assert.deepEqual(s.getBookmarks(u.id),['C5-A']);
  s.revoke(token.token);assert.equal(s.readSession(token.token),null);
  assert.equal(s.countSeats().active,1);
+ const recovery=s.createReset(u.id);
+ const expiredSession=s.sessionFor(u.id);
+ const recovered=s.redeemReset(recovery.token,mail(1),'even-stronger-reset-password');
+ assert.equal(recovered.id,u.id);
+ assert.equal(s.readSession(expiredSession.token),null);
+ assert.equal(s.authenticate(mail(1),'long-secret-phrase1','local').status,'invalid');
+ assert.equal(s.authenticate(mail(1),'even-stronger-reset-password','local').status,'ok');
+ assert.throws(()=>s.redeemReset(recovery.token,mail(1),'even-stronger-reset-password'));
  s.db.close();
 });
 test('HTTP sessions, csrf, origin, role access, 50 seat concept and disable',async()=>{
@@ -67,6 +75,16 @@ test('HTTP sessions, csrf, origin, role access, 50 seat concept and disable',asy
   assert.equal((await request('/')).status,303);
   assert.equal((await request('/','GET',null,null,cookie)).status,200);
   assert.equal((await request('/api/team','GET',null,null,cookie)).status,200);
+  const docUser=store.listUsers().find(u=>u.email===mail(1));
+  const resetRequest=await request('/api/team/reset','POST',{userId:docUser.id},csrf,cookie);
+  assert.equal(resetRequest.status,201);
+  const resetToken=(await resetRequest.json()).link.split('#reset=')[1];
+  assert.ok(resetToken);
+  const resetResult=await request('/api/reset/accept','POST',{token:resetToken,email:mail(1),password:'new-reset-unique-password!'});
+  assert.equal(resetResult.status,200);
+  const resetCookie=resetResult.headers.get('set-cookie').split(';')[0];
+  assert.equal((await request('/api/session','GET',null,null,resetCookie)).status,200);
+  assert.equal((await request('/api/reset/accept','POST',{token:resetToken,email:mail(1),password:'another-password-reset!'})).status,400);
  }finally{await new Promise(resolve=>server.close(resolve));store.db.close();rmSync(dir,{recursive:true,force:true});}
 });
 
