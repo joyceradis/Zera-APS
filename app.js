@@ -121,12 +121,14 @@
     const open = expanded.has(r.id);
     const checked = reviewed.has(r.id);
     const verification = r.verification === "pending_verification";
+    const saved = !!window.ZERA_AUTH?.bookmarks?.has(r.id);
     const clauses = (r.cautions || []).map(x => `<li>${safe(x)}</li>`).join("");
     const codeBtns = (r.codes || []).map(z => `<button type="button" class="detail-code" data-copy="${safe(z.value)}" title="Copiar referência">${safe(z.system)} ${safe(z.value)} ↗</button>`).join("");
     return `<article class="rule ${open ? "open" : ""}" data-rule="${safe(r.id)}">
       <div class="rule-top">
         <input type="checkbox" class="review-checkbox" data-review="${safe(r.id)}" ${checked ? "checked" : ""} aria-label="Marcar orientação revisada: ${safe(r.title)}">
         <div class="rule-info"><h4>${safe(r.title)}</h4><p><span>${safe(r.id)}</span> &nbsp; ${safe(r.goal || "Orientação")} &nbsp;·&nbsp; ${safe(r.window || "Conforme contexto")}</p></div>
+        <button type="button" class="rule-save ${saved ? "saved" : ""}" data-bookmark="${safe(r.id)}" aria-pressed="${saved}" aria-label="${saved ? "Remover guia dos favoritos" : "Salvar guia nos favoritos"}" title="${saved ? "Remover favorito" : "Salvar favorito"}">${saved ? "★" : "☆"}</button>
         <button type="button" class="rule-open" data-expand="${safe(r.id)}" aria-expanded="${open}">${open ? "Ocultar −" : "Ver detalhes +"}</button>
       </div>
       ${open ? `<div class="rule-detail">
@@ -216,6 +218,12 @@
       renderRules();
       return;
     }
+    const favoriteButton=event.target.closest("[data-bookmark]");
+    if(favoriteButton) {
+      if(!window.ZERA_AUTH?.toggleBookmark) notify("Para salvar guias, acesse a plataforma com sua conta individual.");
+      else window.ZERA_AUTH.toggleBookmark(favoriteButton.dataset.bookmark).catch(()=>notify("Não foi possível atualizar o favorito."));
+      return;
+    }
     const expandButton = event.target.closest("[data-expand]");
     if (expandButton) {
       const id=expandButton.dataset.expand;
@@ -264,6 +272,7 @@
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()==="k") {event.preventDefault();openSearch();}
     if (event.key==="/" && !["INPUT","TEXTAREA"].includes(document.activeElement?.tagName) && !byId("search-dialog").open) {event.preventDefault();openSearch();}
   });
+  window.ZERA_APP = {rerenderRules: renderRules};
   renderWorkspace();
   renderLibrary();
   changeView("trabalho",false);
