@@ -11,7 +11,7 @@ import os
 import socket
 import subprocess
 import time
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, expect
 
 ROOT = Path(__file__).resolve().parents[1]
 ADMIN_EMAIL = "admin-ui@example.test"
@@ -30,7 +30,7 @@ with TemporaryDirectory(prefix="zera-ui-") as temporary:
     env = os.environ.copy()
     env.update({"PORT": str(port), "APP_ORIGIN": origin, "HOST": "127.0.0.1",
                 "ZERA_DB_PATH": str(Path(temporary) / "pilot.sqlite"),
-                "ZERA_MAX_DOCTORS": "2"})
+                "ZERA_MAX_DOCTORS": "2", "NODE_ENV": "test"})
     bootstrap = subprocess.run(
         ["node", "server/cli.mjs", "bootstrap-admin", ADMIN_EMAIL],
         cwd=ROOT, env=env, capture_output=True, text=True, check=True
@@ -67,6 +67,7 @@ with TemporaryDirectory(prefix="zera-ui-") as temporary:
             admin.locator("#password").fill(ADMIN_PASS)
             admin.locator("#submit").click()
             admin.wait_for_url(origin + "/")
+            admin.wait_for_function("() => !!window.ZERA_AUTH?.openAccount")
             admin.locator("#profile-button").click()
             dialog = admin.locator(".account-dialog")
             assert dialog.is_visible()
@@ -83,10 +84,11 @@ with TemporaryDirectory(prefix="zera-ui-") as temporary:
             doctor.locator("#password").fill(DOCTOR_PASS)
             doctor.locator("#submit").click()
             doctor.wait_for_url(origin + "/")
+            doctor.wait_for_function("() => !!window.ZERA_AUTH?.toggleBookmark")
             doctor.locator('[data-bookmark="C5-A"]').click()
-            assert doctor.locator('[data-bookmark="C5-A"]').get_attribute("aria-pressed") == "true"
+            expect(doctor.locator('[data-bookmark="C5-A"]')).to_have_attribute("aria-pressed", "true")
             doctor.reload()
-            assert doctor.locator('[data-bookmark="C5-A"]').get_attribute("aria-pressed") == "true"
+            expect(doctor.locator('[data-bookmark="C5-A"]')).to_have_attribute("aria-pressed", "true")
             doctor.locator("#profile-button").click()
             assert DOCTOR_EMAIL in doctor.locator(".account-dialog").inner_text()
             doctor.locator(".account-dialog").get_by_text("Encerrar sessão").click()
