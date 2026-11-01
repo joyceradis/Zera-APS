@@ -1,0 +1,16 @@
+.git
+.env
+.env.*
+!.env.example
+runtime
+node_modules
+coverage
+__pycache__
+.pytest_cache
+tests/preview-*.png
+*.db
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.pem
+*.key
