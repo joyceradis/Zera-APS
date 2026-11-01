@@ -10,9 +10,9 @@ Requer Node.js >=22.13 (preferencialmente Node 24 LTS). Usar terminal na pasta d
 2. `npm start` — inicia o servidor local em `http://localhost:8787`, usando `127.0.0.1` para limitar acesso ao próprio computador.
 3. Em **outro terminal**, executar `npm run bootstrap-admin -- admin@exemplo.com` substituindo pelo e-mail de quem administrará as contas. O comando gera link único por 48 h.
 4. Abrir o convite no navegador local, criar senha própria de pelo menos 12 caracteres e entrar.
-5. No avatar/perfil, criar convites individuais para médicos. Entregar links privadamente aos destinatários (a aplicação não envia e-mails).
+5. No avatar/perfil, criar convites individuais para médicos, verificar a relação de usuários, encerrar acessos e gerar links de recuperação. Entregar links privadamente aos destinatários (a aplicação não envia e-mails).
 
-O servidor usa SQLite local em `runtime/zeraaps.sqlite`, protegido pelo diretório e permissões locais. Esse diretório é ignorado pelo Git. **Não colocar CPF/CNS, prontuário, dados clínicos identificáveis nem segredos nas regras, nos testes ou no repositório público.**
+Para recuperar administrativamente uma conta perdida a partir do computador autorizado: `npm run recover-account -- usuario@dominio.com` (o comando cria um link de uso único, validade de 1 hora). Não executar em terminais compartilhados.\n\nO servidor usa SQLite local em `runtime/zeraaps.sqlite`, protegido pelo diretório e permissões locais. Esse diretório é ignorado pelo Git. **Não colocar CPF/CNS, prontuário, dados clínicos identificáveis nem segredos nas regras, nos testes ou no repositório público.**
 
 ### Configuração por variáveis de ambiente
 
@@ -23,7 +23,7 @@ O servidor usa SQLite local em `runtime/zeraaps.sqlite`, protegido pelo diretór
 - `ZERA_MAX_DOCTORS`: máximo de médicos ativos + convites pendentes; padrão 50.
 - `NODE_ENV=production`: recusa `APP_ORIGIN` que não seja HTTPS.
 
-Os convites são tokens aleatórios com uso único, expiração de 48 horas, vinculados ao e-mail designado. O vínculo ao e-mail é uma restrição de identidade, **não** comprovação automática de posse de caixa postal; links devem ser entregues por canal privado. Não existe mecanismo de redefinição de senha por e-mail nesta fase.
+Os convites são tokens aleatórios com uso único, expiração de 48 horas, vinculados ao e-mail designado. O vínculo ao e-mail é uma restrição de identidade, **não** comprovação automática de posse de caixa postal; links devem ser entregues por canal privado. A recuperação de acesso é gerada por administrador no painel (expira em 1 hora) ou, sob controle do operador local, por CLI. Não existe recuperação autônoma por e-mail nesta fase.
 
 ## Controles implementados
 
@@ -41,7 +41,7 @@ Os convites são tokens aleatórios com uso único, expiração de 48 horas, vin
 ## Limitações críticas antes de disponibilizar na internet
 
 - **Segurança ainda não foi auditada externamente.** Não tratar testes locais como certificação de segurança nem conformidade com LGPD.
-- Não há recuperação segura de senha nem segundo fator, gestão de e-mails transacionais, registro auditável de ações administrativas ou infraestrutura de monitoramento/alertas.
+- Existe **recuperação administrativa por link temporário**, mas ainda não há segundo fator, verificação automatizada de posse de e-mail, sistema transacional de mensagens, registro auditável completo de ações administrativas ou monitoramento/alertas.
 - Não há banco replicado, backups automatizados testados, alta disponibilidade ou migração de schema comprovada.
 - O banco SQLite e o servidor Node funcionam para um piloto restrito; produção requer avaliação de persistência e escalabilidade, isolamento de infraestrutura, backups e eventual migração a banco gerenciado.
 - O teste local de 50 sessões simultâneas é um **ensaio funcional**, não um benchmark de desempenho em nuvem nem auditoria de carga da produção.
