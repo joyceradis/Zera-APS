@@ -258,7 +258,7 @@
   byId("guide-button").addEventListener("click",()=>byId("help-dialog").showModal());
   byId("help-close").addEventListener("click",()=>byId("help-dialog").close());
   byId("help-confirm").addEventListener("click",()=>byId("help-dialog").close());
-  byId("profile-button").addEventListener("click",()=>notify("Contas individuais ainda não habilitadas no protótipo."));
+  byId("profile-button").addEventListener("click",()=>{ if(window.ZERA_AUTH?.openAccount) window.ZERA_AUTH.openAccount(); else notify("Acesso demonstrativo sem contas. Abra pelo servidor para login individual."); });
   byId("brand-home").addEventListener("click",event=>{event.preventDefault();changeView("trabalho",true);});
   document.addEventListener("keydown",event=>{
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()==="k") {event.preventDefault();openSearch();}
