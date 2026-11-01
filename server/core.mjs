@@ -86,11 +86,12 @@ export function createStore(filename, maxDoctors = 50) {
   function redeemInvite(value,email,password) {
     email = normalizeEmail(email);
     if (!email || typeof value!=='string' || value.length>128) throw new Error('INVALID_INVITE');
-    const pass=passwordHash(password);
+    if(typeof password!=='string'||password.length<passwordMinLength||password.length>128)throw new Error('INVALID_PASSWORD');
     return transaction(() => {
       const invite=one('SELECT * FROM invites WHERE token_hash=? AND used_at IS NULL AND expires_at>?',hashToken(value),now());
       if (!invite || invite.email!==email) throw new Error('INVALID_INVITE');
       if (one('SELECT id FROM users WHERE email=?',email)) throw new Error('INVALID_INVITE');
+      const pass=passwordHash(password);
       // Reserved doctor seat is already counted in countSeats().
       const id=token();
       exec('INSERT INTO users(id,email,role,password_hash,created_at) VALUES(?,?,?,?,?)',id,email,invite.role,pass,now());
