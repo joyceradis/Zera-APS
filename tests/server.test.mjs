@@ -1,0 +1,71 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createApp} from '../server/http.mjs';
+import {createStore,passwordHash,passwordMatch} from '../server/core.mjs';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+
+const mail=i=>`doctor${i}@example.test`;
+test('password hashing and validation',()=>{
+ const hash=passwordHash('long and unique passphrase');
+ assert.equal(passwordMatch('long and unique passphrase',hash),true);
+ assert.equal(passwordMatch('another wrong passphrase',hash),false);
+ assert.throws(()=>passwordHash('short'));
+});
+test('stores, seat limits, invite replay and isolation',()=>{
+ const s=createStore(':memory:',2);
+ const a=s.createInvite(mail(1),'doctor');
+ const b=s.createInvite(mail(2),'doctor');
+ assert.equal(s.countSeats().free,0);
+ assert.throws(()=>s.createInvite(mail(3),'doctor'),/SEATS_FULL/);
+ const u=s.redeemInvite(a.token,mail(1),'long-secret-phrase1');
+ assert.throws(()=>s.redeemInvite(a.token,mail(1),'long-secret-phrase1'));
+ assert.equal(s.authenticate(mail(1),'long-secret-phrase1','local').status,'ok');
+ assert.equal(s.authenticate(mail(1),'wrong','local').status,'invalid');
+ const token=s.sessionFor(u.id);
+ assert.equal(s.readSession(token.token).user.id,u.id);
+ s.setBookmark(u.id,'C5-A',true);assert.deepEqual(s.getBookmarks(u.id),['C5-A']);
+ s.revoke(token.token);assert.equal(s.readSession(token.token),null);
+ assert.equal(s.countSeats().active,1);
+ s.db.close();
+});
+test('HTTP sessions, csrf, origin, role access, 50 seat concept and disable',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'zera-http-'));
+ mkdirSync(join(dir,'data'));writeFileSync(join(dir,'index.html'),'INDEX PRIVATE');
+ writeFileSync(join(dir,'login.html'),'LOGIN PUBLIC');
+ writeFileSync(join(dir,'styles.css'),'CSS');
+ writeFileSync(join(dir,'data/regras-aps-2026.json'),JSON.stringify({cards:[{rules:[{id:'C5-A'}]}]}));
+ const {server,store}=createApp({root:dir,filename:':memory:',origin:'http://127.0.0.1:8787',maxDoctors:2});
+ await new Promise(resolve=>server.listen(8787,'127.0.0.1',resolve));
+ const origin='http://127.0.0.1:8787';
+ const request=(path,method='GET',body,csrf,cookie,custom={})=>fetch('http://127.0.0.1:8787'+path,{method,redirect:'manual',headers:{...(method!=='GET'?{origin,'content-type':'application/json'}:{}),...(csrf?{'x-csrf-token':csrf}:{}),...(cookie?{cookie}:{}),...custom},body:body?JSON.stringify(body):undefined});
+ try{
+  assert.equal((await request('/')).status,303);
+  assert.equal((await request('/login')).status,200);
+  const bootstrap=store.createInvite('root@example.test','admin');
+  const register=await request('/api/invite/accept','POST',{token:bootstrap.token,email:'root@example.test',password:'admin-secret-phrase!'});
+  assert.equal(register.status,201);const cookie=register.headers.get('set-cookie').split(';')[0];
+  assert.match(register.headers.get('set-cookie'),/HttpOnly/);
+  assert.match(register.headers.get('set-cookie'),/SameSite=Strict/);
+  const me=await request('/api/session','GET',null,null,cookie);assert.equal(me.status,200);
+  const csrf=(await me.json()).csrf;
+  assert.equal((await request('/api/invites','POST',{email:mail(1),role:'doctor'},'bad',cookie)).status,403);
+  assert.equal((await request('/api/invites','POST',{email:mail(1),role:'doctor'},csrf,cookie,{origin:'https://evil.test'})).status,403);
+  const created=await request('/api/invites','POST',{email:mail(1),role:'doctor'},csrf,cookie);
+  assert.equal(created.status,201);const invite=(await created.json()).link.split('#convite=')[1];
+  assert.ok(invite);const created2=await request('/api/invites','POST',{email:mail(2),role:'doctor'},csrf,cookie);assert.equal(created2.status,201);
+  assert.equal((await request('/api/invites','POST',{email:mail(3),role:'doctor'},csrf,cookie)).status,400);
+  const doctor=await request('/api/invite/accept','POST',{token:invite,email:mail(1),password:'doctor-strong-password!!'});
+  assert.equal(doctor.status,201);const docCookie=doctor.headers.get('set-cookie').split(';')[0],docCsrf=(await doctor.json()).csrf;
+  assert.equal((await request('/api/team','GET',null,null,docCookie)).status,403);
+  assert.equal((await request('/api/bookmarks','PUT',{ruleId:'C5-A',enabled:true},docCsrf,docCookie)).status,200);
+  const books=await request('/api/bookmarks','GET',null,null,docCookie);assert.deepEqual((await books.json()).rules,['C5-A']);
+  const adminBooks=await request('/api/bookmarks','GET',null,null,cookie);assert.deepEqual((await adminBooks.json()).rules,[]);
+  assert.equal((await request('/api/logout','POST',{},docCsrf,docCookie)).status,200);
+  assert.equal((await request('/api/session','GET',null,null,docCookie)).status,401);
+  assert.equal((await request('/')).status,303);
+  assert.equal((await request('/','GET',null,null,cookie)).status,200);
+  assert.equal((await request('/api/team','GET',null,null,cookie)).status,200);
+ }finally{await new Promise(resolve=>server.close(resolve));store.db.close();rmSync(dir,{recursive:true,force:true});}
+});
