@@ -36,6 +36,7 @@ Fluxo:
 - data/regras.js — versão JS gerada a partir do JSON.
 - docs/ESPECIFICACAO-CLINICO-FUNCIONAL.md — escopo e cenários.
 - docs/PLANO-PILOTO-50.md — arquitetura server-backed proposta, gestão de contas e critérios de aceite de 50 médicos.
+- tests/test_static.mjs — validação de base, DOM e inicialização sem dependências externas.
 - tests/test_ui.py — testes automatizados de interface para Chromium/Playwright.
 
 ## Desenvolvedor — Estevão
@@ -46,14 +47,17 @@ Para regenerar a base após alterar JSON:
 python3 tools/gerar-base.py
 ~~~
 
-Para validar sintaxe e interface (depende de Chromium/Playwright local):
+Para validar a inicialização sem instalar dependências extras, e depois conferir a interface no navegador:
 
 ~~~sh
 node --check app.js
+node tests/test_static.mjs
+python3 -m pip install playwright
+python3 -m playwright install chromium
 python3 tests/test_ui.py
 ~~~
 
-O teste em Python espera Chromium em /usr/bin/chromium. Ajuste se usar macOS.
+O teste Python detecta Chromium no Linux e usa o navegador instalado pelo Playwright em macOS. Os arquivos de imagem de prévia são gerados localmente em `tests/preview-desktop.png` e `tests/preview-mobile.png` após uma execução bem-sucedida; não são entregas já verificadas por esta sessão. O smoke test Node é independente de navegador, mas não substitui a inspeção visual.
 
 ### Antes de demonstrar a médicos externos
 
