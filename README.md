@@ -35,9 +35,9 @@ Em outro terminal, para criar o primeiro acesso administrativo:
 npm run bootstrap-admin -- admin@seudominio.com.br
 ~~~
 
-O comando exibe um **convite único e sigiloso**. Abra o link no navegador, defina senha de no mínimo 12 caracteres e entre no servidor local em `http://localhost:8787`. Pelo botão de perfil, o administrador pode convidar médicos, copiar o link e desativar contas. O servidor **não envia e-mails**. Não enviar convites reais antes de validar o ambiente.
+O comando exibe um **convite único e sigiloso**. Abra o link no navegador, defina senha de no mínimo 12 caracteres e entre no servidor local em `http://localhost:8787`. Pelo botão de perfil, o administrador pode convidar médicos, copiar o link e desativar contas e gerar links temporários de recuperação de senha (uso único, expiração em uma hora). O servidor **não envia e-mails**. Não enviar convites reais antes de validar o ambiente.
 
-O backend usa SQLite em `runtime/zeraaps.sqlite` (não publicar esse arquivo). `.env.example` documenta PORT, APP_ORIGIN, HOST, ZERA_DB_PATH e ZERA_MAX_DOCTORS. Execução de desenvolvimento escuta somente `127.0.0.1`.
+Para recuperação de acesso por operador autorizado, também é possível executar `npm run recover-account -- usuario@dominio.com`. Guarde o link em sigilo.\n\nO backend usa SQLite em `runtime/zeraaps.sqlite` (não publicar esse arquivo). `.env.example` documenta PORT, APP_ORIGIN, HOST, ZERA_DB_PATH e ZERA_MAX_DOCTORS. Execução de desenvolvimento escuta somente `127.0.0.1`.
 
 Para testar a interface de fato com Chromium/Playwright:
 
@@ -56,7 +56,7 @@ Este teste não foi confirmado em navegador real nesta rodada e exige revisão d
 - `server/core.mjs`, `server/http.mjs`, `server/launch.mjs`, `server/cli.mjs` — contas, persistência, API, sessões e bootstrap.
 - `data/regras-aps-2026.json` — conteúdo clínico preliminar; `data/regras.js` é gerado a partir dele por `python3 tools/gerar-base.py`.
 - `tests/server.test.mjs` — suíte de identidade, privacidade e 50 sessões concorrentes **em ambiente local**.
-- `tests/test_static.mjs` — smoke test sem dependências de navegador.
+- `tools/audit-rules.mjs` — auditoria **estrutural** do JSON, sem validar clinicamente códigos ou indicadores.\n- `tests/test_static.mjs` — smoke test sem dependências de navegador.
 - `tests/test_ui.py` — testes e capturas no Chromium (execução local a confirmar).
 - `docs/IMPLANTACAO-E-SEGURANCA.md` — implantação e limites de segurança.
 - `docs/PLANO-PILOTO-50.md` — roadmap de produto e critérios de aceite.
