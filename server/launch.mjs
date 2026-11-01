@@ -1,0 +1,8 @@
+import { createApp } from './http.mjs';
+import { resolve } from 'node:path';
+const port=Number(process.env.PORT||8787);
+if(!Number.isInteger(port)||port<1||port>65535)throw new Error('Invalid PORT');
+const origin=process.env.APP_ORIGIN||`http://localhost:${port}`;
+const app=createApp({root:resolve(import.meta.dirname,'..'),filename:process.env.ZERA_DB_PATH||'./runtime/zeraaps.sqlite',origin,maxDoctors:Number(process.env.ZERA_MAX_DOCTORS||50)});
+app.server.listen(port,'0.0.0.0',()=>console.log(`ZERA-APS available at ${origin}`));
+for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>{app.server.close(()=>{app.store.db.close();process.exit(0);});});
