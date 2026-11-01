@@ -1,24 +1,47 @@
-# Validação técnica — Zera-APS v0.1
+# ZERA-APS — Matriz de qualidade (v0.2, branch de desenvolvimento)
 
-## Testes previstos
+**Estado em 01/11/2026:** desenvolvimento em PR rascunho. A versão antiga v0.1 permanece congelada. **Não confundir revisão estática com validação funcional no navegador.**
 
-- [x] Carrega cinco cards sem requisições a servidores externos.
-- [x] Hipertensão mostra quatro componentes de orientação, com pontos de atenção.
-- [x] Diabetes apresenta seus componentes; Saúde mental exibe aviso de pendência.
-- [x] Busca universal por 'pressão' retorna orientações de mais de uma área.
-- [ ] Busca por 'I10' retorna código CID-10 pesquisável.
-- [ ] Botões de código copiam apenas o identificador, sem afetar o PEC.
-- [x] Marcação manual muda o progresso; limpar revisões zera; recarregar não mantém estado.
-- [ ] Navegação por teclado e layout responsivo em 390px.
-- [x] Nenhum campo ou formulário solicita informação de pacientes.
+## Evidências disponíveis
 
-## Limitações clínicas e operacionais
+| Verificação | Estado | Observação |
+|---|---|---|
+| Sintaxe da aplicação em JavaScript | PASS | Verificada com runtime V8 |
+| IDs referenciados pela aplicação | PASS | Todos encontrados no HTML |
+| Base JSON e módulos iniciais | PASS | 5 linhas; 21 orientações preliminares |
+| Inicialização em DOM simulado | PASS | Sem erro de runtime no cenário isolado |
+| Seleção de HAS/DM/Saúde mental | PASS (simulado) | 4/6/0 itens, respectivamente |
+| Detalhes das regras, controle de leitura e busca I10 | PASS (simulado) | Não garante resultado em navegador real |
+| Smoke test Node independente de dependências | CRIADO; EXECUÇÃO LOCAL PENDENTE | `node tests/test_static.mjs` |
+| Interface real desktop/390px | PENDENTE | Rodar `python3 tests/test_ui.py` |
+| Capturas de tela e inspeção visual | PENDENTE | Geradas pelo teste após execução |
+| Navegação por teclado, leitor de tela e zoom 200% | PARCIAL / PENDENTE | Testes adicionais necessários |
+| Cópia de códigos no navegador do posto | PENDENTE | Conferir política de clipboard |
+| Autenticação e 50 sessões simultâneas | NÃO IMPLEMENTADO | Exige backend e teste de carga |
+| Revisão normativa de cada regra | PENDENTE | Não usar para validar financiamento |
+| Deploy, domínio e contas reais | NÃO REALIZADO | Sem gasto ou publicação nesta entrega |
 
-- As 21 regras documentadas abrangem parcialmente quatro áreas; não foram integralmente auditadas nesta implementação.
-- O módulo Saúde mental não possui conteúdo clínico.
-- Sem leitura do histórico, não há como confirmar indicadores, elegibilidade, periodicidade ou versão do PEC do município.
-- Não confirma se um código SIGTAP gerado pelo PEC foi efetivamente transmitido e computado.
-- A atualização normativa não é automática: exige revisão editorial da base e novos testes.
-- Um profissional deve revisar relevância dos códigos clínicos (não existe seleção diagnóstica automática segura).
+## Rotina de testes para Estevão
 
-Execução local com Chromium/Playwright: **PASS** para os cenários automatizados em `tests/test_ui.py` (incluindo largura 390px sem transbordamento). A cópia para área de transferência e navegação por teclado ainda precisam de teste manual no dispositivo final.
+~~~sh
+node --check app.js
+node tests/test_static.mjs
+python3 -m pip install playwright
+python3 -m playwright install chromium
+python3 tests/test_ui.py
+~~~
+
+No macOS, utilizar o navegador gerenciado pelo Playwright. O teste Chromium deve gerar `tests/preview-desktop.png` e `tests/preview-mobile.png`. Examinar manualmente ambos, inclusive tipografia, contrastes, espaços e cards nos computadores do posto.
+
+## Riscos e limites clínicos
+
+- As regras e códigos constituem extração **parcial**, pendente de revisão por profissional responsável e conferência das fontes oficiais vigentes.
+- Nenhuma marcação ou contador representa indicador cumprido ou faturamento elegível.
+- O sistema não captura registros do PEC, não faz cálculo oficial, não demonstra integração nem alega transmissão ao SISAB.
+- Saúde mental permanece intencionalmente sem regras até mapeamento clínico específico.
+- Não inserir pacientes, nomes, documentos, prontuários, fotografias, informações de saúde identificáveis, senhas ou segredos em repositório público.
+- Cadastro de 50 médicos, segregação de sessões e segurança de servidor são condições prévias para piloto real e **não estão presentes** na v0.2.
+
+## Critério de aprovação de merge
+
+Não publicar nem mesclar este PR até que testes reais em Chromium, revisão visual responsiva e aceite técnico sejam documentados. O piloto com médicos externos requer também identidade, privacidade, segurança e homologação clínica antes de qualquer uso assistencial.
