@@ -50,7 +50,8 @@ for(const c of source.cards){
     if(!['confirmed_in_official_esus_2026_guide','pending_verification'].includes(r.verification))issues.push(r.id+': estado editorial desconhecido');
   }
   for(const [key,values] of Object.entries(c.codes||{})){
-    const system=key==='cid10'?'CID-10':key==='ciap2'?'CIAP-2':key.toUpperCase();
+    const normalized=key.toLowerCase().replace(/_examples$/,'');
+    const system=normalized==='cid10'?'CID-10':normalized==='ciap2'?'CIAP-2':normalized.toUpperCase();
     for(const value of values||[])checkCode({system,value},c.id);
   }
 }
