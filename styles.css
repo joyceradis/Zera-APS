@@ -281,3 +281,8 @@ dialog::backdrop{background:#122536a8}
 @media(max-width:370px){.metric-value.metric-safe{font-size:18px}.segmented button{padding:7px}.status-pill{font-size:8px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media print{.sidebar,.topbar,.mobile-nav,.context-panel,.subtle-action,.work-toolbar,.rule-open,.quick-code-heading button,.toast{display:none!important}.shell{display:block}.content{padding:0}.work-grid{display:block}.rule-detail{display:block!important}.metrics{page-break-inside:avoid}.work-card{box-shadow:none;border:1px solid #ddd}.page-heading h1{font-size:25px}}
+
+/* Ações de favoritagem individual, sem dados de pacientes. */
+.rule-save{border:1px solid #e0eeea;background:#fff;color:#8aa5a0;border-radius:8px;font-size:18px;width:30px;height:30px;display:grid;place-items:center;padding:0;line-height:1;flex-shrink:0}
+.rule-save:hover,.rule-save.saved{color:#0c8878;background:#e9f7f1;border-color:#afe0d4}
+@media(max-width:400px){.rule-save{width:26px;height:26px;font-size:15px}}
