@@ -8,6 +8,7 @@ const isMatch=(a,b)=>typeof a==='string'&&typeof b==='string'&&a.length===b.leng
 
 export function createApp({root=resolve(import.meta.dirname,'..'),filename='./runtime/zeraaps.sqlite',origin='http://localhost:8787',maxDoctors=50}={}){
   const expected=new URL(origin);
+  const publicOrigin=expected.origin;
   if(!['http:','https:'].includes(expected.protocol)||expected.pathname!=='/'||expected.search||expected.hash)throw new Error('Invalid APP_ORIGIN');
   if(process.env.NODE_ENV==='production'&&expected.protocol!=='https:')throw new Error('Production requires HTTPS APP_ORIGIN');
   if(expected.protocol==='http:'&&!['localhost','127.0.0.1','::1'].includes(expected.hostname))throw new Error('HTTP allowed only for local development');
@@ -47,10 +48,10 @@ export function createApp({root=resolve(import.meta.dirname,'..'),filename='./ru
     res.setHeader('Cross-Origin-Opener-Policy','same-origin');
     res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=(), payment=()');
     res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'");
-    if(secure)res.setHeader('Strict-Transport-Security','max-age=31536000; includeSubDomains');
+    if(secure)res.setHeader('Strict-Transport-Security','max-age=31536000');
     if(req.headers.host!==expected.host)return fail(res,400,'INVALID_HOST');
     if(!['GET','POST','PUT'].includes(req.method))return fail(res,405,'METHOD_NOT_ALLOWED');
-    if(req.method!=='GET' && (req.headers.origin!==origin || req.headers['sec-fetch-site']==='cross-site'))return fail(res,403,'INVALID_ORIGIN');
+    if(req.method!=='GET' && (req.headers.origin!==publicOrigin || req.headers['sec-fetch-site']==='cross-site'))return fail(res,403,'INVALID_ORIGIN');
     if(path==='/healthz'&&req.method==='GET')return encoded(res,200,{ok:true});
     if(path==='/login'&&req.method==='GET')return respondFile(res,'/login.html');
     if((path==='/login.js'||path==='/login.css')&&req.method==='GET')return respondFile(res,path);
@@ -120,7 +121,7 @@ export function createApp({root=resolve(import.meta.dirname,'..'),filename='./ru
           const b=await receive(req);
           if(!validRole(b.role))throw Error();
           const invite=store.createInvite(b.email,b.role,me.id);
-          return encoded(res,201,{email:invite.email,role:invite.role,expiresAt:invite.expiresAt,link:origin+'/login#convite='+encodeURIComponent(invite.token)});
+          return encoded(res,201,{email:invite.email,role:invite.role,expiresAt:invite.expiresAt,link:publicOrigin+'/login#convite='+encodeURIComponent(invite.token)});
         }catch(err){return fail(res,400,err.message==='SEATS_FULL'?'SEATS_FULL':'INVITE_NOT_CREATED');}
       }
       if(path==='/api/team/disable'&&req.method==='POST'){
