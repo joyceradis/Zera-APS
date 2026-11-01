@@ -50,7 +50,7 @@
     const seats=document.createElement('p');
     const usersHeading=document.createElement('h3');usersHeading.textContent='Profissionais cadastrados';
     const usersList=document.createElement('div');usersList.className='team-list';
-    const copy=document.createElement('button');copy.type='button';copy.textContent='Copiar último convite';
+    const copy=document.createElement('button');copy.type='button';copy.textContent='Copiar link gerado';
     copy.addEventListener('click',async()=>{if(link.value){try{await navigator.clipboard.writeText(link.value);feedback.textContent='Convite copiado. Envie apenas ao destinatário.';}catch{link.focus();link.select();feedback.textContent='Selecione e copie o convite manualmente.';}}});
     async function loadSeats(){
       const r=await fetch('/api/team',{credentials:'same-origin'});
@@ -60,6 +60,18 @@
       for(const user of d.users){
         const line=document.createElement('div');line.className='team-row';
         const description=document.createElement('span');description.textContent=user.email+' · '+user.role+(user.active?' · ativo':' · desativado');line.append(description);
+        if(user.active){
+          const recover=document.createElement('button');recover.type='button';recover.textContent='Recuperar acesso';recover.setAttribute('aria-label','Gerar recuperação de acesso para '+user.email);
+          recover.addEventListener('click',async()=>{
+            if(!window.confirm('Gerar um link de uso único para redefinir a senha de '+user.email+'?'))return;
+            const response=await fetch('/api/team/reset',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':state.csrf},body:JSON.stringify({userId:user.id})});
+            if(!response.ok){feedback.textContent='Não foi possível criar o link de recuperação.';return;}
+            const result=await response.json();link.value=result.link;
+            feedback.textContent='Link de recuperação criado para '+result.email+'. Expira em 1 hora. Envie privadamente.';
+            copy.textContent='Copiar link de recuperação';
+          });
+          line.append(recover);
+        }
         if(user.active&&user.id!==state.user.id){
           const disable=document.createElement('button');disable.type='button';disable.textContent='Desativar';disable.setAttribute('aria-label','Desativar acesso de '+user.email);
           disable.addEventListener('click',async()=>{
@@ -82,7 +94,7 @@
     container.append(form);await loadSeats();
   }
   const css=document.createElement('style');
-  css.textContent='.account-dialog{max-height:86vh;overflow-y:auto;border:0;border-radius:13px;padding:25px;width:min(450px,calc(100% - 24px));color:#203747;box-shadow:0 25px 80px #0004}.account-dialog::backdrop{background:#102435a8}.account-dialog h2{font-size:19px;margin:0 0 9px}.account-dialog h3{font-size:14px;margin:22px 0 9px}.account-dialog p{color:#65818c;font-size:12px;line-height:1.6}.account-dialog button{border:1px solid #d1e9e2;border-radius:8px;background:#e8f7f1;color:#086d63;font-size:12px;font-weight:750;padding:9px 12px;margin:5px 6px 5px 0}.account-dialog .team-list{display:grid;gap:7px;margin:12px 0}.account-dialog .team-row{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid #e4eeee;padding:8px 0;font-size:11px;color:#4a6370;overflow-wrap:anywhere}.account-dialog .team-row button{white-space:nowrap;background:#fff5f2;color:#a04b3c;border-color:#f1dfd9}.account-dialog input,.account-dialog select{display:block;width:100%;padding:12px;margin:9px 0;border:1px solid #dce8eb;border-radius:8px;color:#273f4e;font-size:12px}';
+  css.textContent='.account-dialog{max-height:86vh;overflow-y:auto;border:0;border-radius:13px;padding:25px;width:min(450px,calc(100% - 24px));color:#203747;box-shadow:0 25px 80px #0004}.account-dialog::backdrop{background:#102435a8}.account-dialog h2{font-size:19px;margin:0 0 9px}.account-dialog h3{font-size:14px;margin:22px 0 9px}.account-dialog p{color:#65818c;font-size:12px;line-height:1.6}.account-dialog button{border:1px solid #d1e9e2;border-radius:8px;background:#e8f7f1;color:#086d63;font-size:12px;font-weight:750;padding:9px 12px;margin:5px 6px 5px 0}.account-dialog .team-list{display:grid;gap:7px;margin:12px 0}.account-dialog .team-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid #e4eeee;padding:8px 0;font-size:11px;color:#4a6370;overflow-wrap:anywhere}.account-dialog .team-row button{white-space:nowrap;background:#fff5f2;color:#a04b3c;border-color:#f1dfd9}.account-dialog input,.account-dialog select{display:block;width:100%;padding:12px;margin:9px 0;border:1px solid #dce8eb;border-radius:8px;color:#273f4e;font-size:12px}';
   document.head.append(css);
   document.body.append(container);
   window.ZERA_AUTH={openAccount:()=>{describeFavorites();container.showModal();},bookmarks,toggleBookmark};
