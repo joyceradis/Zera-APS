@@ -1,47 +1,51 @@
-# ZERA-APS — Matriz de qualidade (v0.2, branch de desenvolvimento)
+# ZERA-APS | Relatório técnico de qualidade e pendências (01/11/2026)
 
-**Estado em 01/11/2026:** desenvolvimento em PR rascunho. A versão antiga v0.1 permanece congelada. **Não confundir revisão estática com validação funcional no navegador.**
+## Entrega e versão
 
-## Evidências disponíveis
+**Beta v0.3:** interface profissional, autenticação por convite, administração básica, recuperação de acesso, favoritos por usuário, SQLite, perfis e API. `main` preservada; versão v0.1 congelada. PR de rascunho, sem merge/deploy, sem contas reais e sem cobrança.
 
-| Verificação | Estado | Observação |
-|---|---|---|
-| Sintaxe da aplicação em JavaScript | PASS | Verificada com runtime V8 |
-| IDs referenciados pela aplicação | PASS | Todos encontrados no HTML |
-| Base JSON e módulos iniciais | PASS | 5 linhas; 21 orientações preliminares |
-| Inicialização em DOM simulado | PASS | Sem erro de runtime no cenário isolado |
-| Seleção de HAS/DM/Saúde mental | PASS (simulado) | 4/6/0 itens, respectivamente |
-| Detalhes das regras, controle de leitura e busca I10 | PASS (simulado) | Não garante resultado em navegador real |
-| Smoke test Node independente de dependências | CRIADO; EXECUÇÃO LOCAL PENDENTE | `node tests/test_static.mjs` |
-| Interface real desktop/390px | PENDENTE | Rodar `python3 tests/test_ui.py` |
-| Capturas de tela e inspeção visual | PENDENTE | Geradas pelo teste após execução |
-| Navegação por teclado, leitor de tela e zoom 200% | PARCIAL / PENDENTE | Testes adicionais necessários |
-| Cópia de códigos no navegador do posto | PENDENTE | Conferir política de clipboard |
-| Autenticação e 50 sessões simultâneas | NÃO IMPLEMENTADO | Exige backend e teste de carga |
-| Revisão normativa de cada regra | PENDENTE | Não usar para validar financiamento |
-| Deploy, domínio e contas reais | NÃO REALIZADO | Sem gasto ou publicação nesta entrega |
+## Evidências de teste
 
-## Rotina de testes para Estevão
+| Verificação | Resultado | Limites |
+| --- | --- | --- |
+| Sintaxe do JavaScript principal | PASS em runtime V8 | Não é prova de funcionalidade do navegador |
+| IDs do DOM em index.html | PASS, 29 referências existentes | Checagem estática |
+| Base JSON e JS sincronizados | PASS na comparação de conteúdo | A base clínica continua parcial |
+| UI com DOM simulado | PASS, 11/11 verificações | Simulação de componentes, não Chromium |
+| Backend: senhas, convites, sessões, CSRF/Origin, perfis, favoritos e revogação | PASS, testes Node no ambiente local | Não representa auditoria de segurança externa |
+| Recuperação de senha por admin | PASS, testes Node no ambiente local | Não há envio automático ou verificação de e-mail |
+| Banco com 50 médicos e 50 GETs de sessão concorrentes | PASS no teste local | Não equivale a teste de carga do host final |
+| Formatos de 56 referências preliminares | PASS na auditoria de padrões | Formato não prova validade clínica/normativa |
+| Auditoria automatizada via `npm test` no checkout GitHub completo | PENDENTE | Executar após clonar a branch |
+| Playwright desktop e 390px `tests/test_ui.py` | PENDENTE | Necessária execução visual e revisão de screenshots |
+| Playwright convites/favoritos/logout `tests/test_auth_ui.py` | CRIADO, NÃO EXECUTADO | Testes de navegador real pendentes |
+| Teclado, contraste, zoom 200% e leitor de tela | PENDENTE | Auditoria de acessibilidade |
+| Teste de 50 usuários contra serviço HTTPS hospedado | NÃO EXECUTADO | Nenhum deploy foi realizado |
+| Homologação de regras e permissões institucionais PEC | NÃO REALIZADA | Uso somente com dados fictícios |
+
+## Procedimento reprodutível no Mac ou Linux
 
 ~~~sh
 node --check app.js
-node tests/test_static.mjs
+node --check login.js
+node --check client-auth.js
+npm test
 python3 -m pip install playwright
 python3 -m playwright install chromium
 python3 tests/test_ui.py
+python3 tests/test_auth_ui.py
 ~~~
 
-No macOS, utilizar o navegador gerenciado pelo Playwright. O teste Chromium deve gerar `tests/preview-desktop.png` e `tests/preview-mobile.png`. Examinar manualmente ambos, inclusive tipografia, contrastes, espaços e cards nos computadores do posto.
+**Não usar dados de pacientes** nos testes e não divulgar convites gerados.
 
-## Riscos e limites clínicos
+## Restrições antes do uso real
 
-- As regras e códigos constituem extração **parcial**, pendente de revisão por profissional responsável e conferência das fontes oficiais vigentes.
-- Nenhuma marcação ou contador representa indicador cumprido ou faturamento elegível.
-- O sistema não captura registros do PEC, não faz cálculo oficial, não demonstra integração nem alega transmissão ao SISAB.
-- Saúde mental permanece intencionalmente sem regras até mapeamento clínico específico.
-- Não inserir pacientes, nomes, documentos, prontuários, fotografias, informações de saúde identificáveis, senhas ou segredos em repositório público.
-- Cadastro de 50 médicos, segregação de sessões e segurança de servidor são condições prévias para piloto real e **não estão presentes** na v0.2.
+1. Validar a interface em navegadores reais, acessibilidade e funcionamento com perfis de médicos.
+2. Revisar clinicamente as 21 orientações e suas exceções, com normas vigentes e diferenças de versões do PEC.
+3. Definir ambiente de hospedagem com TLS, DB persistente, backup/restauração, rastreabilidade e orçamento aprovado.
+4. Auditar segurança e privacidade, especialmente acesso em computadores compartilhados, revogação e exposição de links de convite.
+5. Conduzir teste de carga real e gradual no provedor escolhido; o teste local não atesta SLA nem throughput em produção.
+6. Avaliar LGPD, responsabilidades do produto e eventual regulamentação aplicável antes de comercializar.
+7. Impedir que o sistema indique falsamente registro no PEC, pontuação alcançada ou faturamento municipal.
 
-## Critério de aprovação de merge
-
-Não publicar nem mesclar este PR até que testes reais em Chromium, revisão visual responsiva e aceite técnico sejam documentados. O piloto com médicos externos requer também identidade, privacidade, segurança e homologação clínica antes de qualquer uso assistencial.
+**A aprovação de merge, deploy, inclusão de pacientes e operação assistencial continua bloqueada até as validações correspondentes.**
