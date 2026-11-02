@@ -48,6 +48,8 @@
     const feedback=document.createElement('p');feedback.setAttribute('role','status');
     const link=document.createElement('input');link.readOnly=true;link.placeholder='Convite gerado aparecerá aqui';link.setAttribute('aria-label','Link de convite de uso único');
     const seats=document.createElement('p');
+    const pendingHeading=document.createElement('h3');pendingHeading.textContent='Convites ainda não utilizados';
+    const pendingList=document.createElement('div');pendingList.className='team-list';
     const usersHeading=document.createElement('h3');usersHeading.textContent='Profissionais cadastrados';
     const usersList=document.createElement('div');usersList.className='team-list';
     const copy=document.createElement('button');copy.type='button';copy.textContent='Copiar link gerado';
@@ -56,6 +58,20 @@
       const r=await fetch('/api/team',{credentials:'same-origin'});
       if(!r.ok)return;const d=await r.json();
       seats.textContent='Médicos ativos: '+d.capacity.active+' / '+d.capacity.max+' · Convites pendentes: '+d.capacity.pending;
+      pendingList.replaceChildren();
+      for(const pending of d.pendingInvites||[]){
+        const row=document.createElement('div');row.className='team-row';
+        const label=document.createElement('span');label.textContent=pending.email+' · '+pending.role+' · expira '+new Date(pending.expires_at).toLocaleString('pt-BR');row.append(label);
+        const revoke=document.createElement('button');revoke.type='button';revoke.textContent='Cancelar';revoke.setAttribute('aria-label','Cancelar convite de '+pending.email);
+        revoke.addEventListener('click',async()=>{
+          if(!window.confirm('Cancelar convite ainda não utilizado para '+pending.email+'?'))return;
+          const response=await fetch('/api/invites/revoke',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':state.csrf},body:JSON.stringify({email:pending.email})});
+          if(!response.ok){feedback.textContent='Não foi possível cancelar o convite.';return;}
+          feedback.textContent='Convite cancelado e vaga liberada quando aplicável.';await loadSeats();
+        });
+        row.append(revoke);pendingList.append(row);
+      }
+      if(!pendingList.children.length){const note=document.createElement('p');note.textContent='Nenhum convite pendente.';pendingList.append(note);}
       usersList.replaceChildren();
       for(const user of d.users){
         const line=document.createElement('div');line.className='team-row';
@@ -84,7 +100,7 @@
         usersList.append(line);
       }
     }
-    form.append(title,email,role,send,feedback,link,copy,seats,usersHeading,usersList);
+    form.append(title,email,role,send,feedback,link,copy,seats,pendingHeading,pendingList,usersHeading,usersList);
     form.addEventListener('submit',async event=>{
       event.preventDefault();feedback.textContent='';link.value='';
       const r=await fetch('/api/invites',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':state.csrf},body:JSON.stringify({email:email.value,role:role.value})});
