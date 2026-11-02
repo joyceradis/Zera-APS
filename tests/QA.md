@@ -5,7 +5,7 @@
 
 | Ensaio | Resultado | Ambiente e limitação |
 | --- | --- | --- |
-| Node `--test tests/server.test.mjs` | **PASS: 4/4** | Node 22.16, SQLite nativo; testa autenticação, convite, reemissão/cancelamento, quota e 50 sessões concorrentes via HTTP em loopback |
+| Node `--test tests/server.test.mjs` | **PASS: 5/5** | Node 22.16, SQLite nativo; testa autenticação, convite, reemissão/cancelamento, quota e 50 sessões concorrentes via HTTP em loopback |
 | Controle de acesso em HTTP | **PASS** | Testes locais: recursos protegidos exigem login; arquivo interno e `.env` não servidos; `Host` inválido rejeitado; conta médica não acessa API de administração |
 | Teste local de 50 contas | **PASS funcional** | 50 contas fictícias com sessões isoladas, 50 leituras HTTP concorrentes. **Não é benchmark ou SLA no host de produção.** |
 | Bootstrap administrativo, reemissão e cancelamento | **PASS** | CLI testada com banco temporário e e-mails fictícios; convites pendentes de outros administradores são rejeitados |
