@@ -10,6 +10,7 @@
 | Teste local de 50 contas | **PASS funcional** | 50 contas fictícias com sessões isoladas, 50 leituras HTTP concorrentes. **Não é benchmark ou SLA no host de produção.** |
 | Bootstrap administrativo, reemissão e cancelamento | **PASS** | CLI testada com banco temporário e e-mails fictícios; convites pendentes de outros administradores são rejeitados |
 | DOM simulado da interface v0.3 | **PASS: 10/10** | Testa IDs referenciados, módulos, 21 regras, biblioteca de códigos, favoritos, busca e contrato de carga. **Não substitui browser real.** |
+| Modal administrativo em Chromium com API simulada | **PASS para interação e responsividade** | Convites pendentes, botão de cancelamento e rótulo de conta testados com DOM de navegador e respostas fictícias; viewport 1360 e 390 sem transbordamento. Não substitui API real no navegador. |
 | Frontend de login em Chromium usando `page.set_content` | **PASS para layout estático** | Capturas em desktop 1440 e celular 390; sem transbordamento horizontal. Estados de erro de login, convite e recuperação conferidos com `fetch` simulado. |
 | Auditoria estrutural da base | **PASS em inspeção estrutural** | 5 módulos, 21 regras, 56 referências com formato válido; base JS e JSON coerentes. **Não é revisão normativa.** |
 | Playwright integrado ao servidor real | **BLOQUEADO neste ambiente** | Navegação de Chromium por URL foi impedida por política de acesso (`ERR_BLOCKED_BY_ADMINISTRATOR`). O teste automatizado do repositório permanece pendente no Mac do desenvolvedor. |
