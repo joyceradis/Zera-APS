@@ -2,7 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createApp} from '../server/http.mjs';
 import {createStore,passwordHash,passwordMatch} from '../server/core.mjs';
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync, statSync } from 'node:fs';
+import {spawnSync} from 'node:child_process';
+import {DatabaseSync} from 'node:sqlite';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {request as httpRequest} from 'node:http';
@@ -146,4 +148,29 @@ test('50 isolated physician accounts and concurrent HTTP session reads',async()=
    assert.equal(results.filter(r=>r.status===200&&r.match).length,50);
    console.log('Local concurrent 50-session exercise:',Math.round(performance.now()-started),'ms (not a production load benchmark)');
  }finally{await new Promise(resolve=>server.close(resolve));store.db.close();rmSync(dir,{recursive:true,force:true});}
+});
+test('SQLite backup protects confidential files, preserves data and never overwrites an existing target',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'zera-backup-e2e-'));
+ try{
+  const source=join(dir,'source.sqlite');
+  const store=createStore(source,2);
+  store.createInvite('backup-test@example.test','doctor');
+  store.db.close();
+  const target=join(dir,'secured-backup.sqlite');
+  const script=join(import.meta.dirname,'../server/backup.mjs');
+  const env={...process.env,ZERA_DB_PATH:source,ZERA_BACKUP_DIR:dir};
+  const backupRun=spawnSync(process.execPath,[script,target],{env,encoding:'utf8'});
+  assert.equal(backupRun.status,0,backupRun.stderr);
+  assert.equal(statSync(target).mode&0o777,0o600);
+  const snapshot=new DatabaseSync(target,{readOnly:true});
+  assert.equal(snapshot.prepare('SELECT COUNT(*) n FROM invites').get().n,1);
+  assert.equal(snapshot.prepare('PRAGMA integrity_check').get().integrity_check,'ok');
+  snapshot.close();
+  const retry=spawnSync(process.execPath,[script,target],{env,encoding:'utf8'});
+  assert.equal(retry.status,1);
+  assert.equal(statSync(target).mode&0o777,0o600);
+  const snapshotAfter=new DatabaseSync(target,{readOnly:true});
+  assert.equal(snapshotAfter.prepare('SELECT COUNT(*) n FROM invites').get().n,1);
+  snapshotAfter.close();
+ }finally{rmSync(dir,{recursive:true,force:true});}
 });
