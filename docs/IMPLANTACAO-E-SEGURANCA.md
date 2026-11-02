@@ -12,7 +12,7 @@ Requer Node.js >=22.13 (preferencialmente Node 24 LTS). Usar terminal na pasta d
 4. Abrir o convite no navegador local, criar senha própria de pelo menos 12 caracteres e entrar.
 5. No avatar/perfil, criar convites individuais para médicos, verificar a relação de usuários, encerrar acessos e gerar links de recuperação. Entregar links privadamente aos destinatários (a aplicação não envia e-mails).
 
-Para recuperar administrativamente uma conta perdida a partir do computador autorizado: `npm run recover-account -- usuario@dominio.com` (o comando cria um link de uso único, validade de 1 hora). Não executar em terminais compartilhados.\n\nO servidor usa SQLite local em `runtime/zeraaps.sqlite`, protegido pelo diretório e permissões locais. Esse diretório é ignorado pelo Git. **Não colocar CPF/CNS, prontuário, dados clínicos identificáveis nem segredos nas regras, nos testes ou no repositório público.**
+Para recuperar administrativamente uma conta perdida a partir do computador autorizado: `npm run recover-account -- usuario@dominio.com` (o comando cria um link de uso único, validade de 1 hora). Não executar em terminais compartilhados. Para cancelar um convite pendente a partir do terminal local, utilize `node server/cli.mjs revoke-pending usuario@dominio.com`.\n\nO servidor usa SQLite local em `runtime/zeraaps.sqlite`, protegido pelo diretório e permissões locais. Esse diretório é ignorado pelo Git. **Não colocar CPF/CNS, prontuário, dados clínicos identificáveis nem segredos nas regras, nos testes ou no repositório público.**
 
 ### Configuração por variáveis de ambiente
 
