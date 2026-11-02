@@ -12,7 +12,7 @@ let source;
 let mayRemoveTarget=false;
 try {
   if(!existsSync(dbPath)||!lstatSync(dbPath).isFile()||lstatSync(dbPath).isSymbolicLink())throw Error('SOURCE_NOT_FOUND_OR_UNSAFE');
-  if(target===dbPath||existsSync(target))throw Error('DESTINATION_EXISTS_OR_SAME_AS_SOURCE');
+  if(target===dbPath||lstatSync(target,{throwIfNoEntry:false}))throw Error('DESTINATION_EXISTS_OR_SAME_AS_SOURCE');
   mkdirSync(dirname(target),{recursive:true,mode:0o700});
   source=new DatabaseSync(dbPath,{readOnly:true});
   mayRemoveTarget=true;
