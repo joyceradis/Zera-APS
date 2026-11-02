@@ -90,7 +90,7 @@ test('HTTP sessions, csrf, origin, role access, 50 seat concept and disable',asy
   const teamState=await teamBefore.json();
   assert.ok(Array.isArray(teamState.pendingInvites));
   assert.ok(teamState.pendingInvites.some(x=>x.email===mail(2)));
-  assert.equal((await request('/api/invites/revoke','POST',{email:mail(2)},docCsrf,docCookie)).status,403);
+  assert.equal((await request('/api/invites/revoke','POST',{email:mail(2)},docCsrf,docCookie)).status,401);
   assert.equal((await request('/api/invites/revoke','POST',{email:mail(2)},'invalid',cookie)).status,403);
   assert.equal((await request('/api/invites/revoke','POST',{email:mail(2)},csrf,cookie)).status,200);
   const teamAfter=(await (await request('/api/team','GET',null,null,cookie)).json());
