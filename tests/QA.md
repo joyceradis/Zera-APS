@@ -1,34 +1,27 @@
-# ZERA-APS | Relatório técnico de qualidade e pendências (01/11/2026)
+# ZERA-APS — Evidência de qualidade e critérios de liberação
+**Data:** 01/11/2026. **Branch:** `feat/pilot-ui-v02`. **Status:** beta técnico em PR #1 (rascunho); main e v0.1 preservadas.
 
-## Entrega e versão
+## Ensaios executados nesta rodada
 
-**Beta v0.3:** interface profissional, autenticação por convite, administração básica, recuperação de acesso, favoritos por usuário, SQLite, perfis e API. `main` preservada; versão v0.1 congelada. PR de rascunho, sem merge/deploy, sem contas reais e sem cobrança.
-
-## Evidências de teste
-
-| Verificação | Resultado | Limites |
+| Ensaio | Resultado | Ambiente e limitação |
 | --- | --- | --- |
-| Sintaxe do JavaScript principal | PASS em runtime V8 | Não é prova de funcionalidade do navegador |
-| IDs do DOM em index.html | PASS, 29 referências existentes | Checagem estática |
-| Base JSON e JS sincronizados | PASS na comparação de conteúdo | A base clínica continua parcial |
-| UI com DOM simulado | PASS, 11/11 verificações | Simulação de componentes, não Chromium |
-| Backend: senhas, convites, sessões, CSRF/Origin, perfis, favoritos e revogação | PASS, testes Node no ambiente local | Não representa auditoria de segurança externa |
-| Recuperação de senha por admin | PASS, testes Node no ambiente local | Não há envio automático ou verificação de e-mail |
-| Banco com 50 médicos e 50 GETs de sessão concorrentes | PASS no teste local | Não equivale a teste de carga do host final |
-| Formatos de 56 referências preliminares | PASS na auditoria de padrões | Formato não prova validade clínica/normativa |
-| Auditoria automatizada via `npm test` no checkout GitHub completo | PENDENTE | Executar após clonar a branch |
-| Playwright desktop e 390px `tests/test_ui.py` | PENDENTE | Necessária execução visual e revisão de screenshots |
-| Playwright convites/favoritos/logout `tests/test_auth_ui.py` | CRIADO, NÃO EXECUTADO | Testes de navegador real pendentes |
-| Teclado, contraste, zoom 200% e leitor de tela | PENDENTE | Auditoria de acessibilidade |
-| Teste de 50 usuários contra serviço HTTPS hospedado | NÃO EXECUTADO | Nenhum deploy foi realizado |
-| Homologação de regras e permissões institucionais PEC | NÃO REALIZADA | Uso somente com dados fictícios |
+| Node `--test tests/server.test.mjs` | **PASS: 4/4** | Node 22.16, SQLite nativo; testa autenticação, convite, reemissão/cancelamento, quota e 50 sessões concorrentes via HTTP em loopback |
+| Controle de acesso em HTTP | **PASS** | Testes locais: recursos protegidos exigem login; arquivo interno e `.env` não servidos; `Host` inválido rejeitado; conta médica não acessa API de administração |
+| Teste local de 50 contas | **PASS funcional** | 50 contas fictícias com sessões isoladas, 50 leituras HTTP concorrentes. **Não é benchmark ou SLA no host de produção.** |
+| Bootstrap administrativo, reemissão e cancelamento | **PASS** | CLI testada com banco temporário e e-mails fictícios; convites pendentes de outros administradores são rejeitados |
+| DOM simulado da interface v0.3 | **PASS: 10/10** | Testa IDs referenciados, módulos, 21 regras, biblioteca de códigos, favoritos, busca e contrato de carga. **Não substitui browser real.** |
+| Frontend de login em Chromium usando `page.set_content` | **PASS para layout estático** | Capturas em desktop 1440 e celular 390; sem transbordamento horizontal. Estados de erro de login, convite e recuperação conferidos com `fetch` simulado. |
+| Auditoria estrutural da base | **PASS em inspeção estrutural** | 5 módulos, 21 regras, 56 referências com formato válido; base JS e JSON coerentes. **Não é revisão normativa.** |
+| Playwright integrado ao servidor real | **BLOQUEADO neste ambiente** | Navegação de Chromium por URL foi impedida por política de acesso (`ERR_BLOCKED_BY_ADMINISTRATOR`). O teste automatizado do repositório permanece pendente no Mac do desenvolvedor. |
+| Screenshots visuais da interface clínica completa | **PENDENTE** | Sem evidência de visual real do dashboard na sessão; executar `tests/test_ui.py` localmente. |
+| Uso em produção/convites reais | **NÃO REALIZADO** | Sem hospedagem, domínio, dados de pacientes, integração com PEC, merge ou gasto. |
 
-## Procedimento reprodutível no Mac ou Linux
+Os cenários da suíte do backend usam e-mails `example.test` e dados sintéticos; os valores de latência locais não têm validade para servidor externo.
+
+## Execução no Mac de Estevão
 
 ~~~sh
-node --check app.js
-node --check login.js
-node --check client-auth.js
+node --version
 npm test
 python3 -m pip install playwright
 python3 -m playwright install chromium
@@ -36,16 +29,16 @@ python3 tests/test_ui.py
 python3 tests/test_auth_ui.py
 ~~~
 
-**Não usar dados de pacientes** nos testes e não divulgar convites gerados.
+Os testes de navegador devem produzir evidências de telas desktop/mobile, navegação por teclado, favoritos persistentes, login individual, encerramento de sessão e ausência de console errors. Sempre usar apenas dados fictícios. Para revisar a experiência visual no computador de uma UBS, conferir Chrome ou Edge e zoom de 200%.
 
-## Restrições antes do uso real
+## Portões ainda obrigatórios
 
-1. Validar a interface em navegadores reais, acessibilidade e funcionamento com perfis de médicos.
-2. Revisar clinicamente as 21 orientações e suas exceções, com normas vigentes e diferenças de versões do PEC.
-3. Definir ambiente de hospedagem com TLS, DB persistente, backup/restauração, rastreabilidade e orçamento aprovado.
-4. Auditar segurança e privacidade, especialmente acesso em computadores compartilhados, revogação e exposição de links de convite.
-5. Conduzir teste de carga real e gradual no provedor escolhido; o teste local não atesta SLA nem throughput em produção.
-6. Avaliar LGPD, responsabilidades do produto e eventual regulamentação aplicável antes de comercializar.
-7. Impedir que o sistema indique falsamente registro no PEC, pontuação alcançada ou faturamento municipal.
+1. **Clínico/normativo:** homologar cada orientação, código, período, exceção e versão aplicável do PEC. Não apresentar cumprimento de indicadores ou faturamento sem evidência oficial e integração autorizada.
+2. **Qualidade visual:** validar telas reais, responsividade, estados de erro, contrastes, acessibilidade, processo de login e administração de 50 usuários.
+3. **Segurança:** auditoria de autenticação e autorização, testes de vulnerabilidade, logout e sessão em computador compartilhado, cópias de segurança e recuperação.
+4. **Operação:** HTTPS, domínio, hospedagem com volume persistente, plano de incidentes, rollback, métricas técnicas e custo aprovado.
+5. **Teste de carga:** 50 sessões no **provedor escolhido**, com relatório reproduzível de erros e desempenho.
+6. **Jurídico/comercial:** termos, política de privacidade, LGPD, responsabilidade profissional e avaliação regulatória.
+7. **Governança:** revisão de PR e aprovação antes de merge/deploy. O Issue #2 acompanha esses portões.
 
-**A aprovação de merge, deploy, inclusão de pacientes e operação assistencial continua bloqueada até as validações correspondentes.**
+A arquitetura é um **beta executável local**. O produto para médicos externos ainda não está homologado nem concluído.
