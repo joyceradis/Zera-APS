@@ -125,7 +125,7 @@ export function createApp({root=resolve(import.meta.dirname,'..'),filename='./ru
         }catch{return fail(res,400,'INVALID_BOOKMARK');}
       }
       if(me.role!=='admin')return fail(res,403,'FORBIDDEN');
-      if(path==='/api/team'&&req.method==='GET')return encoded(res,200,{users:store.listUsers(),capacity:store.countSeats()});
+      if(path==='/api/team'&&req.method==='GET')return encoded(res,200,{users:store.listUsers(),capacity:store.countSeats(),pendingInvites:store.listPendingInvites()});
       if(path==='/api/invites'&&req.method==='POST'){
         try{
           const b=await receive(req);
@@ -133,6 +133,13 @@ export function createApp({root=resolve(import.meta.dirname,'..'),filename='./ru
           const invite=store.createInvite(b.email,b.role,me.id);
           return encoded(res,201,{email:invite.email,role:invite.role,expiresAt:invite.expiresAt,link:publicOrigin+'/login#convite='+encodeURIComponent(invite.token)});
         }catch(err){return fail(res,400,err.message==='SEATS_FULL'?'SEATS_FULL':'INVITE_NOT_CREATED');}
+      }
+      if(path==='/api/invites/revoke'&&req.method==='POST'){
+        try{
+          const b=await receive(req);
+          store.revokeInvite(b.email);
+          return encoded(res,200,{ok:true});
+        }catch{return fail(res,400,'INVITE_NOT_REVOKED');}
       }
       if(path==='/api/team/reset'&&req.method==='POST'){
         try{
