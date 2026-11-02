@@ -42,7 +42,7 @@ Os convites são tokens aleatórios com uso único, expiração de 48 horas, vin
 
 - **Segurança ainda não foi auditada externamente.** Não tratar testes locais como certificação de segurança nem conformidade com LGPD.
 - Existe **recuperação administrativa por link temporário**, mas ainda não há segundo fator, verificação automatizada de posse de e-mail, sistema transacional de mensagens, registro auditável completo de ações administrativas ou monitoramento/alertas.
-- Não há banco replicado, backups automatizados testados, alta disponibilidade ou migração de schema comprovada.
+- Há **backup manual verificado** via `npm run backup`, mas não há agendamento seguro, armazenamento externo protegido, replicação, alta disponibilidade, nem procedimento completo de restauração testado em hospedagem. Backups contêm dados de usuários e hashes, portanto exigem proteção e controle de acesso.
 - O banco SQLite e o servidor Node funcionam para um piloto restrito; produção requer avaliação de persistência e escalabilidade, isolamento de infraestrutura, backups e eventual migração a banco gerenciado.
 - O teste local de 50 sessões simultâneas é um **ensaio funcional**, não um benchmark de desempenho em nuvem nem auditoria de carga da produção.
 - As regras clínicas são preliminares; não existe conformidade do cálculo de indicadores, acesso ao PEC ou elegibilidade/faturamento automático.
@@ -55,3 +55,11 @@ O `Dockerfile` utiliza Node 24 sem dependências npm, roda como usuário não-ro
 Só realizar deploy depois de: domínio sob controle do proprietário, ambiente de hospedagem selecionado com custo **explicitamente aprovado**, TLS, volume persistente privado, backup/restauração testados, inspeção de logs, verificação de segurança, teste real de carga, revisão das fontes e aceite clínico. O Dockerfile por si só não atende a esses requisitos.
 
 **Não houve contratação, deploy, criação de usuários reais ou alteração de produção nesta entrega.**
+
+## Backup e recuperação (operação local)
+
+Executar `npm run backup` no diretório do projeto, com `ZERA_DB_PATH` apontando para o arquivo SQLite correto. O utilitário utiliza o mecanismo nativo de backup SQLite, verifica `PRAGMA integrity_check`, impede substituição de destino existente e cria arquivo com permissão `0600`. A pasta padrão é `./backups`; pode ser alterada via `ZERA_BACKUP_DIR`.
+
+Antes de usar com pessoas reais, documentar periodicidade, cofre criptografado, acesso mínimo, política de retenção, exclusão segura e **teste de restauração em ambiente isolado**. Não copiar o banco original enquanto o servidor escreve nele e não sobrepor arquivos de banco em uso. Após restauração, revisar e revogar sessões ativas, conferir integridade e aplicar procedimento formal de reabertura.
+
+**O backup não é automaticamente enviado para a nuvem, não é criptografado pela aplicação, não gera custos externos e não equivale a plano de desastre validado.**
