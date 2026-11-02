@@ -70,6 +70,17 @@ export function createStore(filename, maxDoctors = 50) {
     try {const value=fn(); db.exec('COMMIT'); return value;}
     catch(error) {db.exec('ROLLBACK'); throw error;}
   }
+  function listPendingInvites() {
+    return many('SELECT email,role,expires_at,created_by FROM invites WHERE used_at IS NULL AND expires_at>? ORDER BY expires_at ASC LIMIT 100', now());
+  }
+  function revokeInvite(email) {
+    email=normalizeEmail(email);
+    if(!email)throw new Error('INVALID_INVITE');
+    return transaction(()=>{
+      const result=exec('DELETE FROM invites WHERE email=? AND used_at IS NULL',email);
+      if(!result.changes)throw new Error('INVITE_NOT_FOUND');
+    });
+  }
   function countSeats() {
     const active = one("SELECT count(*) n FROM users WHERE role='doctor' AND active=1").n;
     const pending = one("SELECT count(*) n FROM invites WHERE role='doctor' AND used_at IS NULL AND expires_at>?",now()).n;
@@ -168,5 +179,5 @@ export function createStore(filename, maxDoctors = 50) {
   }
   function getBookmarks(userId){return many('SELECT rule_id FROM bookmarks WHERE user_id=? ORDER BY rule_id',userId).map(x=>x.rule_id);}
   function sweep(){const time=now();exec('DELETE FROM sessions WHERE expires_at<=?',time);exec('DELETE FROM invites WHERE expires_at<=? OR used_at IS NOT NULL',time);exec('DELETE FROM login_attempts WHERE until_at<=?',time);exec('DELETE FROM password_resets WHERE expires_at<=? OR used_at IS NOT NULL',time);}
-  return {db,countSeats,createInvite,redeemInvite,createReset,redeemReset,authenticate,sessionFor,readSession,revoke,listUsers,disableUser,setBookmark,getBookmarks,sweep};
+  return {db,countSeats,listPendingInvites,revokeInvite,createInvite,redeemInvite,createReset,redeemReset,authenticate,sessionFor,readSession,revoke,listUsers,disableUser,setBookmark,getBookmarks,sweep};
 }
