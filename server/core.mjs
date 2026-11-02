@@ -79,9 +79,10 @@ export function createStore(filename, maxDoctors = 50) {
     email = normalizeEmail(email);
     if (!email || !['admin','editor','doctor'].includes(role)) throw new Error('INVALID_INVITE');
     return transaction(() => {
-      if (role==='doctor' && countSeats().free<=0) throw new Error('SEATS_FULL');
       if (one('SELECT id FROM users WHERE email=?',email)) throw new Error('ACCOUNT_EXISTS');
+      // Reissue an invite without double-counting the same reserved seat.
       exec('DELETE FROM invites WHERE email=? AND used_at IS NULL',email);
+      if (role==='doctor' && countSeats().free<=0) throw new Error('SEATS_FULL');
       const value=token();
       exec('INSERT INTO invites(token_hash,email,role,expires_at,created_by) VALUES(?,?,?,?,?)',hashToken(value),email,role,now()+ttlMs,createdBy);
       return {token:value,email,role,expiresAt:now()+ttlMs};
