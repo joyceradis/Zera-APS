@@ -1,63 +1,131 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#111b37" />
-  <meta name="description" content="Zera-APS: guia contextual independente para registros no e-SUS APS. Protótipo sem dados de pacientes." />
-  <title>Zera-APS · Guia de registro na APS</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101d2d">
+  <meta name="description" content="ZERA-APS: espaço de trabalho para consulta de fluxos de registro no e-SUS APS, com base preliminar e códigos para conferência.">
+  <title>ZERA-APS · Espaço de trabalho</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="app-shell">
+<div class="shell">
+  <aside class="sidebar" aria-label="Navegação principal">
+    <a href="#trabalho" class="brand" id="brand-home" aria-label="ZERA-APS: início">
+      <span class="brand-mark" aria-hidden="true"><span class="brand-stem"></span><span class="brand-cut"></span></span>
+      <span class="brand-name">ZERA<span>APS</span><small>INTELIGÊNCIA PARA A APS</small></span>
+    </a>
+    <div class="side-group">
+      <p class="side-label">PLATAFORMA</p>
+      <nav class="side-nav" id="side-nav" aria-label="Seções">
+        <button type="button" class="side-link active" data-view="trabalho" aria-current="page"><span class="nav-icon" aria-hidden="true">▦</span> Espaço de trabalho</button>
+        <button type="button" class="side-link" data-view="codigos"><span class="nav-icon" aria-hidden="true">⌗</span> Biblioteca de códigos</button>
+        <button type="button" class="side-link" data-view="fontes"><span class="nav-icon" aria-hidden="true">≡</span> Fontes e limites</button>
+      </nav>
+    </div>
+    <div class="side-group side-group-secondary">
+      <p class="side-label">PRODUTO</p>
+      <nav class="side-nav" aria-label="Produto">
+        <button type="button" class="side-link" data-view="piloto"><span class="nav-icon" aria-hidden="true">◎</span> Preparação do piloto</button>
+      </nav>
+    </div>
+    <div class="side-bottom">
+      <div class="side-note"><span class="side-status-dot"></span><strong>Protótipo de demonstração</strong><small>Sem prontuários ou pacientes reais</small></div>
+      <div class="side-version">ZERA-APS <span>v0.3 • beta técnico</span></div>
+    </div>
+  </aside>
+
+  <div class="app-column">
     <header class="topbar">
-      <a class="brand" href="#inicio" aria-label="Zera-APS, início">
-        <span class="brand-symbol" aria-hidden="true">Z<span>+</span></span>
-        <span><strong>Zera-APS</strong><small>Assistente de registro • protótipo</small></span>
-      </a>
-      <div class="topbar-actions"><span class="tag tag-muted">Funciona offline</span><button class="top-action" id="help-button" type="button">Como funciona <span aria-hidden="true">↗</span></button></div>
+      <div class="mobile-brand"><strong>ZERA<span>APS</span></strong><span class="mobile-version">PILOTO</span></div>
+      <div class="top-context"><span class="crumb-dot"></span> ÁREA CLÍNICA <span class="crumb-sep">/</span> <strong id="breadcrumb">Espaço de trabalho</strong></div>
+      <div class="top-actions">
+        <button class="top-search" type="button" id="search-trigger"><span class="search-symbol">⌕</span> <span>Buscar orientações e códigos</span> <kbd>Ctrl K</kbd></button>
+        <span class="env-tag"><span></span> DEMONSTRAÇÃO</span>
+        <button type="button" class="profile" id="profile-button" title="Sessões individuais disponíveis após habilitação do backend" aria-label="Perfil demonstrativo; contas ainda não habilitadas">JR</button>
+      </div>
     </header>
+    <nav class="mobile-nav" aria-label="Navegação móvel">
+      <button data-view="trabalho" class="active" type="button">Fluxos</button><button data-view="codigos" type="button">Códigos</button><button data-view="fontes" type="button">Fontes</button><button data-view="piloto" type="button">Piloto</button>
+    </nav>
 
-    <main id="inicio" class="main-wrap">
-      <section class="hero" aria-labelledby="headline">
-        <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> Orientação de registro no e-SUS APS</p>
-          <h1 id="headline">Menos busca por códigos.<br><span>Mais clareza no registro.</span></h1>
-          <p>Abra uma linha de cuidado, confira os caminhos do PEC e copie códigos quando necessário. Não substitui prontuário nem decisão clínica.</p>
-          <div class="hero-mini"><span>5 áreas de atendimento</span><span class="bullet">•</span><span>Busca por nome e código</span><span class="bullet">•</span><span>Sem dados de pacientes</span></div>
+    <main class="content" id="main-content">
+      <section class="view" id="view-trabalho" aria-labelledby="page-heading">
+        <div class="page-heading">
+          <div><div class="overline"><span class="overline-line"></span> SEU ESPAÇO DE TRABALHO</div><h1 id="page-heading">Tudo o que você precisa <em>conferir.</em></h1><p>Fluxos de registro na APS, etapas por contexto e referências em um só lugar. Sem alterar o PEC.</p></div>
+          <button type="button" id="guide-button" class="subtle-action"><span aria-hidden="true">↗</span> Como utilizar</button>
         </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="art-panel"><div class="art-mini-header"><b></b><b></b><b></b></div><div class="art-line wide"></div><div class="art-check">✓ <span></span></div><div class="art-check">✓ <span></span></div><div class="art-check faint">○ <span></span></div><div class="art-bottom"><i></i><i></i></div></div>
-          <div class="art-floating"><span>⌘</span> CID · CIAP · SIGTAP</div>
+        <div class="metrics" aria-label="Escopo da demonstração">
+          <div class="metric"><div class="metric-title">LINHAS DE CUIDADO <span class="metric-symbol">▤</span></div><div class="metric-value" id="metric-modules">05 <span>mapeadas</span></div><div class="metric-sub">Uma ainda sem conteúdo clínico</div></div>
+          <div class="metric"><div class="metric-title">ITENS DA BASE <span class="metric-symbol">⌗</span></div><div class="metric-value" id="metric-rules">—</div><div class="metric-sub">Orientações preliminares, não homologadas</div></div>
+          <div class="metric highlight"><div class="metric-title">SEGURANÇA DO AMBIENTE <span class="metric-symbol">◌</span></div><div class="metric-value metric-safe">Sem dados clínicos</div><div class="metric-sub">Nenhum paciente é identificado ou armazenado</div></div>
         </div>
-      </section>
+        <div class="section-kicker"><span>01</span><div><h2>Selecione o contexto</h2><p>Escolha uma linha de cuidado para organizar sua consulta.</p></div></div>
+        <div id="modules" class="modules" aria-label="Linhas de cuidado"></div>
 
-      <section class="notice" role="note"><span class="notice-icon">!</span><div><strong>Versão demonstrativa — não validar indicadores aqui.</strong><span>Os itens são guias para conferência manual; não há acesso ao PEC, ao histórico clínico ou ao cálculo oficial de financiamento. Regras parciais exigem revisão antes do uso assistencial.</span></div></section>
-
-      <section class="workspace" aria-label="Explorar orientações">
-        <div class="section-head"><div><p class="eyebrow dark">ESCOLHA O ATENDIMENTO</p><h2>O que você precisa registrar?</h2></div><p>Selecione uma área para ver as orientações disponíveis.</p></div>
-        <nav class="module-grid" id="modules" aria-label="Áreas de atendimento"></nav>
-        <div class="content-grid">
-          <section class="main-panel" aria-labelledby="panel-heading">
-            <div class="panel-head"><div><p class="eyebrow dark" id="indicator-label">INDICADOR</p><h2 id="panel-heading">Hipertensão</h2><p id="panel-summary">Carregando...</p></div><span class="tag tag-warn" id="coverage-tag">Cobertura parcial</span></div>
-            <div class="tools-row"><label class="searchbox"><span aria-hidden="true">⌕</span><span class="sr-only">Pesquisar orientações ou códigos</span><input id="search" type="search" placeholder="Buscar: pressão, HbA1c, SIGTAP, I10..." autocomplete="off" /></label><button class="button-outline" id="reset" type="button">Limpar revisões</button></div>
-            <div class="progress-area"><div><strong id="progress-title">Nenhum item revisado</strong><span id="progress-description">Uma marcação não comprova indicador cumprido.</span></div><div class="progress-track" aria-hidden="true"><div id="progress-fill"></div></div></div>
+        <div class="section-kicker second-kicker"><span>02</span><div><h2>Guia de conferência <span id="current-context" class="context-name"></span></h2><p>Use durante a consulta ao PEC. Leia critérios e ressalvas antes de registrar.</p></div></div>
+        <div class="work-grid">
+          <section class="work-card" aria-labelledby="work-heading">
+            <div class="work-card-head">
+              <div><p class="card-eyebrow" id="indicator-label">ORIENTAÇÕES</p><h3 id="work-heading">Hipertensão</h3><p class="work-summary" id="panel-summary"></p></div>
+              <span class="status-pill">BASE PARCIAL</span>
+            </div>
+            <div class="work-toolbar">
+              <div class="segmented" role="group" aria-label="Filtrar itens">
+                <button type="button" data-filter="todos" class="active" aria-pressed="true">Todos</button>
+                <button type="button" data-filter="pendentes" aria-pressed="false">Não revisados</button>
+                <button type="button" data-filter="revisados" aria-pressed="false">Revisados</button>
+              </div>
+              <button type="button" id="reset" class="text-action">Limpar revisões</button>
+            </div>
+            <div class="review-banner"><div class="review-progress" aria-hidden="true"><span id="progress-fill"></span></div><div><strong id="progress-title">0 de 0 itens revisados</strong><small>Apenas leitura nesta sessão. Não representa cumprimento de indicador.</small></div></div>
             <div id="rule-list" class="rule-list" aria-live="polite"></div>
-            <div class="panel-footer">Informações baseadas em extração preliminar de guias oficiais. A conduta e o registro devem corresponder ao atendimento efetivamente realizado.</div>
+            <div class="work-footnote"><span class="footnote-icon">i</span> Registre apenas procedimentos realmente realizados. A revisão desta página não altera o PEC nem verifica histórico, elegibilidade ou financiamento.</div>
           </section>
-          <aside class="side-stack" aria-label="Busca de códigos e orientações">
-            <section class="side-panel" aria-labelledby="codes-heading"><div class="side-head"><span class="side-icon">#</span><div><h3 id="codes-heading">Códigos relacionados</h3><p>Copie somente quando aplicável.</p></div></div><div id="code-list" class="code-list"></div></section>
-            <section class="side-panel help-panel"><span class="side-icon secondary-icon">i</span><h3>O que muda no PEC?</h3><p>Alguns procedimentos SIGTAP podem ser incluídos automaticamente quando o profissional preenche o campo estruturado, como a pressão arterial e a antropometria.</p><p><strong>Não basta colar um código:</strong> o registro precisa ficar no campo correto e corresponder a um fato realizado.</p></section>
-            <section class="side-panel sources-panel"><h3>Fontes de consulta</h3><a href="https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/" target="_blank" rel="noopener noreferrer">Guia e-SUS APS ↗</a><a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia" target="_blank" rel="noopener noreferrer">Fichas técnicas e indicadores ↗</a><p>Referências iniciais de 2026; confirme a versão vigente antes de usar.</p></section>
+          <aside class="context-panel" aria-label="Painel contextual">
+            <div class="context-card">
+              <div class="context-top"><span class="context-ico">⌗</span><span class="context-label">CONSULTA RÁPIDA</span></div>
+              <h3>Códigos do contexto</h3><p>Referências para conferência. Nenhum código é aplicado automaticamente ao paciente.</p>
+              <div id="code-list" class="quick-codes"></div>
+              <button type="button" class="full-width-link" id="all-codes">Ver biblioteca de códigos <span aria-hidden="true">→</span></button>
+            </div>
+            <div class="context-card note-card">
+              <div class="context-top"><span class="context-ico note-ico">✓</span><span class="context-label">LEMBRETE DO PEC</span></div>
+              <h3>Campo estruturado primeiro.</h3>
+              <p>Pressão arterial, antropometria e outros dados devem ser registrados nos locais apropriados. Copiar um SIGTAP não comprova atendimento nem transmissão.</p>
+            </div>
+            <div class="source-mini"><span>BASE DOCUMENTAL</span><strong>Referências ministeriais • 2026</strong><button type="button" data-view="fontes">Consultar rastreabilidade <span aria-hidden="true">↗</span></button></div>
           </aside>
         </div>
       </section>
-      <footer><span><strong>Zera-APS</strong> · protótipo local v0.1</span><span>Sem login, sem servidor, sem pacientes, sem integração automática.</span></footer>
+
+      <section class="view" id="view-codigos" hidden aria-labelledby="codes-heading">
+        <div class="page-heading compact"><div><div class="overline"><span class="overline-line"></span> FERRAMENTAS</div><h1 id="codes-heading">Biblioteca de <em>códigos.</em></h1><p>Busque por descrição, sistema, número ou linha de cuidado. Sempre confirme a indicação clínica.</p></div></div>
+        <div class="library"><div class="library-toolbar"><label class="library-search"><span aria-hidden="true">⌕</span><input type="search" id="code-search" placeholder="Ex.: I10, antropometria, SIGTAP..." autocomplete="off"></label><span id="code-count">— códigos</span></div><div class="library-head"><span>SISTEMA / CÓDIGO</span><span>DESCRIÇÃO E CONTEXTO</span><span>AÇÃO</span></div><div id="code-library" class="library-list"></div></div>
+        <p class="library-disclaimer">Esta biblioteca contém referências da base preliminar, não um catálogo oficial completo. Não use códigos sem confirmação de compatibilidade com o registro efetivo.</p>
+      </section>
+
+      <section class="view" id="view-fontes" hidden aria-labelledby="sources-heading">
+        <div class="page-heading compact"><div><div class="overline"><span class="overline-line"></span> RASTREABILIDADE</div><h1 id="sources-heading">Fontes e <em>limites.</em></h1><p>O que a plataforma apresenta, o que não comprova e como tratar divergências.</p></div></div>
+        <div class="info-grid"><article class="info-card"><div class="info-index">01 / ORIGEM</div><h2>Manuais do e-SUS APS</h2><p>Consulte as orientações oficiais para preenchimento e campos estruturados no prontuário.</p><a href="https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/" target="_blank" rel="noopener noreferrer">Abrir guia do Ministério da Saúde ↗</a></article><article class="info-card"><div class="info-index">02 / INDICADORES</div><h2>Fichas técnicas</h2><p>Critérios, janelas e regras podem sofrer atualizações. O app não calcula o resultado oficial.</p><a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia" target="_blank" rel="noopener noreferrer">Abrir fichas técnicas ↗</a></article></div>
+        <div class="limits-card"><span class="limits-mark">!</span><div><h2>Limitações que não podem ser omitidas</h2><p>A cobertura dos módulos é parcial, os critérios ainda exigem auditoria clínica e normativa e não existe conexão autenticada ao e-SUS PEC. Sem histórico e validação dos dados, não é possível confirmar registro, elegibilidade, indicador, faturamento ou pontuação municipal.</p><p>As marcações “revisado” não são indicadores, prontuário ou evidência de realização de procedimentos. A fonte original prevalece em caso de divergência.</p></div></div>
+      </section>
+
+      <section class="view" id="view-piloto" hidden aria-labelledby="pilot-heading">
+        <div class="page-heading compact"><div><div class="overline"><span class="overline-line"></span> EVOLUÇÃO DO PRODUTO</div><h1 id="pilot-heading">Piloto com <em>50 médicos.</em></h1><p>Visão de preparação para acesso individual, validação e escala comercial.</p></div></div>
+        <div class="pilot-state"><div><span class="pilot-state-label">ESTADO ATUAL</span><h2>Interface funcional, acesso ainda demonstrativo.</h2><p>Esta versão permite explorar guias e copiar referências, mas não oferece autenticação ou sessão de usuário. Contas reais só devem ser habilitadas após a infraestrutura e a revisão de segurança estarem prontas.</p></div><span class="pilot-badge">NÃO LIBERADO</span></div>
+        <div class="pilot-stages"><div class="pilot-stage"><span class="stage-number">01</span><div><strong>Experiência clínica</strong><small>Navegação, busca, leitura e biblioteca de códigos</small></div><span class="stage-status ready">Protótipo</span></div><div class="pilot-stage"><span class="stage-number">02</span><div><strong>Contas e sessões segregadas</strong><small>Convites, autenticação, recuperação de acesso e auditoria</small></div><span class="stage-status">Pendente</span></div><div class="pilot-stage"><span class="stage-number">03</span><div><strong>Base clínica homologada</strong><small>Regras versionadas, testes clínicos e revisão das fontes</small></div><span class="stage-status">Pendente</span></div><div class="pilot-stage"><span class="stage-number">04</span><div><strong>Publicação e observabilidade</strong><small>Ambiente de hospedagem, logs técnicos e teste com 50 contas</small></div><span class="stage-status">Pendente</span></div></div>
+        <p class="pilot-foot">Arquitetura de implantação e critérios de aceite no repositório em <code>docs/PLANO-PILOTO-50.md</code>. Nenhum gasto ou serviço foi contratado nesta entrega.</p>
+      </section>
     </main>
   </div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <dialog id="help-modal"><div class="modal-title"><h2>Como funciona</h2><button type="button" id="help-close" aria-label="Fechar">×</button></div><p>Este aplicativo é um catálogo interativo de orientações. Selecione uma linha de cuidado; confira o que deve ser documentado no PEC, em qual campo e por quem. Use a busca para localizar termos ou códigos e o botão Copiar para transferir um código.</p><p>A marcação “Revisei” é apenas um controle de leitura nesta tela. Não verifica atendimento, paciente nem pontuação do indicador.</p><p><strong>Privacidade:</strong> os dados do guia são locais, nenhum identificador de paciente é solicitado ou armazenado e a marcação não persiste ao atualizar a página.</p><form method="dialog"><button class="button-primary">Entendi</button></form></dialog>
-  <script src="data/regras.js"></script>
-  <script src="app.js"></script>
+</div>
+
+<dialog id="search-dialog" class="search-dialog" aria-labelledby="search-dialog-heading"><div class="dialog-search-head"><label><span>⌕</span><span class="sr-only" id="search-dialog-heading">Busca global</span><input type="search" id="global-search" placeholder="Busque orientação, condição ou código..." autocomplete="off"></label><button type="button" id="search-close" aria-label="Fechar busca">Esc</button></div><div id="search-results" class="search-results" aria-live="polite"></div><div class="search-dialog-footer">Use a busca para localizar referências. Nenhum diagnóstico é definido automaticamente.</div></dialog>
+<dialog id="help-dialog" class="help-dialog" aria-labelledby="help-heading"><div class="help-head"><h2 id="help-heading">Como utilizar o ZERA-APS</h2><button type="button" id="help-close" aria-label="Fechar">×</button></div><p><strong>1.</strong> Escolha a linha de cuidado. <strong>2.</strong> Abra o item para ler campo PEC, prazo, ressalvas e referências. <strong>3.</strong> Copie códigos apenas se corresponderem ao atendimento real. <strong>4.</strong> Use a marcação de revisão somente para organizar a leitura atual.</p><p>Não digite dados pessoais ou clínicos identificáveis. O protótipo não acessa o PEC, não compartilha informações entre profissionais e não valida financiamento.</p><button type="button" id="help-confirm" class="primary-button">Entendi</button></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="data/regras.js"></script>
+<script src="app.js"></script>
+<script src="client-auth.js"></script>
 </body>
 </html>

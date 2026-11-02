@@ -1,0 +1,22 @@
+{
+  "name": "zera-aps",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "ZERA-APS - pilot workspace for 50 invited physicians, no patient data",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node server/launch.mjs",
+    "dev": "node server/launch.mjs",
+    "bootstrap-admin": "node server/cli.mjs bootstrap-admin",
+    "test:api": "node --test tests/server.test.mjs",
+    "test:static": "node tests/test_static.mjs",
+    "test:browser": "python3 tests/test_ui.py",
+    "test": "node --test tests/server.test.mjs && node tests/test_static.mjs && node tools/audit-rules.mjs",
+    "test:rules": "node tools/audit-rules.mjs",
+    "recover-account": "node server/cli.mjs recover-account",
+    "backup": "node server/backup.mjs"
+  }
+}

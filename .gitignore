@@ -1,0 +1,21 @@
+# Credenciais, sessões, backups e bancos locais (nunca publicar)
+.env
+.env.*
+!.env.example
+runtime/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-wal
+*.db-shm
+*.key
+*.pem
+node_modules/
+coverage/
+.DS_Store
+__pycache__/
+.pytest_cache/
+tests/preview-*.png
+
+backups/
