@@ -58,10 +58,12 @@
         }
       }
       for (const [key, values] of Object.entries(c.codes || {})) {
-        const system = key === "cid10" ? "CID-10" : key === "ciap2" ? "CIAP-2" : key.toUpperCase();
+        const normalized = key.toLowerCase().replace(/_examples$/, "");
+        const system = normalized === "cid10" ? "CID-10" : normalized === "ciap2" ? "CIAP-2" : normalized.toUpperCase();
+        const label = key.endsWith("_examples") ? "Exemplo não exaustivo; verificar contexto clínico e guia oficial." : "Referência vinculada ao contexto. Verificar indicação clínica.";
         for (const value of values || []) {
           const k = system + ":" + value;
-          if (!seen.has(k)) seen.set(k, { system, value, label: "Referência vinculada ao contexto. Verificar indicação clínica.", context: c.title, cardId: c.id });
+          if (!seen.has(k)) seen.set(k, { system, value, label, context: c.title, cardId: c.id });
         }
       }
     }
