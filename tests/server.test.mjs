@@ -5,6 +5,7 @@ import {createStore,passwordHash,passwordMatch} from '../server/core.mjs';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {request as httpRequest} from 'node:http';
 
 const mail=i=>`doctor${i}@example.test`;
 test('password hashing and validation',()=>{
@@ -62,6 +63,17 @@ test('HTTP sessions, csrf, origin, role access, 50 seat concept and disable',asy
  try{
   assert.equal((await request('/')).status,303);
   assert.equal((await request('/login')).status,200);
+  assert.equal((await request('/app.js')).status,401);
+  assert.equal((await request('/data/regras.js')).status,401);
+  assert.equal((await request('/client-auth.js')).status,401);
+  assert.equal((await request('/server/core.mjs')).status,404);
+  assert.equal((await request('/.env')).status,404);
+  assert.equal((await request('/api/team')).status,401);
+  const badHostStatus=await new Promise((resolve,reject)=>{
+    const req=httpRequest({hostname:'127.0.0.1',port:8787,path:'/login',method:'GET',headers:{host:'evil.example.test'}},res=>{res.resume();resolve(res.statusCode);});
+    req.on('error',reject);req.end();
+  });
+  assert.equal(badHostStatus,400);
   const bootstrap=store.createInvite('root@example.test','admin');
   const register=await request('/api/invite/accept','POST',{token:bootstrap.token,email:'root@example.test',password:'admin-secret-phrase!'});
   assert.equal(register.status,201);const cookie=register.headers.get('set-cookie').split(';')[0];
