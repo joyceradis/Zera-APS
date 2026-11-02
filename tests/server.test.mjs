@@ -18,6 +18,10 @@ test('stores, seat limits, invite replay and isolation',()=>{
  const a=s.createInvite(mail(1),'doctor');
  const b=s.createInvite(mail(2),'doctor');
  assert.equal(s.countSeats().free,0);
+ const refreshed=s.createInvite(mail(2),'doctor');
+ assert.equal(s.countSeats().free,0);
+ assert.throws(()=>s.redeemInvite(b.token,mail(2),'some-password-long-enough'),/INVALID_INVITE/);
+ assert.ok(refreshed.token !== b.token);
  assert.throws(()=>s.createInvite(mail(3),'doctor'),/SEATS_FULL/);
  const u=s.redeemInvite(a.token,mail(1),'long-secret-phrase1');
  assert.throws(()=>s.redeemInvite(a.token,mail(1),'long-secret-phrase1'));
