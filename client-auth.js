@@ -19,6 +19,7 @@
   }; 
   profile.textContent = state.user.email.slice(0,2).toUpperCase();
   profile.title = state.user.email + ' · ' + state.user.role;
+  profile.setAttribute('aria-label','Abrir minha conta: '+state.user.email);
   const container = document.createElement('dialog');
   container.className='account-dialog';
   container.setAttribute('aria-label','Conta e administração');
