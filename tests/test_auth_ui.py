@@ -91,7 +91,7 @@ with TemporaryDirectory(prefix="zera-ui-") as temporary:
             expect(doctor.locator('[data-bookmark="C5-A"]')).to_have_attribute("aria-pressed", "true")
             doctor.reload()
             expect(doctor.locator('[data-bookmark="C5-A"]')).to_have_attribute("aria-pressed", "true")
-            assert (await_doctor_access := doctor.request.get(origin + "/api/team")).status == 403
+            assert doctor_context.request.get(origin + "/api/team").status == 403
             doctor.locator("#profile-button").click()
             assert DOCTOR_EMAIL in doctor.locator(".account-dialog").inner_text()
             doctor.locator(".account-dialog").get_by_text("Encerrar sessão").click()
