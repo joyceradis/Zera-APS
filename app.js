@@ -1,135 +1,207 @@
-/* Zera-APS — interface estática, sem APIs, persistência, cookies ou dados de pacientes. */
+/* Roteiro em memória: nenhuma consulta ao PEC, persistência ou cálculo de pontuação. */
 (() => {
   'use strict';
+  const $ = id => document.getElementById(id);
   const data = window.ZERA_APS_DATA;
-  if (!data || !Array.isArray(data.cards)) {
-    document.getElementById('rule-list').textContent = 'Base de orientações não encontrada. Verifique data/regras.js.';
+  if (!Array.isArray(data?.cards)) {
+    $('setup').textContent = 'Não foi possível carregar a base. Reabra o aplicativo com a pasta data disponível.';
     return;
   }
-  const $ = (id) => document.getElementById(id);
-  const icons = {has:'♥',dm:'◈',prenatal:'✦',mulher:'♀',mental:'◎'};
-  const checked = new Set();
-  const expanded = new Set();
-  let selected = 'has';
-  let query = '';
-  let showAllCodes = false;
-  let toastTimer;
-  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
-  const normalize = (s) => String(s ?? '').toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const cards = data.cards;
-  const currentCard = () => cards.find(c => c.id === selected) || cards[0];
 
-  function toast(msg) {
-    $('toast').textContent = msg;
-    $('toast').classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2600);
+  // Apenas organização editorial. Critérios, códigos, caminhos e ressalvas vêm da base.
+  const actions = {
+    'C5-A': ['consulta', 'Consulta e condição registrada', 'Localize a consulta e confira a condição na Avaliação e na lista de problemas.', 'medical'],
+    'C4-A': ['consulta', 'Consulta e condição registrada', 'Localize a consulta e confira a condição na Avaliação e na lista de problemas.', 'medical'],
+    'C5-B': ['pa', 'Pressão arterial', 'Confira o valor registrado no campo de pressão arterial do PEC.', 'medical'],
+    'C4-B': ['pa', 'Pressão arterial', 'Confira o valor registrado no campo de pressão arterial do PEC.', 'medical'],
+    'C5-C': ['peso-altura', 'Peso e altura', 'Confira se peso e altura estão nos campos próprios e na mesma data.', 'medical'],
+    'C4-C': ['peso-altura', 'Peso e altura', 'Confira se peso e altura estão nos campos próprios e na mesma data.', 'medical'],
+    'C5-D': ['visitas', 'Visitas domiciliares com o ACS', 'Confira com a equipe as datas e os registros das visitas no e-SUS Território.', 'team'],
+    'C4-D': ['visitas', 'Visitas domiciliares com o ACS', 'Confira com a equipe as datas e os registros das visitas no e-SUS Território.', 'team'],
+    'C4-E': ['hba1c', 'Registro da HbA1c', 'Diferencie a solicitação do exame da avaliação de um resultado existente.', 'medical'],
+    'C4-F': ['pes', 'Registro do exame dos pés', 'Se o exame foi realizado, confira a descrição e o procedimento correspondente.', 'medical'],
+    'C3-A': ['inicio-prenatal', 'Início do pré-natal', 'Confira a DUM estruturada, a consulta inicial e o registro da gestação.', 'medical'],
+    'C3-B': ['consultas-prenatal', 'Consultas de pré-natal', 'Confira as consultas no histórico e os campos estruturados de pré-natal.', 'medical'],
+    'C3-C': ['pa-prenatal', 'Pressão arterial no pré-natal', 'Localize as aferições registradas durante a gestação.', 'medical'],
+    'C3-D': ['peso-prenatal', 'Peso e altura no pré-natal', 'Confira os pares de registros na mesma data durante a gestação.', 'medical'],
+    'C3-E': ['visitas-prenatal', 'Visitas do ACS no pré-natal', 'Confira as visitas com a equipe, considerando a fase da gestação.', 'team'],
+    'C3-F': ['dtpa', 'Registro da dTpa', 'Confira a aplicação ou a transcrição de vacinação comprovada.', 'team'],
+    'C3-G': ['testes-primeiro', 'Testes do primeiro trimestre', 'Confira os registros de sífilis, HIV e hepatites B e C no primeiro trimestre.', 'medical'],
+    'C3-H': ['testes-terceiro', 'Testes do terceiro trimestre', 'Confira os registros de sífilis e HIV no terceiro trimestre.', 'medical'],
+    'C3-I': ['consulta-puerperio', 'Consulta puerperal', 'Confira a consulta no puerpério e a data de desfecho da gestação no PEC.', 'medical'],
+    'C3-J': ['visita-puerperio', 'Visita do ACS no puerpério', 'Confira com o ACS o registro da visita puerperal no e-SUS Território.', 'team'],
+    'C3-K': ['bucal-gestacao', 'Saúde bucal na gestação', 'Confira com a odontologia o atendimento realizado durante a gestação.', 'team'],
+    'C7-A': ['colo', 'Registro do rastreamento do colo', 'Confira modalidade, faixa etária e histórico antes de interpretar o componente.', 'medical'],
+    'C7-B': ['hpv', 'Registro da vacinação HPV', 'Confira com a vacinação o registro e a elegibilidade do componente.', 'team'],
+    'C7-C': ['sexual', 'Atendimento de saúde sexual e reprodutiva', 'Confira se o código da Avaliação corresponde ao atendimento realizado.', 'medical'],
+    'C7-D': ['mama', 'Registro do rastreamento de mama', 'Diferencie solicitação e avaliação do exame e confira elegibilidade e histórico.', 'medical']
+  };
+
+  let selected = [];
+  let phase = '';
+  let groups = [];
+  const reviewed = new Set();
+  let toastTimer;
+
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+  const normalize = value => String(value ?? '').toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const sourceLink = value => {
+    try { const url = new URL(value); return url.protocol === 'https:' ? url.href : ''; }
+    catch { return ''; }
+  };
+  const labelFor = card => card.id === 'prenatal' ? phase === 'puerperio' ? 'Puerpério' : 'Pré-natal' : card.title;
+  const keysFromForm = () => Array.from(document.querySelectorAll('[name="condition"]:checked'), el => el.value);
+
+  function updateSelection() {
+    const keys = keysFromForm();
+    const needsPhase = keys.includes('prenatal');
+    $('phase-field').hidden = !needsPhase;
+    const phaseChoice = document.querySelector('[name="phase"]:checked');
+    $('build-guide').disabled = !keys.length || (needsPhase && !phaseChoice);
+    $('selection-hint').textContent = !keys.length ? 'Selecione pelo menos uma situação para começar.' : needsPhase && !phaseChoice ? 'Escolha pré-natal ou puerpério para separar os percursos.' : 'Tudo pronto para organizar a conferência.';
   }
-  async function copy(value) {
-    try {
-      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(value);
-      else {
-        const el = document.createElement('textarea');
-        el.value = value; el.style.position = 'fixed'; el.style.opacity = '0'; document.body.appendChild(el);
-        el.focus(); el.select();
-        const ok = document.execCommand('copy');
-        el.remove();
-        if (!ok) throw new Error('Cópia indisponível');
-      }
-      toast('Código copiado: ' + value);
-    } catch (err) { toast('Não foi possível copiar automaticamente. Selecione o código.'); }
-  }
-  function renderModules() {
-    $('modules').innerHTML = cards.map(c => `<button type="button" class="module-card ${selected===c.id?'active':''}" aria-pressed="${selected===c.id}" data-module="${esc(c.id)}"><span class="module-icon" aria-hidden="true">${icons[c.id]||'+'}</span><strong>${esc(c.title)}</strong><small>${c.indicator?`Indicador ${esc(c.indicator)}`:'Mapeamento pendente'}</small></button>`).join('');
-    $('modules').querySelectorAll('[data-module]').forEach(btn => btn.addEventListener('click', () => {
-      selected = btn.dataset.module;
-      query = ''; $('search').value = ''; showAllCodes = false;
-      render();
-    }));
-  }
-  function getSearchRules() {
-    if (!query.trim()) return currentCard().rules.map(r=>({rule:r,card:currentCard()}));
-    const q = normalize(query).trim();
-    return cards.flatMap(card=>(card.rules||[]).filter(r=> normalize([card.title,card.indicator,r.id,r.title,r.goal,r.window,r.actor,r.pec_location,(r.codes||[]).map(z=>z.value).join(' '),...(r.cautions||[])].join(' ')).includes(q)).map(rule=>({rule,card})));
-  }
-  function getCodes() {
-    const all=[]; const seen=new Set();
-    const relevant = query.trim() ? cards : [currentCard()];
-    for(const card of relevant){
-      for(const rule of card.rules||[]) for(const code of rule.codes||[]){
-        const key=`${code.system}|${code.value}`;
-        if(!seen.has(key)) { seen.add(key); all.push({system:code.system,value:code.value,label:code.label||rule.title,card:card.title}); }
-      }
-      for(const [system,codes] of Object.entries(card.codes||{})) for(const value of codes||[]){
-        const sys = system==='cid10'?'CID-10':system==='ciap2'?'CIAP-2':system.toUpperCase();
-        const key=`${sys}|${value}`;
-        if(!seen.has(key)) { seen.add(key); all.push({system:sys,value,label:`Código de referência • ${card.title}. Confirmar indicação antes de utilizar.`,card:card.title}); }
-      }
-    }
-    if(query.trim()) {
-      const q=normalize(query).trim();
-      return all.filter(c => normalize(`${c.system} ${c.value} ${c.label} ${c.card}`).includes(q));
-    }
-    // Prioridade para códigos usuais de referência no cartão de hipertensão
-    if(selected==='has') {
-      const first=['03.01.10.003-9','I10','K86','01.01.04.008-3','01.01.04.007-5'];
-      all.sort((a,b)=>{
-        const x=first.indexOf(a.value),y=first.indexOf(b.value);
-        return (x<0?999:x)-(y<0?999:y);
+
+  function makeGroups() {
+    const map = new Map();
+    data.cards.filter(card => selected.includes(card.id)).forEach(card => {
+      (card.rules || []).forEach(rule => {
+        if (card.id === 'prenatal' && rule.phase !== phase) return;
+        const [key, title, instruction, lane] = actions[rule.id] || [rule.id, rule.title, 'Confira o registro e as condições de aplicação na base.', 'medical'];
+        if (!map.has(key)) map.set(key, {key, title, instruction, lane, variants: []});
+        map.get(key).variants.push({rule, card});
       });
-    }
-    return all;
+    });
+    const laneOrder = {medical: 0, shared: 1, team: 2};
+    return Array.from(map.values()).sort((a, b) => laneOrder[a.lane] - laneOrder[b.lane]);
   }
-  function renderCodes(){
-    const codes=getCodes();
-    const n=showAllCodes?codes.length:Math.min(codes.length,6);
-    if(!codes.length){ $('code-list').innerHTML='<div class="empty"><strong>Nenhum código correspondente</strong><p>Tente outro termo ou selecione uma área diferente.</p></div>';return; }
-    $('code-list').innerHTML = codes.slice(0,n).map(c=>`<div class="code-row"><div><span class="code-type">${esc(c.system)}</span><button type="button" class="copy-btn" data-copy="${esc(c.value)}" aria-label="Copiar ${esc(c.value)}">Copiar</button></div><div class="code-value">${esc(c.value)}</div><p class="code-label">${esc(c.label)}</p></div>`).join('') +(codes.length>6?`<button type="button" class="button-outline" style="margin-top:12px;width:100%;height:36px" id="show-codes">${showAllCodes?'Mostrar menos':`Ver mais ${codes.length-6} códigos`}</button>`:'');
-    $('code-list').querySelectorAll('[data-copy]').forEach(btn=>btn.addEventListener('click',()=>copy(btn.dataset.copy)));
-    const more=$('show-codes'); if(more) more.addEventListener('click',()=>{showAllCodes=!showAllCodes;renderCodes();});
+
+  function criteriaMarkup(group) {
+    // Cada regra conserva seu próprio caminho, prazo, código, profissional, fonte e ressalvas.
+    return group.variants.map(({rule, card}) => {
+      const link = sourceLink(rule.source);
+      const methodology = sourceLink(rule.methodology_source);
+      const diagnosticCodes = group.key === 'consulta' ? Object.entries(card.codes || {}).flatMap(([system, codes]) => codes.map(value => ({
+        system: system === 'cid10' ? 'CID-10' : system === 'ciap2' ? 'CIAP-2' : system,
+        value, label: 'Referência diagnóstica: selecionar somente se corresponder ao diagnóstico.'
+      }))) : [];
+      const codes = [...(rule.codes || []), ...diagnosticCodes];
+      return `<section class="criterion" aria-label="${esc(rule.id)}">
+        <h4>${esc(labelFor(card))} <span>${esc(rule.id)}</span></h4>
+        <dl><dt>Critério da ficha do indicador</dt><dd>${esc(rule.goal)} · ${esc(rule.window)}</dd>
+        <dt>Campo no PEC / sistema da equipe</dt><dd>${esc(rule.pec_location)}</dd>
+        <dt>Profissional indicado na base</dt><dd>${esc(rule.actor)}</dd></dl>
+        ${(rule.cautions || []).length ? `<div class="cautions"><strong>Cuidados para este item</strong><ul>${rule.cautions.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>` : ''}
+        ${codes.length ? `<details class="codes"><summary>Códigos de referência — somente se aplicáveis</summary><p>Copiar não registra o atendimento. Confira os campos estruturados antes de acrescentar procedimentos.</p>${codes.map(code => `<div class="code-row"><span><small>${esc(code.system)}</small><code>${esc(code.value)}</code>${code.label ? `<small>${esc(code.label)}</small>` : ''}</span><button type="button" class="button secondary copy-button" data-copy="${esc(code.value)}" aria-label="Copiar ${esc(code.value)}">Copiar</button></div>`).join('')}</details>` : ''}
+        ${link ? `<a class="source-link" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Fonte indicada na base ↗</a>` : '<p>Fonte específica não disponível.</p>'}
+        ${methodology ? `<a class="source-link" href="${esc(methodology)}" target="_blank" rel="noopener noreferrer">Nota metodológica oficial ↗</a>` : ''}
+      </section>`;
+    }).join('');
   }
-  function ruleMarkup(rule,card){
-    const isOpen=expanded.has(rule.id),isChecked=checked.has(rule.id);
-    const extra = query.trim() && card.id!==selected ? `<span class="code-chip">${esc(card.title)}</span> `:'';
-    const codes=(rule.codes||[]).map(c=>`<span class="code-chip">${esc(c.system)} ${esc(c.value)}</span>`).join('');
-    const caution=(rule.cautions||[]).length?`<div class="caution"><strong>Atenção:</strong><ul style="margin:6px 0 0;padding-left:17px">${rule.cautions.map(v=>`<li>${esc(v)}</li>`).join('')}</ul></div>`:'';
-    return `<article class="rule ${isOpen?'open':''}" data-rule="${esc(rule.id)}"><div class="rule-summary"><label class="checkbox-label"><input type="checkbox" class="rule-checkbox" data-check="${esc(rule.id)}" ${isChecked?'checked':''} aria-label="Marquei como revisado: ${esc(rule.title)}" /><span><span class="rule-title">${esc(rule.title)}</span><span class="rule-meta">${extra}${esc(rule.id)} · ${esc(rule.goal||'Orientação')} · ${esc(rule.window||'Conforme contexto')}</span></span></label><button type="button" class="rule-toggle" data-toggle="${esc(rule.id)}" aria-expanded="${isOpen}" aria-label="${isOpen?'Ocultar':'Ver'} detalhes de ${esc(rule.title)}">${isOpen?'Ocultar −':'Ver detalhes +'}</button></div><div class="rule-body"><div class="rule-body-row"><strong>Profissional</strong><p>${esc(rule.actor||'Consultar regra')}</p></div><div class="rule-body-row"><strong>Onde no PEC</strong><p>${esc(rule.pec_location||'Local a validar')}</p></div><div class="rule-body-row"><strong>Referências</strong><div class="code-chips">${codes||'<span style="color:#8c96a9;font-size:11px">Sem código único definido neste componente.</span>'}</div></div>${caution}<p style="margin:12px 0 0"><a class="source-link" href="https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/" target="_blank" rel="noopener noreferrer">Consultar fonte oficial ↗</a></p></div></article>`;
+
+  function actionMarkup(group, index) {
+    const badges = group.variants.map(({rule}) => rule.id).join(' · ');
+    return `<article class="action ${reviewed.has(group.key) ? 'reviewed' : ''}" data-action="${esc(group.key)}">
+      <div class="action-main"><span class="number" aria-hidden="true">${index + 1}</span><div><h3>${esc(group.title)}</h3><p>${esc(group.instruction)}</p></div></div>
+      <details class="action-details"><summary>Ver campo do PEC e critério de conferência</summary>
+        ${group.variants.length > 1 ? '<p class="merge-note">Ação reunida para facilitar a leitura. Confira cada condição abaixo: um registro não comprova automaticamente dois indicadores.</p>' : ''}
+        ${criteriaMarkup(group)}
+      </details>
+      <label class="review-control"><input type="checkbox" data-review="${esc(group.key)}" ${reviewed.has(group.key) ? 'checked' : ''}> Já conferi este item no PEC <span>${esc(badges)}</span></label>
+    </article>`;
   }
-  function renderRules(){
-    const matches = getSearchRules();
-    if(currentCard().rules.length===0 && !query.trim()){
-      $('rule-list').innerHTML='<div class="empty"><strong>Conteúdo ainda não homologado</strong><p>Não existe uma regra única para toda a saúde mental. Este card está reservado para mapeamento por situação clínica, sem inventar códigos ou condutas.</p></div>';
-    }else if(!matches.length){
-      $('rule-list').innerHTML='<div class="empty"><strong>Nenhuma orientação encontrada</strong><p>Experimente outro termo ou selecione uma área de atendimento.</p></div>';
-    }else{
-      $('rule-list').innerHTML=matches.map(({rule,card})=>ruleMarkup(rule,card)).join('');
-    }
-    $('rule-list').querySelectorAll('[data-toggle]').forEach(b=>b.addEventListener('click',()=>{
-      const id=b.dataset.toggle;expanded.has(id)?expanded.delete(id):expanded.add(id);renderRules();
-    }));
-    $('rule-list').querySelectorAll('[data-check]').forEach(box=>box.addEventListener('change',()=>{
-      box.checked?checked.add(box.dataset.check):checked.delete(box.dataset.check);
-      renderProgress();
-    }));
+
+  function searchable(group) {
+    return normalize(JSON.stringify([group.title, group.instruction, group.variants.map(({rule, card}) => [rule, card.title, group.key === 'consulta' ? card.codes : null])]));
   }
-  function renderProgress(){
-    const c=currentCard(), total=(c.rules||[]).length, n=c.rules.filter(r=>checked.has(r.id)).length;
-    $('progress-title').textContent=total?`${n} de ${total} orientações revisadas`:'Aguardando mapeamento';
-    $('progress-description').textContent='Marcação manual de leitura, não validação de indicador.';
-    $('progress-fill').style.width=total?`${100*n/total}%`:'0%';
+
+  function renderActions() {
+    const query = normalize($('search').value).trim();
+    const filtered = groups.filter(group => !query || searchable(group).includes(query));
+    const lanes = [
+      ['medical', 'Conferir no registro do atendimento', 'Localize o registro e confira a indicação e o histórico. A ausência de um registro não é indicação automática de repetir um procedimento.'],
+      ['shared', 'Conferir em conjunto com a equipe', 'Este componente reúne responsabilidades da consulta e da equipe.'],
+      ['team', 'Conferir com a equipe', 'Visitas e vacinação têm responsáveis e registros próprios.']
+    ];
+    $('action-list').innerHTML = lanes.map(([lane, title, description]) => {
+      const items = filtered.filter(group => group.lane === lane);
+      return items.length ? `<section class="lane ${lane}" aria-label="${title}"><div class="lane-heading"><h2>${title}</h2><p>${description}</p></div>${items.map(group => actionMarkup(group, groups.indexOf(group))).join('')}</section>` : '';
+    }).join('');
+    $('no-results').hidden = filtered.length > 0;
+    updateProgress();
   }
-  function render(){
-    const c=currentCard();
-    renderModules();
-    $('panel-heading').textContent=query.trim()?'Resultados em todas as áreas':c.title;
-    $('indicator-label').textContent=query.trim()?'BUSCA GLOBAL':c.indicator?`INDICADOR ${c.indicator}`:'ÁREA RESERVADA';
-    $('panel-summary').textContent=query.trim()?`Buscando “${query.trim()}” nos componentes cadastrados.`:(c.rules.length?`${c.rules.length} orientações documentais preliminares. Verifique elegibilidade, contexto e versão do PEC.`:'Não há conteúdo clínico validado para exibição.');
-    $('coverage-tag').textContent=c.rules.length?'Base parcial • revisar':'Pendente';
-    renderRules();renderProgress();renderCodes();
+
+  function updateProgress() {
+    $('review-summary').textContent = `${reviewed.size} de ${groups.length} itens conferidos manualmente`;
   }
-  $('search').addEventListener('input',e=>{query=e.target.value;showAllCodes=false;render();});
-  $('reset').addEventListener('click',()=>{checked.clear();render();toast('Marcações manuais limpas.');});
-  $('help-button').addEventListener('click',()=>$('help-modal').showModal());
-  $('help-close').addEventListener('click',()=>$('help-modal').close());
-  render();
+
+  function buildGuide(event) {
+    event.preventDefault();
+    if ($('build-guide').disabled) return;
+    selected = keysFromForm();
+    phase = selected.includes('prenatal') ? document.querySelector('[name="phase"]:checked').value : '';
+    reviewed.clear();
+    groups = makeGroups();
+    $('search').value = '';
+    $('guide-heading').textContent = data.cards.filter(card => selected.includes(card.id)).map(labelFor).join(' + ');
+    $('page-heading').textContent = 'O que preciso conferir nesta consulta?';
+    $('page-description').textContent = 'Siga o roteiro abaixo. Abra apenas o item em que precisar consultar o campo do PEC, o prazo ou o código.';
+    $('guide-context').textContent = selected.includes('prenatal') ? 'Pré-natal: componentes A–H e K. Puerpério: I e J. Confira trimestre, data de desfecho e histórico no PEC; a seleção da fase não confirma elegibilidade.' : selected.includes('mulher') ? 'Confira faixa etária, modalidade do exame e demais critérios em cada item. Selecionar esta situação não confirma elegibilidade.' : 'Situações combinadas compartilham a leitura de algumas ações. Os critérios de cada indicador continuam separados nos detalhes.';
+    $('base-date').textContent = `Revisão documental: ${data.reviewed_on || 'não disponível'}. Versão: ${data.version || 'não informada'}.`;
+    $('setup').hidden = true; $('guide').hidden = false;
+    renderActions();
+    $('guide-heading').focus();
+  }
+
+  function resetVisit() {
+    $('visit-form').reset();
+    selected = []; phase = ''; groups = []; reviewed.clear();
+    $('search').value = ''; $('action-list').replaceChildren();
+    $('review-summary').textContent = ''; $('guide-heading').textContent = ''; $('guide-context').textContent = '';
+    clearTimeout(toastTimer); $('toast').hidden = true;
+    $('guide').hidden = true; $('setup').hidden = false;
+    $('page-heading').textContent = 'Quem estou atendendo?';
+    $('page-description').textContent = 'Selecione as situações já identificadas. Vou organizar o que conferir no PEC e o que depende da equipe.';
+    updateSelection(); $('page-heading').focus();
+  }
+
+  async function copyCode(button) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(button.dataset.copy);
+      else {
+        const field = document.createElement('textarea');
+        field.value = button.dataset.copy; field.className = 'clipboard-field';
+        document.body.append(field); field.select();
+        const ok = document.execCommand('copy'); field.remove(); button.focus();
+        if (!ok) throw new Error('copy unavailable');
+      }
+      $('toast').textContent = 'Código copiado. O registro é feito no PEC.';
+    } catch { $('toast').textContent = 'Cópia indisponível. Selecione o código ao lado do botão.'; }
+    clearTimeout(toastTimer); $('toast').hidden = false;
+    toastTimer = setTimeout(() => { $('toast').hidden = true; }, 3000);
+  }
+
+  $('visit-form').addEventListener('change', updateSelection);
+  $('visit-form').addEventListener('submit', buildGuide);
+  $('new-visit').addEventListener('click', resetVisit);
+  $('edit-visit').addEventListener('click', () => {
+    $('guide').hidden = true; $('setup').hidden = false;
+    $('page-heading').textContent = 'Quem estou atendendo?';
+    $('page-description').textContent = 'Ajuste as situações. Ao montar o roteiro novamente, as marcações anteriores serão apagadas.';
+    $('page-heading').focus();
+  });
+  $('search').addEventListener('input', renderActions);
+  $('action-list').addEventListener('change', event => {
+    const key = event.target.dataset.review;
+    if (!key) return;
+    event.target.checked ? reviewed.add(key) : reviewed.delete(key);
+    event.target.closest('.action').classList.toggle('reviewed', event.target.checked);
+    updateProgress();
+  });
+  $('action-list').addEventListener('click', event => {
+    const button = event.target.closest('[data-copy]');
+    if (button) copyCode(button);
+  });
+  window.addEventListener('pageshow', event => { if (event.persisted) resetVisit(); });
+  $('visit-form').reset();
+  updateSelection();
 })();

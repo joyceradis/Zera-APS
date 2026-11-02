@@ -1,48 +1,50 @@
-# Zera-APS — MVP estático (v0.1)
+# Zera-APS — roteiro de conferência no PEC
 
-**Situação:** protótipo funcional de navegação, pesquisa, checklist manual e cópia de códigos. **Não é** produto assistencial homologado, integração com o PEC ou calculadora de indicadores.
+Aplicativo interativo para organizar a conferência dos registros de um atendimento de APS. Versão 0.2.0: critérios de C3, C4, C5 e C7 cruzados com as notas metodológicas oficiais e o guia e-SUS APS em 02/11/2026. A apuração oficial não é calculada. Consulte a rastreabilidade em [REVISÃO DE FONTES](docs/REVISAO-FONTES-2026-11-02.md).
 
-## Como executar (Estevão)
+## Como usar
 
-1. Baixe o projeto, mantendo a estrutura de pastas.
-2. Abra `index.html` em um navegador moderno (Chrome, Edge ou Safari). **Não precisa instalar nada nem pagar hospedagem**.
-3. Selecione um card (Hipertensão, Diabetes, Gestante e puerpério, Saúde da mulher ou Saúde mental).
-4. Explore as regras, busque nomes ou códigos e use o botão **Copiar**.
-5. Clique nos quadradinhos de **revisado** para acompanhar sua leitura. As marcações somem quando a página é recarregada.
+1. Selecione as situações já reconhecidas no atendimento. Pode combinar hipertensão e diabetes, por exemplo.
+2. Se selecionar gestação/puerpério, escolha a fase. Os dois percursos são separados.
+3. Clique em **Montar meu roteiro**.
+4. Confira os itens do registro do atendimento e, separadamente, os que dependem da equipe.
+5. Abra **Ver campo do PEC e critério de conferência** quando precisar do caminho, prazo, profissional, ressalvas ou código.
+6. Marque **Já conferi este item no PEC** apenas como controle manual de leitura.
+7. Use **Novo atendimento** para apagar as escolhas, busca e marcações antes de outro caso.
 
-A busca é global: procure uma palavra para localizar informações em todos os módulos. Saúde mental permanece sem regras clínicas, intencionalmente, até validação.
+Não informe identificadores de pacientes. As escolhas existem apenas na memória da página: recarregar também as apaga. Alterar situações e montar outro roteiro limpa as marcações anteriores.
 
-## Estrutura
+## Limites clínicos e de apuração
 
-- `index.html`: estrutura semântica do site.
-- `styles.css`: interface responsiva para celular/computador.
-- `app.js`: lógica de navegação, busca por sinônimos/códigos, checklist manual e cópia.
-- `data/regras.js`: base local carregada pelo navegador (sem servidor).
-- `data/regras-aps-2026.json`: base fonte de regras preliminares (versão pesquisável).
-- `docs/ESPECIFICACAO-CLINICO-FUNCIONAL.md`: escopo e cenários clínico-funcionais preliminares.
-- `tests/QA.md`: verificações e limitações.
+- O aplicativo não acessa o PEC, o histórico ou o sistema oficial de indicadores.
+- A base não foi validada para a versão local do PEC nem para a unidade de Vitor Hugo, em Marechal Floriano.
+- Selecionar uma situação não verifica elegibilidade, idade, histórico, modalidade de exame ou indicação clínica.
+- HAS e diabetes compartilham algumas ações de leitura, com mapeamento explícito por ID. Cada regra mantém seu prazo, código, campo, responsável, ressalvas e fonte nos detalhes.
+- Os componentes obstétricos não são mesclados aos de HAS/DM por semelhança de título.
+- Os 11 componentes A–K de C3 estão separados em pré-natal (A–H e K) e puerpério (I e J). C1, C2, C6, saúde mental e outros percursos ainda não estão incluídos.
+- A ausência de um registro não indica automaticamente repetição de procedimento.
+- Os critérios e caminhos foram cruzados documentalmente com fontes públicas. Isso não valida a implementação local do PEC ou a elegibilidade real de uma pessoa. O nome antigo “Previne Brasil” não identifica por si só qual regra se aplica.
 
-Quando modificar `data/regras-aps-2026.json`, **gere novamente** `data/regras.js`:
+## Desenvolvimento
+
+O navegador executa a lógica localmente; não há servidor de aplicação, bibliotecas externas, rastreadores ou persistência. Sirva a pasta com um servidor HTTP local para avaliar o aplicativo:
 
 ```sh
-python3 tools/gerar-base.py
+cd /workspace/Zera-APS
+python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Este comando também rejeita IDs duplicados. Depois execute `python3 tests/test_ui.py` (requer Playwright/Chromium instalado) para conferir a interface.
+Arquivos principais:
 
-### Princípios de implementação
+- `index.html`: entrada de situações e resultado do roteiro.
+- `app.js`: seleção, separação por fase, reunião explícita de ações, busca, cópia e limpeza.
+- `styles.css`: layout e acessibilidade.
+- `data/regras-aps-2026.json`: fonte dos critérios clínicos e documentais.
+- `data/regras.js`: versão da base carregada pelo navegador.
+- `tests/test_ui.py`: cenários de uso com Playwright/Chromium.
 
-- **Sem backend:** não usa autenticação, servidores, APIs nem serviços pagos.
-- **Sem dados de pacientes:** não coletar CPF, CNS, nome, idade identificável ou texto livre de evolução.
-- **Sem alterações no PEC:** o botão copia códigos apenas; o profissional deve registrar informações verdadeiras nos campos apropriados.
-- **Indicadores:** nenhum checkbox afirma que um indicador foi atingido.
-- **Revisão obrigatória:** o JSON clínico é uma primeira extração, com cobertura parcial de condições e critérios. Cada regra precisa ser revisada e versionada contra documentos oficiais antes de comercialização ou uso assistencial.
+As frases de navegação em `app.js` não substituem os critérios da base. Após uma alteração validada no JSON, execute `python3 tools/gerar-base.py` para atualizar a versão JS.
 
-## Antes de divulgar publicamente
+Execute `python3 tests/test_ui.py` para a verificação do navegador. O teste inicia e encerra seu próprio servidor em loopback e verifica os arquivos reais do aplicativo. Para salvar capturas fora do checkout, crie uma pasta e defina `ZERA_REVIEW_DIR` com esse caminho.
 
-1. Revisar códigos e cada regra no material normativo atualizado, com identificação de versão.
-2. Criar cenários de teste de elegibilidade, temporalidade, multimorbidade e ações de outros profissionais.
-3. Validar fluxos reais em ambiente autorizado do PEC, somente com dados fictícios.
-4. Revisar segurança, acessibilidade, direitos de uso, regulatório e privacidade.
-
-**Não há cobrança, instalação no PEC, deploy ou integração realizada por este pacote.**
+Publicar o ambiente de desenvolvimento não publica as alterações no GitHub Pages. O endereço público precisa de uma publicação própria, mediante autorização.

@@ -1,13 +1,18 @@
 /* Base estática local. Não armazena informações de pacientes. */
 window.ZERA_APS_DATA = {
-  "project": "Zera-APS — base clínica inicial (pré-validação)",
-  "version": "0.1.0",
+  "project": "Zera-APS — roteiro de registro para APS",
+  "version": "0.2.0",
   "prepared_on": "2026-10-31",
   "verified_sources": [
     "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-    "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia"
+    "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia",
+    "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+    "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view",
+    "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c5-cuidado-da-pessoa-com-hipertensao/view",
+    "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view",
+    "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-tecnica-no-8-2026-deaps-saps-ms"
   ],
-  "scope": "parcial; não cobre integralmente todas as linhas de cuidado e exceções",
+  "scope": "Roteiro documental dos componentes C3, C4, C5 e C7; critérios e caminhos cruzados com fontes públicas em 02/11/2026. Sem validação no PEC da unidade, sem integração e sem cálculo oficial.",
   "security": {
     "offline_first": true,
     "patient_identifiers": false,
@@ -39,7 +44,7 @@ window.ZERA_APS_DATA = {
       "patient_data_available_authorized"
     ],
     "status_values": [
-      "confirmed_in_official_esus_2026_guide",
+      "cross_checked_methodology_and_pec_guide",
       "pending_verification"
     ],
     "warning": "O protótipo independente não verifica registros nem calcula pontuação real dos pacientes."
@@ -49,7 +54,7 @@ window.ZERA_APS_DATA = {
       "id": "has",
       "title": "Hipertensão",
       "indicator": "C5",
-      "status": "partial_2026_rules_verified",
+      "status": "criteria_cross_checked_2026_11_02",
       "codes": {
         "ciap2": [
           "K86",
@@ -96,11 +101,15 @@ window.ZERA_APS_DATA = {
           "cautions": [
             "Não escolher código apenas para pontuar; deve corresponder ao diagnóstico.",
             "PEC ≥5.4.5 habilita inclusão à LPC ao selecionar código; versões anteriores exigem seleção manual da opção.",
-            "Teleconsulta: registrar forma de participação e, quando aplicável, SIGTAP 03.01.01.025-0 em Procedimentos administrativos."
+            "Teleconsulta: registrar forma de participação e, quando aplicável, SIGTAP 03.01.01.025-0 em Procedimentos administrativos.",
+            "Confira vínculo da pessoa à equipe e condição elegível no histórico. O aplicativo não verifica cadastro, vínculo, CBO, envio ou processamento no Siaps."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-hipertens%C3%A3o",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c5-cuidado-da-pessoa-com-hipertensao/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente A"
         },
         {
           "id": "C5-B",
@@ -120,8 +129,11 @@ window.ZERA_APS_DATA = {
             "Não substituir registro estruturado da PA por texto solto ou mera cópia do código."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-hipertens%C3%A3o",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c5-cuidado-da-pessoa-com-hipertensao/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente B"
         },
         {
           "id": "C5-C",
@@ -131,6 +143,11 @@ window.ZERA_APS_DATA = {
           "actor": "profissional habilitado conforme modelo de informação",
           "pec_location": "SOAP → Objetivo → Antropometria → Peso e Altura",
           "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "01.01.04.002-4",
+              "label": "Avaliação antropométrica"
+            },
             {
               "system": "SIGTAP",
               "value": "01.01.04.008-3",
@@ -147,8 +164,11 @@ window.ZERA_APS_DATA = {
             "O PEC pode incluir os códigos automaticamente ao registrar nos campos."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-hipertens%C3%A3o",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c5-cuidado-da-pessoa-com-hipertensao/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente C"
         },
         {
           "id": "C5-D",
@@ -160,11 +180,15 @@ window.ZERA_APS_DATA = {
           "codes": [],
           "cautions": [
             "Não é tarefa que o médico possa marcar como realizada em nome do ACS.",
-            "Sem integração com prontuário, o app apenas informa a regra e não comprova execução."
+            "Sem integração com prontuário, o app apenas informa a regra e não comprova execução.",
+            "A nota metodológica dispensa este componente como condicionante de pontuação para eAP tipo 76. Confirme o tipo da equipe; não presumir essa condição na unidade."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-hipertens%C3%A3o",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c5-cuidado-da-pessoa-com-hipertensao/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente D"
         }
       ]
     },
@@ -172,7 +196,7 @@ window.ZERA_APS_DATA = {
       "id": "dm",
       "title": "Diabetes",
       "indicator": "C4",
-      "status": "partial_2026_rules_verified",
+      "status": "criteria_cross_checked_2026_11_02",
       "codes": {
         "ciap2": [
           "T89",
@@ -195,11 +219,15 @@ window.ZERA_APS_DATA = {
           "codes": [],
           "cautions": [
             "Código deve refletir o diagnóstico correto.",
-            "Diferenças de inclusão LPC conforme versão do PEC."
+            "Diferenças de inclusão LPC conforme versão do PEC.",
+            "Confira vínculo da pessoa à equipe e condição elegível no histórico. O aplicativo não verifica cadastro, vínculo, CBO, envio ou processamento no Siaps."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-diabetes",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente A"
         },
         {
           "id": "C4-B",
@@ -216,8 +244,11 @@ window.ZERA_APS_DATA = {
           ],
           "cautions": [],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-diabetes",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente B"
         },
         {
           "id": "C4-C",
@@ -229,6 +260,11 @@ window.ZERA_APS_DATA = {
           "codes": [
             {
               "system": "SIGTAP",
+              "value": "01.01.04.002-4",
+              "label": "Avaliação antropométrica"
+            },
+            {
+              "system": "SIGTAP",
               "value": "01.01.04.008-3"
             },
             {
@@ -238,8 +274,11 @@ window.ZERA_APS_DATA = {
           ],
           "cautions": [],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-diabetes",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente C"
         },
         {
           "id": "C4-D",
@@ -249,10 +288,15 @@ window.ZERA_APS_DATA = {
           "actor": "ACS/TACS",
           "pec_location": "e-SUS Território → visita ao cidadão",
           "codes": [],
-          "cautions": [],
+          "cautions": [
+            "A nota metodológica dispensa este componente como condicionante de pontuação para eAP tipo 76. Confirme o tipo da equipe; não presumir essa condição na unidade."
+          ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-diabetes",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente D"
         },
         {
           "id": "C4-E",
@@ -265,14 +309,22 @@ window.ZERA_APS_DATA = {
             {
               "system": "SIGTAP",
               "value": "02.02.01.050-3"
+            },
+            {
+              "system": "ABEX",
+              "value": "ABEX008",
+              "label": "Hemoglobina glicosilada"
             }
           ],
           "cautions": [
             "Solicitação: preencher justificativa; avaliação: resultado e data do exame; não presumir que exame foi realizado."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-diabetes",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente E"
         },
         {
           "id": "C4-F",
@@ -291,8 +343,11 @@ window.ZERA_APS_DATA = {
             "O código não substitui o exame clínico efetivamente realizado e documentado."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-diabetes",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente F"
         }
       ]
     },
@@ -300,7 +355,7 @@ window.ZERA_APS_DATA = {
       "id": "prenatal",
       "title": "Gestante e puerpério",
       "indicator": "C3",
-      "status": "partial_2026_rules_verified",
+      "status": "criteria_cross_checked_2026_11_02",
       "codes": {
         "ciap2": [
           "W03",
@@ -331,8 +386,12 @@ window.ZERA_APS_DATA = {
             "Há lista mais ampla de códigos oficiais; exemplos fornecidos não são lista exaustiva."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "phase": "gestacao",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente A"
         },
         {
           "id": "C3-B",
@@ -346,8 +405,12 @@ window.ZERA_APS_DATA = {
             "Não registrar consultas não realizadas."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "phase": "gestacao",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente B"
         },
         {
           "id": "C3-C",
@@ -364,8 +427,12 @@ window.ZERA_APS_DATA = {
           ],
           "cautions": [],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "phase": "gestacao",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente C"
         },
         {
           "id": "C3-D",
@@ -374,13 +441,23 @@ window.ZERA_APS_DATA = {
           "window": "durante a gestação",
           "actor": "profissional habilitado",
           "pec_location": "SOAP → Objetivo → Antropometria",
-          "codes": [],
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "01.01.04.002-4",
+              "label": "Avaliação antropométrica"
+            }
+          ],
           "cautions": [
             "Dados aferidos no mesmo dia."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "phase": "gestacao",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente D"
         },
         {
           "id": "C3-E",
@@ -390,10 +467,16 @@ window.ZERA_APS_DATA = {
           "actor": "ACS/TACS",
           "pec_location": "e-SUS Território → visita ao cidadão",
           "codes": [],
-          "cautions": [],
+          "cautions": [
+            "Para eAP tipo 76, a nota C3 prevê pontuação integral para este componente; confirmar o tipo da equipe."
+          ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "phase": "gestacao",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente E"
         },
         {
           "id": "C3-F",
@@ -407,23 +490,146 @@ window.ZERA_APS_DATA = {
             "Registro fiel à vacina administrada ou comprovada."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "phase": "gestacao",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente F"
         },
         {
           "id": "C3-G",
-          "title": "Acompanhamento puerperal",
-          "goal": "Consulta puerperal e visita ACS conforme critérios técnicos",
-          "window": "puerpério",
-          "actor": "médico/enfermeiro e ACS/TACS",
-          "pec_location": "SOAP para consulta / e-SUS Território para visita",
-          "codes": [],
+          "title": "Testes ou exames avaliados no primeiro trimestre",
+          "goal": "Registro de sífilis, HIV e hepatites B e C",
+          "window": "1º trimestre de cada gestação",
+          "actor": "profissionais habilitados conforme CBO da nota metodológica",
+          "pec_location": "SOAP → Objetivo → Resultados de exames → resultado e data de realização; testes rápidos realizados: SOAP → Plano → Intervenções/procedimentos clínicos realizados, com o código correspondente",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "02.14.01.027-9",
+              "label": "Teste rápido anti-HIV em gestante"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.14.01.008-2",
+              "label": "Teste rápido para sífilis na gestante ou pai/parceiro"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.14.01.023-6",
+              "label": "Teste rápido HBsAg em gestante"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.14.01.030-9",
+              "label": "Teste rápido anti-HCV em gestante"
+            }
+          ],
           "cautions": [
-            "A ficha C3 contém outros componentes de exames, saúde bucal e puerpério; não implementar como checklist completo com este arquivo."
+            "Solicitar um exame, sem registro do teste realizado ou exame avaliado, não comprova os componentes G/H.",
+            "O componente G exige o conjunto sífilis, HIV, hepatite B e hepatite C no 1º trimestre; o H exige sífilis e HIV no 3º trimestre.",
+            "Selecione o código que corresponda ao teste efetivamente realizado; a nota contém outras alternativas."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "phase": "gestacao",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente G",
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera"
+        },
+        {
+          "id": "C3-H",
+          "title": "Testes ou exames avaliados no terceiro trimestre",
+          "goal": "Registro de sífilis e HIV",
+          "window": "3º trimestre de cada gestação",
+          "actor": "profissionais habilitados conforme CBO da nota metodológica",
+          "pec_location": "SOAP → Objetivo → Resultados de exames → resultado e data de realização; testes rápidos realizados: SOAP → Plano → Intervenções/procedimentos clínicos realizados, com o código correspondente",
+          "codes": [
+            {
+              "system": "SIGTAP",
+              "value": "02.14.01.027-9",
+              "label": "Teste rápido anti-HIV em gestante"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.14.01.008-2",
+              "label": "Teste rápido para sífilis na gestante ou pai/parceiro"
+            }
+          ],
+          "cautions": [
+            "Solicitar um exame, sem registro do teste realizado ou exame avaliado, não comprova os componentes G/H.",
+            "O componente G exige o conjunto sífilis, HIV, hepatite B e hepatite C no 1º trimestre; o H exige sífilis e HIV no 3º trimestre.",
+            "Selecione o código que corresponda ao teste efetivamente realizado; a nota contém outras alternativas."
+          ],
+          "conditionals": [],
+          "phase": "gestacao",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente H",
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera"
+        },
+        {
+          "id": "C3-I",
+          "title": "Consulta puerperal",
+          "goal": "≥1 consulta presencial ou remota",
+          "window": "durante o puerpério (42 dias após o término da gestação)",
+          "actor": "médico ou enfermeiro",
+          "pec_location": "SOAP → Avaliação → condição correspondente ao puerpério; conferir data de desfecho da gestação",
+          "codes": [],
+          "cautions": [
+            "A nota prioriza a data de desfecho da gestação. Na ausência dela, o sistema usa 294 dias a partir da DUM para o término e mais 42 dias para o puerpério.",
+            "O código escolhido deve corresponder à situação clínica; não inferir a data do parto nem criar registro retroativo fictício."
+          ],
+          "conditionals": [],
+          "phase": "puerperio",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente I",
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera"
+        },
+        {
+          "id": "C3-J",
+          "title": "Visita do ACS no puerpério",
+          "goal": "≥1 visita domiciliar realizada por ACS/TACS",
+          "window": "durante o puerpério",
+          "actor": "ACS/TACS",
+          "pec_location": "e-SUS Território → Visita ao Cidadão → motivo da visita e desfecho",
+          "codes": [],
+          "cautions": [
+            "O registro é do profissional que realizou a visita.",
+            "A nota C3 prevê pontuação integral para E/J em eAP tipo 76; não presumir o tipo da equipe da unidade."
+          ],
+          "conditionals": [],
+          "phase": "puerperio",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente J",
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera"
+        },
+        {
+          "id": "C3-K",
+          "title": "Saúde bucal na gestação",
+          "goal": "≥1 atividade em saúde bucal",
+          "window": "durante a gestação",
+          "actor": "cirurgião-dentista ou técnico em saúde bucal",
+          "pec_location": "Atendimento Odontológico Individual → condição de gestação identificada na LPC e registro odontológico",
+          "codes": [],
+          "cautions": [
+            "O registro deve ser feito pelo profissional responsável pela ação de saúde bucal.",
+            "A nota admite outros modelos de informação especificados no quadro 8; a existência de encaminhamento isolado não comprova atividade realizada."
+          ],
+          "conditionals": [],
+          "phase": "gestacao",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente K",
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera"
         }
       ]
     },
@@ -431,12 +637,12 @@ window.ZERA_APS_DATA = {
       "id": "mulher",
       "title": "Saúde da mulher",
       "indicator": "C7",
-      "status": "partial_2026_rules_verified",
+      "status": "criteria_cross_checked_2026_11_02",
       "rules": [
         {
           "id": "C7-A",
           "title": "Rastreamento de colo do útero",
-          "goal": "≥1 exame, conforme modalidade",
+          "goal": "≥1 exame de rastreamento coletado, solicitado ou avaliado",
           "window": "36 meses (citopatológico) / 60 meses (HPV molecular específico)",
           "actor": "profissional habilitado",
           "pec_location": "SOAP → Plano → Solicitação de exames/procedimentos OU Objetivo → Resultados de exames",
@@ -453,17 +659,21 @@ window.ZERA_APS_DATA = {
           ],
           "cautions": [
             "Critério da ficha técnica 2026: faixa de 25 a 64 anos para o componente.",
-            "A lista de códigos aceitos é mais ampla do que os exemplos."
+            "A lista de códigos aceitos é mais ampla do que os exemplos.",
+            "A janela de 60 meses é específica do SIGTAP 02.02.10.025-1, considerado a partir da competência janeiro/2026; não aplicar 60 meses a todo teste ou coleta para HPV."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-mulher-na-preven%C3%A7%C3%A3o-do-c%C3%A2ncer",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente A"
         },
         {
           "id": "C7-B",
           "title": "Vacinação HPV",
           "goal": "≥1 dose registrada",
-          "window": "faixa de 9 a 14 anos (componente)",
+          "window": "sexo feminino, 9 a 14 anos, conforme população do componente C7-B",
           "actor": "profissional habilitado",
           "pec_location": "PEC → Vacinação → Aplicar/Transcrição de caderneta",
           "codes": [],
@@ -471,8 +681,11 @@ window.ZERA_APS_DATA = {
             "A elegibilidade clínica e o calendário vacinal vigente não se reduzem ao cálculo do indicador."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-mulher-na-preven%C3%A7%C3%A3o-do-c%C3%A2ncer",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente B"
         },
         {
           "id": "C7-C",
@@ -486,8 +699,11 @@ window.ZERA_APS_DATA = {
             "Diversos códigos aceitos; não selecionar automaticamente diagnóstico com base na idade."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-mulher-na-preven%C3%A7%C3%A3o-do-c%C3%A2ncer",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente C"
         },
         {
           "id": "C7-D",
@@ -507,11 +723,15 @@ window.ZERA_APS_DATA = {
             }
           ],
           "cautions": [
-            "Critérios de financiamento não substituem diretrizes clínicas individualizadas."
+            "Critérios de financiamento não substituem diretrizes clínicas individualizadas.",
+            "A faixa de 50 a 69 anos aqui é a população do componente C7-D na nota consultada, não uma diretriz clínica universal de rastreamento."
           ],
           "conditionals": [],
-          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
-          "verification": "confirmed_in_official_esus_2026_guide"
+          "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-mulher-na-preven%C3%A7%C3%A3o-do-c%C3%A2ncer",
+          "verification": "cross_checked_methodology_and_pec_guide",
+          "reviewed_on": "2026-11-02",
+          "methodology_source": "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view",
+          "methodology_section": "Seção 3, item 16; Seção 4, quadro do componente D"
         }
       ]
     },
@@ -597,5 +817,12 @@ window.ZERA_APS_DATA = {
       "scenario": "Saúde mental sem escopo especificado",
       "expected": "mostrar card desabilitado ou rascunho; não inventar regra C1-C7"
     }
-  ]
+  ],
+  "reviewed_on": "2026-11-02",
+  "source_review": {
+    "date": "2026-11-02",
+    "method": "Cruzamento documental das notas metodológicas C3/C4/C5/C7 (versões publicadas no portal oficial) e guia e-SUS APS 2026. Nota Técnica 8/2026 consultada para distinguir registro de apuração.",
+    "not_local_pec_validation": true,
+    "not_official_calculator": true
+  }
 };

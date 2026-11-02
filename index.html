@@ -1,63 +1,59 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#111b37" />
-  <meta name="description" content="Zera-APS: guia contextual independente para registros no e-SUS APS. Protótipo sem dados de pacientes." />
-  <title>Zera-APS · Guia de registro na APS</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123d33">
+  <meta name="description" content="Monte um roteiro de conferência de registros no PEC para o atendimento da APS.">
+  <title>Zera-APS · Meu atendimento no PEC</title>
+  <link rel="stylesheet" href="styles.css?v=0.2.0">
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="#inicio" aria-label="Zera-APS, início">
-        <span class="brand-symbol" aria-hidden="true">Z<span>+</span></span>
-        <span><strong>Zera-APS</strong><small>Assistente de registro • protótipo</small></span>
-      </a>
-      <div class="topbar-actions"><span class="tag tag-muted">Funciona offline</span><button class="top-action" id="help-button" type="button">Como funciona <span aria-hidden="true">↗</span></button></div>
-    </header>
-
-    <main id="inicio" class="main-wrap">
-      <section class="hero" aria-labelledby="headline">
-        <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> Orientação de registro no e-SUS APS</p>
-          <h1 id="headline">Menos busca por códigos.<br><span>Mais clareza no registro.</span></h1>
-          <p>Abra uma linha de cuidado, confira os caminhos do PEC e copie códigos quando necessário. Não substitui prontuário nem decisão clínica.</p>
-          <div class="hero-mini"><span>5 áreas de atendimento</span><span class="bullet">•</span><span>Busca por nome e código</span><span class="bullet">•</span><span>Sem dados de pacientes</span></div>
-        </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="art-panel"><div class="art-mini-header"><b></b><b></b><b></b></div><div class="art-line wide"></div><div class="art-check">✓ <span></span></div><div class="art-check">✓ <span></span></div><div class="art-check faint">○ <span></span></div><div class="art-bottom"><i></i><i></i></div></div>
-          <div class="art-floating"><span>⌘</span> CID · CIAP · SIGTAP</div>
-        </div>
-      </section>
-
-      <section class="notice" role="note"><span class="notice-icon">!</span><div><strong>Versão demonstrativa — não validar indicadores aqui.</strong><span>Os itens são guias para conferência manual; não há acesso ao PEC, ao histórico clínico ou ao cálculo oficial de financiamento. Regras parciais exigem revisão antes do uso assistencial.</span></div></section>
-
-      <section class="workspace" aria-label="Explorar orientações">
-        <div class="section-head"><div><p class="eyebrow dark">ESCOLHA O ATENDIMENTO</p><h2>O que você precisa registrar?</h2></div><p>Selecione uma área para ver as orientações disponíveis.</p></div>
-        <nav class="module-grid" id="modules" aria-label="Áreas de atendimento"></nav>
-        <div class="content-grid">
-          <section class="main-panel" aria-labelledby="panel-heading">
-            <div class="panel-head"><div><p class="eyebrow dark" id="indicator-label">INDICADOR</p><h2 id="panel-heading">Hipertensão</h2><p id="panel-summary">Carregando...</p></div><span class="tag tag-warn" id="coverage-tag">Cobertura parcial</span></div>
-            <div class="tools-row"><label class="searchbox"><span aria-hidden="true">⌕</span><span class="sr-only">Pesquisar orientações ou códigos</span><input id="search" type="search" placeholder="Buscar: pressão, HbA1c, SIGTAP, I10..." autocomplete="off" /></label><button class="button-outline" id="reset" type="button">Limpar revisões</button></div>
-            <div class="progress-area"><div><strong id="progress-title">Nenhum item revisado</strong><span id="progress-description">Uma marcação não comprova indicador cumprido.</span></div><div class="progress-track" aria-hidden="true"><div id="progress-fill"></div></div></div>
-            <div id="rule-list" class="rule-list" aria-live="polite"></div>
-            <div class="panel-footer">Informações baseadas em extração preliminar de guias oficiais. A conduta e o registro devem corresponder ao atendimento efetivamente realizado.</div>
-          </section>
-          <aside class="side-stack" aria-label="Busca de códigos e orientações">
-            <section class="side-panel" aria-labelledby="codes-heading"><div class="side-head"><span class="side-icon">#</span><div><h3 id="codes-heading">Códigos relacionados</h3><p>Copie somente quando aplicável.</p></div></div><div id="code-list" class="code-list"></div></section>
-            <section class="side-panel help-panel"><span class="side-icon secondary-icon">i</span><h3>O que muda no PEC?</h3><p>Alguns procedimentos SIGTAP podem ser incluídos automaticamente quando o profissional preenche o campo estruturado, como a pressão arterial e a antropometria.</p><p><strong>Não basta colar um código:</strong> o registro precisa ficar no campo correto e corresponder a um fato realizado.</p></section>
-            <section class="side-panel sources-panel"><h3>Fontes de consulta</h3><a href="https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/" target="_blank" rel="noopener noreferrer">Guia e-SUS APS ↗</a><a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia" target="_blank" rel="noopener noreferrer">Fichas técnicas e indicadores ↗</a><p>Referências iniciais de 2026; confirme a versão vigente antes de usar.</p></section>
-          </aside>
-        </div>
-      </section>
-      <footer><span><strong>Zera-APS</strong> · protótipo local v0.1</span><span>Sem login, sem servidor, sem pacientes, sem integração automática.</span></footer>
-    </main>
-  </div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <dialog id="help-modal"><div class="modal-title"><h2>Como funciona</h2><button type="button" id="help-close" aria-label="Fechar">×</button></div><p>Este aplicativo é um catálogo interativo de orientações. Selecione uma linha de cuidado; confira o que deve ser documentado no PEC, em qual campo e por quem. Use a busca para localizar termos ou códigos e o botão Copiar para transferir um código.</p><p>A marcação “Revisei” é apenas um controle de leitura nesta tela. Não verifica atendimento, paciente nem pontuação do indicador.</p><p><strong>Privacidade:</strong> os dados do guia são locais, nenhum identificador de paciente é solicitado ou armazenado e a marcação não persiste ao atualizar a página.</p><form method="dialog"><button class="button-primary">Entendi</button></form></dialog>
-  <script src="data/regras.js"></script>
-  <script src="app.js"></script>
+  <header class="topbar">
+    <a class="brand" href="#inicio"><span aria-hidden="true">Z+</span><strong>Zera-APS</strong><small>Meu atendimento no PEC</small></a>
+    <button type="button" id="new-visit" class="button secondary">Novo atendimento</button>
+  </header>
+  <main id="inicio">
+    <div class="intro">
+      <p class="eyebrow">APOIO À CONFERÊNCIA DO REGISTRO</p>
+      <h1 id="page-heading" tabindex="-1">Quem estou atendendo?</h1>
+      <p id="page-description">Selecione as situações já identificadas. Vou organizar o que conferir no PEC e o que depende da equipe.</p>
+    </div>
+    <p class="base-notice"><strong>Fontes oficiais conferidas em 02/11/2026.</strong> Guia de registro para C3, C4, C5 e C7. O roteiro não consulta o PEC nem confirma pontuação oficial.</p>
+    <section id="setup" aria-labelledby="setup-heading">
+      <form id="visit-form" autocomplete="off">
+        <fieldset>
+          <legend id="setup-heading">O que se aplica a este atendimento?</legend>
+          <p class="hint">Pode escolher mais de uma opção. Não informe dados de identificação.</p>
+          <div class="conditions">
+            <label class="condition"><input type="checkbox" name="condition" value="has"><span><strong>Hipertensão</strong><small>Diagnóstico já reconhecido</small></span></label>
+            <label class="condition"><input type="checkbox" name="condition" value="dm"><span><strong>Diabetes</strong><small>Diagnóstico já reconhecido</small></span></label>
+            <label class="condition"><input type="checkbox" name="condition" value="prenatal"><span><strong>Gestação ou puerpério</strong><small>Escolha a fase abaixo</small></span></label>
+            <label class="condition"><input type="checkbox" name="condition" value="mulher"><span><strong>Saúde da mulher</strong><small>Rastreamentos, saúde sexual e vacinação</small></span></label>
+          </div>
+        </fieldset>
+        <fieldset id="phase-field" hidden>
+          <legend>Em qual fase?</legend>
+          <div class="phase-options"><label><input type="radio" name="phase" value="gestacao"> Pré-natal</label><label><input type="radio" name="phase" value="puerperio"> Puerpério</label></div>
+        </fieldset>
+        <div class="form-bottom"><p id="selection-hint" role="status">Selecione pelo menos uma situação para começar.</p><button id="build-guide" class="button primary" disabled>Montar meu roteiro <span aria-hidden="true">→</span></button></div>
+      </form>
+      <details class="scope-note"><summary>Não encontrei minha situação</summary><p>A base atual cobre parcialmente hipertensão, diabetes, gestação, puerpério e saúde sexual e reprodutiva. Saúde mental e outros atendimentos ainda não têm roteiro validado aqui. A ausência de uma opção não significa que o cuidado ou o registro não seja importante.</p></details>
+    </section>
+    <section id="guide" hidden aria-labelledby="guide-heading">
+      <div class="guide-toolbar"><div><p class="eyebrow">ROTEIRO DESTA CONSULTA</p><h2 id="guide-heading" tabindex="-1"></h2></div><button id="edit-visit" type="button" class="button secondary">Alterar situações</button></div>
+      <p id="guide-context" class="context-note"></p>
+      <div class="summary-strip"><strong id="review-summary" role="status"></strong><span>“Conferido” indica leitura manual do registro, sem cálculo de indicador.</span></div>
+      <label class="search-label" for="search">Localizar neste roteiro</label>
+      <input type="search" id="search" placeholder="Ex.: pressão, HbA1c ou código" autocomplete="off">
+      <div id="action-list"></div>
+      <div id="no-results" class="empty" hidden>Nenhum item encontrado neste roteiro. Tente outro termo ou altere as situações selecionadas.</div>
+      <details class="references"><summary>Sobre os indicadores e as fontes</summary><p>Este guia cobre componentes de qualidade C3 (gestação/puerpério), C4 (diabetes), C5 (hipertensão) e C7 (saúde da mulher). C1 (acesso), C2 (infância) e C6 (pessoa idosa) ainda não estão incluídos.</p><p>Os critérios foram cruzados com as notas metodológicas oficiais e o guia e-SUS APS. A Nota Técnica nº 8/2026 define a apuração do cofinanciamento; o antigo nome “Previne Brasil” não identifica sozinho as regras atuais.</p><p id="base-date"></p><p>Versão local do PEC, elegibilidade, vínculo, histórico, transmissão e processamento no Siaps afetam a apuração. A marcação nesta tela não comprova atendimento nem pontuação.</p><p>Os caminhos ainda não foram testados no PEC da unidade de Vitor Hugo, em Marechal Floriano.</p></details>
+    </section>
+    <footer>Versão 0.2.0 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
+  </main>
+  <div id="toast" role="status" class="toast" hidden></div>
+  <script src="data/regras.js?v=0.2.0"></script>
+  <script src="app.js?v=0.2.0"></script>
 </body>
 </html>

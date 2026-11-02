@@ -1,24 +1,26 @@
-# Validação técnica — Zera-APS v0.1
+# Validação do roteiro interativo
 
-## Testes previstos
+A verificação técnica demonstra funcionamento da interface; não valida critérios normativos, uso assistencial ou apuração de indicadores.
 
-- [x] Carrega cinco cards sem requisições a servidores externos.
-- [x] Hipertensão mostra quatro componentes de orientação, com pontos de atenção.
-- [x] Diabetes apresenta seus componentes; Saúde mental exibe aviso de pendência.
-- [x] Busca universal por 'pressão' retorna orientações de mais de uma área.
-- [ ] Busca por 'I10' retorna código CID-10 pesquisável.
-- [ ] Botões de código copiam apenas o identificador, sem afetar o PEC.
-- [x] Marcação manual muda o progresso; limpar revisões zera; recarregar não mantém estado.
-- [ ] Navegação por teclado e layout responsivo em 390px.
-- [x] Nenhum campo ou formulário solicita informação de pacientes.
+## Cenários automatizados
 
-## Limitações clínicas e operacionais
+- Nenhuma condição selecionada inicialmente; roteiro indisponível até escolha válida.
+- HAS + diabetes com seis ações, separando registro do atendimento e equipe.
+- Regras C4/C5 preservam cada campo PEC, prazo, fonte e ressalva, mesmo agrupadas.
+- Busca restrita às situações do roteiro, com suporte a acentos e códigos.
+- Marcação manual preservada ao filtrar e apagada ao montar outro roteiro.
+- Cópia entrega apenas o código; o teste usa uma API simulada e não comprova a área de transferência do dispositivo final.
+- Novo atendimento remove escolhas, fase, busca, roteiro, mensagem e marcações.
+- Pré-natal e puerpério mutuamente exclusivos, sem fundir seus critérios com HAS.
+- Saúde da mulher mantém os alertas de elegibilidade, sem assumir faixa etária ou indicação.
+- Navegação por teclado nos controles nativos.
+- Layout sem transbordamento horizontal a 320 e 390 px.
+- Carregamento dos arquivos reais por HTTP local, sem requisições a serviços externos nem erros JavaScript.
 
-- As 21 regras documentadas abrangem parcialmente quatro áreas; não foram integralmente auditadas nesta implementação.
-- O módulo Saúde mental não possui conteúdo clínico.
-- Sem leitura do histórico, não há como confirmar indicadores, elegibilidade, periodicidade ou versão do PEC do município.
-- Não confirma se um código SIGTAP gerado pelo PEC foi efetivamente transmitido e computado.
-- A atualização normativa não é automática: exige revisão editorial da base e novos testes.
-- Um profissional deve revisar relevância dos códigos clínicos (não existe seleção diagnóstica automática segura).
+## Pendências identificadas
 
-Execução local com Chromium/Playwright: **PASS** para os cenários automatizados em `tests/test_ui.py` (incluindo largura 390px sem transbordamento). A cópia para área de transferência e navegação por teclado ainda precisam de teste manual no dispositivo final.
+- Manutenção da revisão documental dos critérios quando houver alterações oficiais. Revisão realizada em 02/11/2026, com rastreabilidade em docs/REVISAO-FONTES-2026-11-02.md.
+- Validação dos caminhos na versão do PEC da unidade e de eventuais fluxos municipais.
+- Validação de usabilidade pela médica em cenários fictícios, sem dados identificáveis.
+- Teste da área de transferência e do navegador do computador da unidade.
+- Confirmação institucional de qualquer futura integração com PEC/histórico.
