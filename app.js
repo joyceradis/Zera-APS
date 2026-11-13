@@ -110,10 +110,25 @@
     }).join('');
   }
 
+  function codeSummaryMarkup(group) {
+    const entries = group.variants.map(({rule, card}) => {
+      const parts = [];
+      if (group.key === 'consulta') {
+        if (Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length) parts.push('CIAP-2: ' + card.codes.ciap2.join(', '));
+        if (Array.isArray(card.codes?.cid10) && card.codes.cid10.length) parts.push('CID-10 possíveis: ' + card.codes.cid10.join(', '));
+        if (Array.isArray(card.codes?.cid10_examples) && card.codes.cid10_examples.length) parts.push('CID-10 de referência: ' + card.codes.cid10_examples.join(', '));
+      }
+      (rule.codes || []).forEach(code => parts.push(code.system + ': ' + code.value + (code.label ? ' (' + code.label + ')' : '')));
+      return parts.length ? '<li><strong>' + esc(rule.id) + '</strong> · ' + esc(parts.join(' | ')) + '</li>' : '';
+    }).filter(Boolean);
+    return entries.length ? '<div class="code-summary"><strong>Códigos oficiais de referência</strong><p>Escolha CID/CIAP conforme o diagnóstico confirmado; SIGTAP/ABEX conforme o registro realizado ou solicitado.</p><ul>' + entries.join('') + '</ul></div>' : '';
+  }
+
   function actionMarkup(group, index) {
     const badges = group.variants.map(({rule}) => rule.id).join(' · ');
     return `<article class="action ${reviewed.has(group.key) ? 'reviewed' : ''}" data-action="${esc(group.key)}">
       <div class="action-main"><span class="number" aria-hidden="true">${index + 1}</span><div><h3>${esc(group.title)}</h3><p>${esc(group.instruction)}</p></div></div>
+      ${codeSummaryMarkup(group)}
       <details class="action-details"><summary>Ver campo do PEC e critério de conferência</summary>
         ${group.variants.length > 1 ? '<p class="merge-note">Ação reunida para facilitar a leitura. Confira cada condição abaixo: um registro não comprova automaticamente dois indicadores.</p>' : ''}
         ${criteriaMarkup(group)}
@@ -130,9 +145,9 @@
     const query = normalize($('search').value).trim();
     const filtered = groups.filter(group => !query || searchable(group).includes(query));
     const lanes = [
-      ['medical', 'Conferir no registro do atendimento', 'Localize o registro e confira a indicação e o histórico. A ausência de um registro não é indicação automática de repetir um procedimento.'],
+      ['medical', 'Cliques médicos no PEC', 'Campos e códigos dos componentes C4/C5. Selecione códigos somente quando corresponderem ao diagnóstico e ao atendimento.'],
       ['shared', 'Conferir em conjunto com a equipe', 'Este componente reúne responsabilidades da consulta e da equipe.'],
-      ['team', 'Conferir com a equipe', 'Visitas e vacinação têm responsáveis e registros próprios.']
+      ['team', 'Ações da equipe — não registrar pelo médico', 'Confira com ACS/TACS, enfermagem ou vacinação. O médico não registra uma ação feita por outra pessoa.']
     ];
     $('action-list').innerHTML = lanes.map(([lane, title, description]) => {
       const items = filtered.filter(group => group.lane === lane);
@@ -182,33 +197,35 @@
   }
 
   function buildSoapChecklist() {
-    const checklist = groups.flatMap(group => group.variants.map(({rule, card}) => {
-      const ids = group.variants.map(item => item.rule.id).join(' / ');
-      const first = group.variants[0].rule.id === rule.id;
-      if (!first) return '';
-      const lines = [
-        '⚠️ ' + ids + ' — ' + group.title,
-        '   CLIQUE/CAMPO: ' + rule.pec_location,
-        '   CONFERIR: ' + rule.goal + ' (' + rule.window + ').'
-      ];
-      if (group.lane === 'team') lines.push('   RESPONSÁVEL: ' + rule.actor + '; confira com a equipe, não registre em nome de quem executou.');
-      if (['C4-A', 'C5-A'].includes(rule.id) && Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length) {
-        lines.push('   CIAP-2 de referência: ' + card.codes.ciap2.join(', ') + ' — somente se corresponder à condição clinicamente avaliada.');
-      }
-      return lines.join('\n');
-    })).filter(Boolean).join('\n');
+    const checklist = groups.map(group => {
+      const lines = ['⚠️ ' + group.variants.map(({rule}) => rule.id).join(' / ') + ' — ' + group.title];
+      const paths = [...new Set(group.variants.map(({rule}) => rule.pec_location))];
+      paths.forEach(path => lines.push('   CLIQUE/CAMPO: ' + path));
+      group.variants.forEach(({rule, card}) => {
+        lines.push('   ' + rule.id + ': ' + rule.goal + ' (' + rule.window + ').');
+        if (group.lane === 'team') lines.push('   RESPONSÁVEL: ' + rule.actor + '; conferir com a equipe, sem registrar em nome de quem executou.');
+        if (group.key === 'consulta') {
+          if (Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length) lines.push('   CIAP-2 de referência: ' + card.codes.ciap2.join(', ') + ' — selecione apenas o correspondente ao diagnóstico.');
+          const cid = card.codes?.cid10 || card.codes?.cid10_examples || [];
+          if (Array.isArray(cid) && cid.length) lines.push('   CID-10 de referência: ' + cid.join(', ') + ' — selecione apenas o correspondente ao diagnóstico.');
+        }
+        const procedureCodes = (rule.codes || []).map(code => code.system + ' ' + code.value + (code.label ? ' (' + code.label + ')' : ''));
+        if (procedureCodes.length) lines.push('   CÓDIGO(S) DO REGISTRO: ' + procedureCodes.join('; '));
+      });
+      return lines.join('\\n');
+    }).join('\\n');
     return [
-      'RASCUNHO SOAP — PREENCHER E REVISAR',
+      'RASCUNHO SOAP — V1 MÉDICA — PREENCHER COM FATOS REAIS',
       'S: [Relato real.]',
       'O: [Achados observados e medidas realmente aferidas.]',
       'A: [Avaliação clínica realizada.]',
       'P: [Conduta decidida, orientações e seguimento, se aplicáveis.]',
       '',
-      '⚠️ MAPA DE CLIQUES — TEXTO LIVRE NA EVOLUÇÃO PODE NÃO ALIMENTAR O INDICADOR. CONFIRA O CAMPO ESTRUTURADO, O HISTÓRICO E A JANELA; NÃO REPITA PROCEDIMENTO SÓ PARA PREENCHER.',
+      '⚠️ MAPA DE CLIQUES — TEXTO LIVRE PODE NÃO ALIMENTAR O INDICADOR. USE O CAMPO ESTRUTURADO, CONFIRA HISTÓRICO E JANELA. NÃO REPITA PROCEDIMENTOS SÓ PARA PONTUAR.',
       checklist,
       '',
-      'Este mapa é lembrete, não prova de execução. Antes de salvar, remova os lembretes e confirme cada registro no e-SUS. Não mantenha no prontuário campos em branco nem ações não realizadas.'
-    ].join('\n');
+      'Os códigos são referências; use somente os compatíveis com o diagnóstico e os atos realmente realizados. Antes de salvar, retire os lembretes e complete o SOAP. Este mapa não comprova execução.'
+    ].join('\\n');
   }
 
   async function writeClipboardText(value, button) {
