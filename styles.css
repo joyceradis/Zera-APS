@@ -1,11 +1,11 @@
 :root {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  color: #1c3029;
-  background: #f4f6f3;
+  color: #18243a;
+  background: #f5f7fb;
   font-synthesis: none;
   line-height: 1.55;
-  --green: #164e3b;
-  --line: #dce5de;
+  --green: #3158d8;
+  --line: #dbe2ee;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -165,3 +165,67 @@ body:has(.copy-dock:not([hidden])) main { padding-bottom: 150px; }
 .code-summary ul { list-style: none; margin: 6px 0 0; padding: 0; }
 .code-summary li + li { margin-top: 5px; }
 .lane.team .lane-heading h2 { color: #765e30; }
+
+/* Interface médica concisa */
+:root { --ink: #18243a; --blue: #3158d8; --line: #dbe2ee; }
+body { color: var(--ink); background: #f5f7fb; }
+.topbar { background: #fff; border-color: var(--line); }
+.brand > span { background: var(--blue); }
+main { max-width: 920px; }
+h1, h2, h3, h4, legend { color: var(--ink); }
+.intro { margin-bottom: 14px; }
+.intro > p:last-child { color: #58677e; }
+form { border-color: var(--line); border-radius: 16px; box-shadow: 0 8px 28px #13284a0a; }
+.condition { border-color: #d6deeb; border-radius: 12px; background: #fff; }
+.condition:has(input:checked) { background: #eef2ff; border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--blue); }
+.primary { border-color: var(--blue); background: var(--blue); }
+.primary:not(:disabled):hover { background: #2446bd; }
+.secondary { color: var(--blue); border-color: #ccd6e8; }
+.later-indicators { border-color: var(--line); }
+.later-indicators > summary { color: var(--blue); }
+.guide-toolbar { margin: 24px 0 12px; }
+.guide-toolbar h2 { font-size: 26px; }
+.map-intro { margin: 22px 0 10px; }
+.map-intro h3 { margin: 0; font-size: 18px; }
+.context-note { margin: 4px 0 0; color: #64728a; font-size: 13px; }
+.action-list { display: grid; gap: 10px; }
+.action { margin: 0; padding: 15px 17px; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 4px 18px #13284a08; }
+.action-main { gap: 12px; align-items: center; }
+.number { min-width: 27px; height: 27px; color: var(--blue); background: #edf1ff; border-radius: 8px; }
+.action-main h3 { margin: 0; font-size: 16px; }
+.action-badges { margin: 2px 0 0; color: #65748b; font-size: 11px; letter-spacing: .03em; }
+.click-path { margin: 12px 0 0 39px; padding: 9px 11px; border-radius: 8px; color: #344660; background: #f4f6fa; font-size: 13px; overflow-wrap: anywhere; }
+.click-path strong { display: block; color: var(--blue); font-size: 10px; letter-spacing: .08em; }
+.click-path p { margin: 2px 0 0; }
+.code-summary { margin: 9px 0 0 39px; padding: 0; border: 0; background: transparent; font-size: 11px; }
+.code-summary > strong { color: #68758b; font-size: 10px; letter-spacing: .08em; }
+.code-line { display: flex; align-items: flex-start; gap: 9px; margin-top: 5px; }
+.code-line > small { min-width: 38px; color: #77839a; font-size: 10px; padding-top: 3px; }
+.code-line > div { display: flex; flex-wrap: wrap; gap: 5px; }
+.code-chip { display: inline-block; padding: 2px 7px; border: 1px solid #dbe3f2; border-radius: 5px; background: #fff; color: #263a5b; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+.all-codes { min-width: 100%; }
+.all-codes > summary { padding: 4px 0; color: var(--blue); font-size: 11px; }
+.all-codes p { margin: 2px 0; color: #475975; overflow-wrap: anywhere; }
+.action-details { margin: 9px 0 0 39px; }
+.action-details > summary { padding: 6px 0; color: #68758b; font-size: 11px; }
+.criterion { margin: 8px 0; padding: 12px; border-color: var(--line); background: #fbfcfe; }
+.criterion h4 { margin-bottom: 8px; font-size: 14px; }
+dt { color: #52657f; }
+dd { color: #27364d; }
+.cautions { color: #67431b; background: #fff8e9; border-color: #e7b54a; }
+.team-lane { margin-top: 16px; padding: 0 14px 10px; border: 1px solid var(--line); border-radius: 11px; background: #f1f3f7; }
+.team-lane > summary { color: #59677c; font-size: 13px; }
+.team-lane > p { margin: 0 0 8px; color: #68758b; font-size: 12px; }
+.team-lane .action { box-shadow: none; }
+.copy-dock { background: #fff; border-top-color: var(--line); }
+.copy-warning { color: #8a4b12; background: #fff6e7; padding: 8px 11px; border-radius: 7px; }
+.copy-dock .button { background: var(--blue); border-color: var(--blue); border-radius: 9px; box-shadow: 0 4px 12px #3158d82a; }
+.references { background: #eff2f7; color: #58677e; }
+footer { color: #7a879b; }
+@media (max-width: 650px) {
+  .conditions { grid-template-columns: 1fr; }
+  .action { padding: 13px 12px; }
+  .click-path, .code-summary, .action-details { margin-left: 0; }
+  .action-list { gap: 8px; }
+}
