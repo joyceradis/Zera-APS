@@ -146,7 +146,8 @@
     $('page-heading').textContent = 'O que preciso conferir nesta consulta?';
     $('page-description').textContent = 'Siga o roteiro abaixo. Abra apenas o item em que precisar consultar o campo do PEC, o prazo ou o código.';
     $('guide-context').textContent = selected.includes('prenatal') ? 'Pré-natal: componentes A–H e K. Puerpério: I e J. Confira trimestre, data de desfecho e histórico no PEC; a seleção da fase não confirma elegibilidade.' : selected.includes('mulher') ? 'Confira faixa etária, modalidade do exame e demais critérios em cada item. Selecionar esta situação não confirma elegibilidade.' : 'Situações combinadas compartilham a leitura de algumas ações. Os critérios de cada indicador continuam separados nos detalhes.';
-    $('copy-warning').textContent = selected.includes('has') || selected.includes('dm') ? '⚠️ PA digitada na evolução livre não substitui o campo estruturado exigido para conferir C4/C5. Veja abaixo o caminho do PEC.' : '⚠️ Use o mapa abaixo para localizar o campo estruturado; a cópia não comprova que o registro foi feito.';
+    const paIndicators = [selected.includes('has') ? 'C5-B' : '', selected.includes('dm') ? 'C4-B' : ''].filter(Boolean);
+    $('copy-warning').textContent = paIndicators.length ? '⚠️ PA digitada na evolução livre não substitui o campo estruturado ' + paIndicators.join(' / ') + '. Veja o caminho do PEC.' : '⚠️ Use o mapa abaixo para localizar o campo estruturado; a cópia não comprova que o registro foi feito.';
     $('base-date').textContent = `Critérios: ${data.reviewed_on || 'não disponível'}. Manual PEC ${data.pec_manual_review?.version || 'não informado'} consultado em ${data.pec_manual_review?.date || 'data não informada'}. Versão: ${data.version || 'não informada'}.`;
     $('setup').hidden = true; $('guide').hidden = false;
     renderActions();
