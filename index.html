@@ -1,89 +1,281 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f7fb">
-  <meta name="description" content="Mapa rápido de campos e códigos do e-SUS APS para a versão médica do Zera-APS.">
-  <title>Zera-APS · Cola médica do PEC</title>
-  <link rel="stylesheet" href="styles.css?v=0.7.0">
-</head>
-<body>
-  <header class="topbar">
-    <a class="brand" href="#inicio"><span aria-hidden="true">Z</span><strong>Zera-APS</strong><small>e-SUS APS</small></a>
-    <button type="button" id="new-visit" class="button secondary" hidden>Limpar seleção</button>
-  </header>
-  <main id="inicio">
-    <section class="intro" aria-labelledby="page-heading">
-      <p class="eyebrow">COLA MÉDICA · VERSÃO 1</p>
-      <h1 id="page-heading" tabindex="-1">Qual indicador você precisa fechar?</h1>
-      <p id="page-description">Escolha diabetes ou hipertensão. O caminho do PEC aparece na hora.</p>
-    </section>
-    <section id="setup" aria-labelledby="setup-heading">
-      <form id="visit-form" autocomplete="off">
-        <fieldset>
-          <legend id="setup-heading">Indicadores prioritários</legend>
-          <div class="conditions">
-            <label class="condition">
-              <input type="checkbox" name="condition" value="dm">
-              <span class="condition-copy"><strong>Diabetes</strong><small>C4 · HbA1c · exame dos pés</small></span>
-              <span class="condition-code">C4</span>
-            </label>
-            <label class="condition">
-              <input type="checkbox" name="condition" value="has">
-              <span class="condition-copy"><strong>Hipertensão</strong><small>C5 · pressão · peso e altura</small></span>
-              <span class="condition-code">C5</span>
-            </label>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7f6" />
+    <meta
+      name="description"
+      content="Campos, códigos e critérios do e-SUS APS organizados para consulta durante o atendimento médico."
+    />
+    <title>Zera-APS · Roteiro do PEC</title>
+    <link rel="stylesheet" href="styles.css?v=0.8.0" />
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Ir para o roteiro</a>
+    <header class="topbar">
+      <a class="brand" href="#inicio" aria-label="Zera APS, início"
+        ><span aria-hidden="true">z<span class="brand-dot">.</span></span
+        ><strong>Zera<span>APS</span></strong></a
+      >
+      <span class="topbar-label">APOIO AO REGISTRO NO PEC</span>
+      <div class="topbar-actions">
+        <span class="privacy-pill"
+          ><i aria-hidden="true"></i>Sem dados salvos</span
+        ><button type="button" id="new-visit" class="button secondary" hidden>
+          Limpar seleção
+        </button>
+      </div>
+    </header>
+    <main id="inicio">
+      <section class="intro" aria-labelledby="page-heading">
+        <div>
+          <p class="eyebrow">SEU ROTEIRO DE REGISTRO</p>
+          <h1 id="page-heading" tabindex="-1">
+            Menos procura.<br class="mobile-break" />
+            Mais atenção ao cuidado.
+          </h1>
+          <p id="page-description">
+            Campos, códigos e critérios do PEC, no mesmo lugar.
+          </p>
+        </div>
+        <span class="version-tag">VERSÃO MÉDICA <span>Em validação</span></span>
+      </section>
+      <div class="workspace-layout">
+        <aside class="sidebar">
+          <section id="setup" aria-labelledby="setup-heading">
+            <form id="visit-form" autocomplete="off">
+              <div class="section-kicker">
+                <span>01</span> DEFINIR O ROTEIRO
+              </div>
+              <fieldset>
+                <legend id="setup-heading">Quais indicadores consultar?</legend>
+                <p class="field-description">
+                  Combine as condições do atendimento.
+                </p>
+                <div class="conditions">
+                  <label class="condition"
+                    ><input type="checkbox" name="condition" value="dm" /><span
+                      class="condition-copy"
+                      ><strong>Diabetes</strong
+                      ><small>HbA1c · exame dos pés</small></span
+                    ><span class="condition-code">C4</span></label
+                  >
+                  <label class="condition"
+                    ><input type="checkbox" name="condition" value="has" /><span
+                      class="condition-copy"
+                      ><strong>Hipertensão</strong
+                      ><small>Pressão · peso e altura</small></span
+                    ><span class="condition-code">C5</span></label
+                  >
+                </div>
+                <details class="secondary-indicators">
+                  <summary>Outros indicadores <span>C3 / C7</span></summary>
+                  <div class="conditions secondary-grid">
+                    <label class="condition"
+                      ><input
+                        type="checkbox"
+                        name="condition"
+                        value="prenatal"
+                      /><span class="condition-copy"
+                        ><strong>Pré-natal / puerpério</strong
+                        ><small>Saúde materna</small></span
+                      ><span class="condition-code">C3</span></label
+                    >
+                    <label class="condition"
+                      ><input
+                        type="checkbox"
+                        name="condition"
+                        value="mulher"
+                      /><span class="condition-copy"
+                        ><strong>Saúde da mulher</strong
+                        ><small>Rastreamento e prevenção</small></span
+                      ><span class="condition-code">C7</span></label
+                    >
+                  </div>
+                </details>
+              </fieldset>
+              <fieldset id="phase-field" hidden>
+                <legend>Fase do acompanhamento</legend>
+                <div class="phase-options">
+                  <label
+                    ><input type="radio" name="phase" value="gestacao" />
+                    Pré-natal</label
+                  ><label
+                    ><input type="radio" name="phase" value="puerperio" />
+                    Puerpério</label
+                  >
+                </div>
+              </fieldset>
+              <p id="selection-hint" class="selection-hint" role="status">
+                Selecione um ou mais indicadores.
+              </p>
+            </form>
+          </section>
+          <div class="sidebar-note">
+            <span class="note-icon" aria-hidden="true">i</span>
+            <p>
+              <strong>O registro acontece no PEC.</strong>Use este roteiro para
+              localizar os campos. A ferramenta não acessa o prontuário nem
+              confirma pontuação.
+            </p>
           </div>
-          <details class="secondary-indicators">
-            <summary>Outros indicadores</summary>
-            <div class="conditions secondary-grid">
-              <label class="condition">
-                <input type="checkbox" name="condition" value="prenatal">
-                <span class="condition-copy"><strong>Pré-natal / puerpério</strong><small>C3</small></span>
-                <span class="condition-code">C3</span>
-              </label>
-              <label class="condition">
-                <input type="checkbox" name="condition" value="mulher">
-                <span class="condition-copy"><strong>Saúde da mulher</strong><small>C7</small></span>
-                <span class="condition-code">C7</span>
-              </label>
+        </aside>
+        <div id="workspace" class="workspace" tabindex="-1">
+          <section
+            id="empty-state"
+            class="empty-state"
+            aria-labelledby="empty-heading"
+          >
+            <div class="empty-symbol" aria-hidden="true">
+              <span></span><span></span><span></span>
             </div>
-          </details>
-        </fieldset>
-        <fieldset id="phase-field" hidden>
-          <legend>Fase</legend>
-          <div class="phase-options">
-            <label><input type="radio" name="phase" value="gestacao"> Pré-natal</label>
-            <label><input type="radio" name="phase" value="puerperio"> Puerpério</label>
+            <p class="eyebrow">DO INDICADOR AO CAMPO CERTO</p>
+            <h2 id="empty-heading">Seu roteiro começa aqui.</h2>
+            <p id="empty-description">
+              Selecione um indicador para ver onde registrar,<br
+                class="desktop-break"
+              />
+              quais códigos consultar e o que conferir.
+            </p>
+            <div class="empty-steps">
+              <div>
+                <span>01</span><strong>Escolha</strong
+                ><small>Os indicadores da consulta</small>
+              </div>
+              <div>
+                <span>02</span><strong>Confira</strong
+                ><small>Campos e critérios no PEC</small>
+              </div>
+              <div>
+                <span>03</span><strong>Organize</strong
+                ><small>O rascunho para revisão</small>
+              </div>
+            </div>
+            <p class="empty-footnote">
+              Sem cadastro de pacientes. Seleções apenas nesta sessão.
+            </p>
+          </section>
+          <section id="guide" hidden aria-labelledby="guide-heading">
+            <div class="guide-heading">
+              <div>
+                <p class="eyebrow">02 · CONFERIR NO PEC</p>
+                <h2 id="guide-heading" tabindex="-1"></h2>
+              </div>
+              <span id="item-count" class="item-count"></span>
+            </div>
+            <p id="guide-context" class="context-note"></p>
+            <div class="review-panel">
+              <div class="review-line">
+                <span id="review-summary" role="status"></span
+                ><span class="manual-label">Conferência manual</span>
+              </div>
+              <progress
+                id="review-progress"
+                max="1"
+                value="0"
+                aria-label="Itens conferidos manualmente"
+              ></progress
+              ><small
+                >Marcar como conferido não confirma execução ou
+                pontuação.</small
+              >
+            </div>
+            <div class="search-toolbar">
+              <label class="search-box"
+                ><span aria-hidden="true">⌕</span
+                ><input
+                  id="search"
+                  type="search"
+                  placeholder="Buscar campo, exame ou código…"
+                  aria-label="Buscar no roteiro"
+                  autocomplete="off" /></label
+              ><span id="search-count" role="status"></span>
+            </div>
+            <div id="no-results" class="no-results" hidden>
+              <strong>Nenhum item encontrado.</strong>
+              <p>
+                Tente outro termo ou
+                <button type="button" id="clear-search">limpe a busca</button>.
+              </p>
+            </div>
+            <div id="action-list" class="action-list"></div>
+            <details class="references">
+              <summary>Fontes e limites do roteiro</summary>
+              <p>
+                Referências oficiais do Ministério da Saúde e do guia e-SUS APS.
+                Os caminhos ainda precisam ser conferidos na instalação local.
+              </p>
+              <p>
+                O Zera não acessa o PEC nem confirma diagnóstico, execução,
+                elegibilidade ou pontuação. Complete o SOAP com fatos reais.
+              </p>
+              <p id="base-date"></p>
+            </details>
+          </section>
+        </div>
+      </div>
+      <aside
+        id="copy-dock"
+        class="copy-dock"
+        hidden
+        aria-label="Rascunho e mapa do PEC"
+      >
+        <div class="copy-dock-inner">
+          <div class="dock-description">
+            <strong>Roteiro à mão. Registro no PEC.</strong>
+            <p id="copy-warning" class="copy-warning">
+              O texto livre não substitui os campos estruturados do PEC.
+            </p>
           </div>
-        </fieldset>
-        <p id="selection-hint" class="selection-hint" role="status">Selecione uma ou duas opções.</p>
-      </form>
-    </section>
-    <section id="guide" hidden aria-labelledby="guide-heading">
-      <div class="guide-heading">
-        <div><p class="eyebrow">CAMPO + CÓDIGO</p><h2 id="guide-heading" tabindex="-1"></h2></div>
+          <div class="dock-buttons">
+            <button id="preview-soap" type="button" class="button secondary">
+              Ver rascunho</button
+            ><button
+              id="copy-soap-checklist"
+              type="button"
+              class="button primary"
+            >
+              Copiar SOAP + mapa <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+      <footer>
+        <span
+          >Zera APS <span class="footer-divider">/</span> Apoio à atenção
+          primária</span
+        ><span>Consulta local · sem integração com o PEC</span>
+      </footer>
+    </main>
+    <dialog id="soap-dialog" aria-labelledby="soap-heading">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">REVISE ANTES DE USAR</p>
+          <h2 id="soap-heading">Rascunho SOAP + mapa</h2>
+        </div>
+        <button
+          id="close-preview"
+          class="button secondary"
+          type="button"
+          aria-label="Fechar rascunho"
+        >
+          Fechar
+        </button>
       </div>
-      <p id="guide-context" class="context-note"></p>
-      <div id="action-list" class="action-list"></div>
-      <details class="references">
-        <summary>Fontes e limites</summary>
-        <p>Referências oficiais do Ministério da Saúde e do guia e-SUS APS. Os caminhos ainda precisam ser conferidos na instalação local.</p>
-        <p>O Zera não acessa o PEC nem confirma diagnóstico, execução, elegibilidade ou pontuação. Complete o SOAP com fatos reais.</p>
-        <p id="base-date"></p>
-      </details>
-    </section>
-    <aside id="copy-dock" class="copy-dock" hidden aria-label="Copiar evolução e mapa do PEC">
-      <div class="copy-dock-inner">
-        <p id="copy-warning" class="copy-warning">O texto livre não substitui os campos estruturados do PEC.</p>
-        <button id="copy-soap-checklist" type="button" class="button primary">Copiar SOAP + mapa</button>
+      <p>
+        Complete com os dados reais no PEC e remova o mapa antes de salvar a
+        evolução.
+      </p>
+      <pre id="soap-preview" tabindex="0"></pre>
+      <div class="dialog-footer">
+        <button id="copy-preview" type="button" class="button primary">
+          Copiar rascunho</button
+        ><span id="dialog-copy-status" role="status"></span>
       </div>
-    </aside>
-    <footer><span>V1 médica · em validação</span><span>Sem dados de pacientes salvos</span></footer>
-  </main>
-  <div id="toast" role="status" class="toast" hidden></div>
-  <script src="data/regras.js?v=0.3.0"></script>
-  <script src="app.js?v=0.7.1"></script>
-</body>
+    </dialog>
+    <div id="toast" role="status" class="toast" hidden></div>
+    <script src="data/regras.js?v=0.3.0"></script>
+    <script src="app.js?v=0.8.0"></script>
+  </body>
 </html>
