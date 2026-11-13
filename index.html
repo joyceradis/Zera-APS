@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#123d33">
   <meta name="description" content="Monte um roteiro de conferência de registros no PEC para o atendimento da APS.">
   <title>Zera-APS · Meu atendimento no PEC</title>
-  <link rel="stylesheet" href="styles.css?v=0.2.0">
+  <link rel="stylesheet" href="styles.css?v=0.3.0">
 </head>
 <body>
   <header class="topbar">
@@ -19,7 +19,7 @@
       <h1 id="page-heading" tabindex="-1">Quem estou atendendo?</h1>
       <p id="page-description">Selecione as situações já identificadas. Vou organizar o que conferir no PEC e o que depende da equipe.</p>
     </div>
-    <p class="base-notice"><strong>Fontes oficiais conferidas em 02/11/2026.</strong> Guia de registro para C3, C4, C5 e C7. O roteiro não consulta o PEC nem confirma pontuação oficial.</p>
+    <p class="base-notice"><strong>Critérios revisados em 02/11/2026; caminhos do PEC conferidos frente ao manual 5.6 em 12/11/2026.</strong> Roteiro para C3, C4, C5 e C7. O Zera não consulta o PEC nem confirma diagnóstico, elegibilidade ou pontuação.</p>
     <section id="setup" aria-labelledby="setup-heading">
       <form id="visit-form" autocomplete="off">
         <fieldset>
@@ -44,16 +44,21 @@
       <div class="guide-toolbar"><div><p class="eyebrow">ROTEIRO DESTA CONSULTA</p><h2 id="guide-heading" tabindex="-1"></h2></div><button id="edit-visit" type="button" class="button secondary">Alterar situações</button></div>
       <p id="guide-context" class="context-note"></p>
       <div class="summary-strip"><strong id="review-summary" role="status"></strong><span>“Conferido” indica leitura manual do registro, sem cálculo de indicador.</span></div>
+      <section class="copy-panel" aria-labelledby="copy-panel-heading">
+        <div><h3 id="copy-panel-heading">Rascunho SOAP e lembretes</h3><p>O texto copiado tem campos em branco e checklist operacional. Complete os fatos clínicos e confirme cada item no PEC antes de salvar.</p><p id="copy-warning">A seleção não confirma diagnóstico nem elegibilidade. Apague os lembretes e campos não preenchidos; a cópia não prova execução nem é documento à prova de auditoria.</p></div>
+        <button id="copy-soap-checklist" type="button" class="button primary">Copiar Evolução e Checklist</button>
+      </section>
+      <p class="copy-scope">A cópia inclui todos os itens das situações selecionadas, mesmo quando a busca filtra a lista na tela. Não inclui dados de identificação.</p>
       <label class="search-label" for="search">Localizar neste roteiro</label>
       <input type="search" id="search" placeholder="Ex.: pressão, HbA1c ou código" autocomplete="off">
       <div id="action-list"></div>
       <div id="no-results" class="empty" hidden>Nenhum item encontrado neste roteiro. Tente outro termo ou altere as situações selecionadas.</div>
       <details class="references"><summary>Sobre os indicadores e as fontes</summary><p>Este guia cobre componentes de qualidade C3 (gestação/puerpério), C4 (diabetes), C5 (hipertensão) e C7 (saúde da mulher). C1 (acesso), C2 (infância) e C6 (pessoa idosa) ainda não estão incluídos.</p><p>Os critérios foram cruzados com as notas metodológicas oficiais e o guia e-SUS APS. A Nota Técnica nº 8/2026 define a apuração do cofinanciamento; o antigo nome “Previne Brasil” não identifica sozinho as regras atuais.</p><p id="base-date"></p><p>Versão local do PEC, elegibilidade, vínculo, histórico, transmissão e processamento no Siaps afetam a apuração. A marcação nesta tela não comprova atendimento nem pontuação.</p><p>Os caminhos ainda não foram testados no PEC da unidade de Vitor Hugo, em Marechal Floriano.</p></details>
     </section>
-    <footer>Versão 0.2.0 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
+    <footer>Versão 0.3.0 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
   </main>
   <div id="toast" role="status" class="toast" hidden></div>
-  <script src="data/regras.js?v=0.2.0"></script>
-  <script src="app.js?v=0.2.0"></script>
+  <script src="data/regras.js?v=0.3.0"></script>
+  <script src="app.js?v=0.3.0"></script>
 </body>
 </html>
