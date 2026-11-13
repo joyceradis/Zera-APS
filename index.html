@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#123d33">
-  <meta name="description" content="Monte um roteiro de conferência de registros no PEC para o atendimento da APS.">
+  <meta name="description" content="Gere um SOAP curto e confira os cliques estruturados do e-SUS APS.">
   <title>Zera-APS · Meu atendimento no PEC</title>
-  <link rel="stylesheet" href="styles.css?v=0.3.0">
+  <link rel="stylesheet" href="styles.css?v=0.4.0">
 </head>
 <body>
   <header class="topbar">
@@ -16,49 +16,46 @@
   <main id="inicio">
     <div class="intro">
       <p class="eyebrow">APOIO À CONFERÊNCIA DO REGISTRO</p>
-      <h1 id="page-heading" tabindex="-1">Quem estou atendendo?</h1>
-      <p id="page-description">Selecione as situações já identificadas. Vou organizar o que conferir no PEC e o que depende da equipe.</p>
+      <h1 id="page-heading" tabindex="-1">Monte sua cola de cliques</h1>
+      <p id="page-description">Marque uma ou mais situações. O mapa do e-SUS aparece na hora; o botão fixo copia o SOAP curto e os campos para conferir.</p>
     </div>
-    <p class="base-notice"><strong>Critérios revisados em 02/11/2026; caminhos do PEC conferidos frente ao manual 5.6 em 12/11/2026.</strong> Roteiro para C3, C4, C5 e C7. O Zera não consulta o PEC nem confirma diagnóstico, elegibilidade ou pontuação.</p>
     <section id="setup" aria-labelledby="setup-heading">
       <form id="visit-form" autocomplete="off">
         <fieldset>
-          <legend id="setup-heading">O que se aplica a este atendimento?</legend>
-          <p class="hint">Pode escolher mais de uma opção. Não informe dados de identificação.</p>
+          <legend id="setup-heading">Selecione o cuidado desta consulta</legend>
+          <p class="hint">Marque tudo que se aplica. Não digite dados do paciente.</p>
           <div class="conditions">
-            <label class="condition"><input type="checkbox" name="condition" value="has"><span><strong>Hipertensão</strong><small>Diagnóstico já reconhecido</small></span></label>
-            <label class="condition"><input type="checkbox" name="condition" value="dm"><span><strong>Diabetes</strong><small>Diagnóstico já reconhecido</small></span></label>
-            <label class="condition"><input type="checkbox" name="condition" value="prenatal"><span><strong>Gestação ou puerpério</strong><small>Escolha a fase abaixo</small></span></label>
-            <label class="condition"><input type="checkbox" name="condition" value="mulher"><span><strong>Saúde da mulher</strong><small>Rastreamentos, saúde sexual e vacinação</small></span></label>
+            <label class="condition"><input type="checkbox" name="condition" value="has"><span><strong>Hipertensão</strong><small>HAS · C5</small></span></label>
+            <label class="condition"><input type="checkbox" name="condition" value="dm"><span><strong>Diabetes</strong><small>DM · C4</small></span></label>
+            <label class="condition"><input type="checkbox" name="condition" value="prenatal"><span><strong>Gestação ou puerpério</strong><small>C3 · Pré-natal e puerpério</small></span></label>
+            <label class="condition"><input type="checkbox" name="condition" value="mulher"><span><strong>Saúde da mulher</strong><small>C7 · Rastreamentos e saúde sexual</small></span></label>
           </div>
         </fieldset>
         <fieldset id="phase-field" hidden>
           <legend>Em qual fase?</legend>
           <div class="phase-options"><label><input type="radio" name="phase" value="gestacao"> Pré-natal</label><label><input type="radio" name="phase" value="puerperio"> Puerpério</label></div>
         </fieldset>
-        <div class="form-bottom"><p id="selection-hint" role="status">Selecione pelo menos uma situação para começar.</p><button id="build-guide" class="button primary" disabled>Montar meu roteiro <span aria-hidden="true">→</span></button></div>
+        <div class="form-bottom"><p id="selection-hint" role="status">Marque uma ou mais situações para ver o mapa de cliques.</p></div>
       </form>
-      <details class="scope-note"><summary>Não encontrei minha situação</summary><p>A base atual cobre parcialmente hipertensão, diabetes, gestação, puerpério e saúde sexual e reprodutiva. Saúde mental e outros atendimentos ainda não têm roteiro validado aqui. A ausência de uma opção não significa que o cuidado ou o registro não seja importante.</p></details>
+      <details class="scope-note"><summary>Escopo e limites</summary><p>O Zera não acessa o PEC nem confirma diagnóstico, elegibilidade, execução ou pontuação. Use os campos estruturados do sistema; o texto copiado é um rascunho.</p></details>
     </section>
     <section id="guide" hidden aria-labelledby="guide-heading">
-      <div class="guide-toolbar"><div><p class="eyebrow">ROTEIRO DESTA CONSULTA</p><h2 id="guide-heading" tabindex="-1"></h2></div><button id="edit-visit" type="button" class="button secondary">Alterar situações</button></div>
+      <div class="guide-toolbar"><div><p class="eyebrow">MAPA DE CLIQUES</p><h2 id="guide-heading" tabindex="-1"></h2></div></div>
       <p id="guide-context" class="context-note"></p>
-      <div class="summary-strip"><strong id="review-summary" role="status"></strong><span>“Conferido” indica leitura manual do registro, sem cálculo de indicador.</span></div>
-      <section class="copy-panel" aria-labelledby="copy-panel-heading">
-        <div><h3 id="copy-panel-heading">SOAP curto + MAPA DE CLIQUES</h3><p>Copie o SOAP curto e siga o mapa até o campo do e-SUS.</p><p id="copy-warning">⚠️ Texto livre pode não alimentar o indicador. Confira o campo estruturado; a cópia não comprova execução.</p></div>
-        <button id="copy-soap-checklist" type="button" class="button primary">Copiar Evolução e Checklist</button>
-      </section>
-      <p class="copy-scope">A cópia inclui o mapa completo das situações selecionadas.</p>
       <label class="search-label" for="search">Localizar neste roteiro</label>
       <input type="search" id="search" placeholder="Ex.: pressão, HbA1c ou código" autocomplete="off">
       <div id="action-list"></div>
       <div id="no-results" class="empty" hidden>Nenhum item encontrado neste roteiro. Tente outro termo ou altere as situações selecionadas.</div>
       <details class="references"><summary>Sobre os indicadores e as fontes</summary><p>Este guia cobre componentes de qualidade C3 (gestação/puerpério), C4 (diabetes), C5 (hipertensão) e C7 (saúde da mulher). C1 (acesso), C2 (infância) e C6 (pessoa idosa) ainda não estão incluídos.</p><p>Os critérios foram cruzados com as notas metodológicas oficiais e o guia e-SUS APS. A Nota Técnica nº 8/2026 define a apuração do cofinanciamento; o antigo nome “Previne Brasil” não identifica sozinho as regras atuais.</p><p id="base-date"></p><p>Versão local do PEC, elegibilidade, vínculo, histórico, transmissão e processamento no Siaps afetam a apuração. A marcação nesta tela não comprova atendimento nem pontuação.</p><p>Os caminhos ainda não foram testados no PEC da unidade de Vitor Hugo, em Marechal Floriano.</p></details>
     </section>
-    <footer>Versão 0.3.1 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
+    <aside id="copy-dock" class="copy-dock" hidden aria-label="Copiar evolução e mapa do e-SUS">
+      <p id="copy-warning" class="copy-warning">⚠️ Texto livre não substitui o campo estruturado do indicador.</p>
+      <button id="copy-soap-checklist" type="button" class="button primary">Copiar SOAP + mapa do PEC</button>
+    </aside>
+    <footer>Versão 0.4.0 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
   </main>
   <div id="toast" role="status" class="toast" hidden></div>
   <script src="data/regras.js?v=0.3.0"></script>
-  <script src="app.js?v=0.3.1"></script>
+  <script src="app.js?v=0.4.0"></script>
 </body>
 </html>
