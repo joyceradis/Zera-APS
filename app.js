@@ -146,7 +146,8 @@
     $('page-heading').textContent = 'O que preciso conferir nesta consulta?';
     $('page-description').textContent = 'Siga o roteiro abaixo. Abra apenas o item em que precisar consultar o campo do PEC, o prazo ou o código.';
     $('guide-context').textContent = selected.includes('prenatal') ? 'Pré-natal: componentes A–H e K. Puerpério: I e J. Confira trimestre, data de desfecho e histórico no PEC; a seleção da fase não confirma elegibilidade.' : selected.includes('mulher') ? 'Confira faixa etária, modalidade do exame e demais critérios em cada item. Selecionar esta situação não confirma elegibilidade.' : 'Situações combinadas compartilham a leitura de algumas ações. Os critérios de cada indicador continuam separados nos detalhes.';
-    $('base-date').textContent = `Revisão documental: ${data.reviewed_on || 'não disponível'}. Versão: ${data.version || 'não informada'}.`;
+    $('copy-warning').textContent = selected.includes('has') || selected.includes('dm') ? '⚠️ PA digitada na evolução livre não substitui o campo estruturado exigido para conferir C4/C5. Veja abaixo o caminho do PEC.' : '⚠️ Use o mapa abaixo para localizar o campo estruturado; a cópia não comprova que o registro foi feito.';
+    $('base-date').textContent = `Critérios: ${data.reviewed_on || 'não disponível'}. Manual PEC ${data.pec_manual_review?.version || 'não informado'} consultado em ${data.pec_manual_review?.date || 'data não informada'}. Versão: ${data.version || 'não informada'}.`;
     $('setup').hidden = true; $('guide').hidden = false;
     renderActions();
     $('guide-heading').focus();
@@ -164,20 +165,63 @@
     updateSelection(); $('page-heading').focus();
   }
 
+  function buildSoapChecklist() {
+    const checklist = groups.flatMap(group => group.variants.map(({rule, card}) => {
+      const ids = group.variants.map(item => item.rule.id).join(' / ');
+      const first = group.variants[0].rule.id === rule.id;
+      if (!first) return '';
+      const lines = [
+        '⚠️ ' + ids + ' — ' + group.title,
+        '   CLIQUE/CAMPO: ' + rule.pec_location,
+        '   CONFERIR: ' + rule.goal + ' (' + rule.window + ').'
+      ];
+      if (group.lane === 'team') lines.push('   RESPONSÁVEL: ' + rule.actor + '; confira com a equipe, não registre em nome de quem executou.');
+      if (['C4-A', 'C5-A'].includes(rule.id) && Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length) {
+        lines.push('   CIAP-2 de referência: ' + card.codes.ciap2.join(', ') + ' — somente se corresponder à condição clinicamente avaliada.');
+      }
+      return lines.join('\n');
+    })).filter(Boolean).join('\n');
+    return [
+      'RASCUNHO SOAP — PREENCHER E REVISAR',
+      'S: [Relato real.]',
+      'O: [Achados observados e medidas realmente aferidas.]',
+      'A: [Avaliação clínica realizada.]',
+      'P: [Conduta decidida, orientações e seguimento, se aplicáveis.]',
+      '',
+      '⚠️ MAPA DE CLIQUES — TEXTO LIVRE NA EVOLUÇÃO PODE NÃO ALIMENTAR O INDICADOR. CONFIRA O CAMPO ESTRUTURADO, O HISTÓRICO E A JANELA; NÃO REPITA PROCEDIMENTO SÓ PARA PREENCHER.',
+      checklist,
+      '',
+      'Este mapa é lembrete, não prova de execução. Antes de salvar, remova os lembretes e confirme cada registro no e-SUS. Não mantenha no prontuário campos em branco nem ações não realizadas.'
+    ].join('\n');
+  }
+
+  async function writeClipboardText(value, button) {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(value);
+    else {
+      const field = document.createElement('textarea');
+      field.value = value; field.className = 'clipboard-field';
+      document.body.append(field); field.select();
+      const ok = document.execCommand('copy'); field.remove(); button?.focus();
+      if (!ok) throw new Error('copy unavailable');
+    }
+  }
   async function copyCode(button) {
     try {
-      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(button.dataset.copy);
-      else {
-        const field = document.createElement('textarea');
-        field.value = button.dataset.copy; field.className = 'clipboard-field';
-        document.body.append(field); field.select();
-        const ok = document.execCommand('copy'); field.remove(); button.focus();
-        if (!ok) throw new Error('copy unavailable');
-      }
+      await writeClipboardText(button.dataset.copy, button);
       $('toast').textContent = 'Código copiado. O registro é feito no PEC.';
     } catch { $('toast').textContent = 'Cópia indisponível. Selecione o código ao lado do botão.'; }
     clearTimeout(toastTimer); $('toast').hidden = false;
     toastTimer = setTimeout(() => { $('toast').hidden = true; }, 3000);
+  }
+
+  async function copySoapChecklist(event) {
+    const button = event.currentTarget;
+    try {
+      await writeClipboardText(buildSoapChecklist(), button);
+      $('toast').textContent = 'Rascunho SOAP e checklist copiados. Complete e confira antes de salvar.';
+    } catch { $('toast').textContent = 'Cópia indisponível. Revise o rascunho na tela antes de continuar.'; }
+    clearTimeout(toastTimer); $('toast').hidden = false;
+    toastTimer = setTimeout(() => { $('toast').hidden = true; }, 4500);
   }
 
   $('visit-form').addEventListener('change', updateSelection);
@@ -190,6 +234,7 @@
     $('page-heading').focus();
   });
   $('search').addEventListener('input', renderActions);
+  $('copy-soap-checklist').addEventListener('click', copySoapChecklist);
   $('action-list').addEventListener('change', event => {
     const key = event.target.dataset.review;
     if (!key) return;
