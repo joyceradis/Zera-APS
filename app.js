@@ -168,7 +168,7 @@
 
   function resetVisit() {
     $('visit-form').reset();
-    selected = []; phase = ''; groups = []; reviewed.clear();
+    selected = []; phase = ''; groups = [];
 $('action-list').replaceChildren();
     $('guide-heading').textContent = ''; $('guide-context').textContent = '';
     clearTimeout(toastTimer); $('toast').hidden = true;
