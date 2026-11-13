@@ -44,3 +44,29 @@ Guia HTML: 6d100284df0c624bfda68f0884915ce0b877b0b2a917717faec12ca1d473c3f6
 ## Limites mantidos
 
 Critérios documentais não comprovam elegibilidade, vínculo, situação cadastral, CBO, envio, processamento ou resultado real do indicador. A versão do PEC e os fluxos da unidade ainda precisam de conferência local. C1, C2 e C6 não estão disponíveis nesta entrega. Não há dados identificáveis, registro fictício, acesso ao PEC ou persistência entre atendimentos.
+
+
+## Adendo — caminhos no PEC 5.6 e cópia segura (12/11/2026)
+
+A versão 5.6 do PEC, publicada em 09/11/2026, acrescentou estratificação de risco cardiovascular, vulnerabilidade familiar e inativação de imóveis. A revisão abaixo trata dos caminhos do PEC; não foi realizada validação na instalação municipal. Os recursos novos são nativos e não são reproduzidos pelo Zera-APS.
+
+### Campos e caminhos conferidos
+
+- Pressão arterial e antropometria: padronizado o caminho para o bloco SOAP **Objetivo → Antropometria, sinais vitais e glicemia capilar**, incluindo os campos próprios de PA, peso e altura.
+- Visita domiciliar: explicitada a **Visita ao Cidadão** no e-SUS Território, por ACS/TACS, com marcação de visita realizada e preenchimento de “Motivo da visita”. Para puerpério, permanece a orientação adicional sobre desfecho. A visita é responsabilidade do profissional que a realizou.
+- HbA1c: mantidos os caminhos para solicitação no Plano e resultado em Objetivo; a solicitação exige justificativa e o resultado precisa de valor e data.
+- C7-A: mantida a janela de 60 meses somente para o SIGTAP 02.02.10.025-1 e ampliada a lista de códigos de referência conforme a nota metodológica vigente.
+- Acompanhamentos: o PEC oferece listas temáticas sob perfis autorizados. A exportação CSV é dado de nível cidadão e não deve ser transformada em uma base paralela do Zera-APS.
+
+### Comportamento da cópia
+
+A cópia produz um esqueleto SOAP com campos em branco e checklist dos itens selecionados. Não preenche sintomas, achados, diagnósticos, medidas, condutas, prescrições ou retornos. A seleção da tela não comprova diagnóstico, elegibilidade ou histórico. Cada item do checklist é um lembrete para conferência, não prova de execução; completar os campos e retirar lembretes operacionais antes de salvar a evolução.
+
+Fontes consultadas para este adendo:
+
+- [Versão 5.6 do PEC](https://sisaps.saude.gov.br/sistemas/esusaps/blog/versao-5-6/).
+- [Manual do PEC — Acompanhamentos](https://sisaps.saude.gov.br/sistemas/esusaps/docs/manual/PEC/PEC_10_acompanhamento_condicoes_saude/).
+- [Guia de preenchimento dos componentes de qualidade](https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/).
+- [Nota metodológica C7](https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view).
+
+A data da revisão metodológica dos componentes permanece 02/11/2026; este adendo registra apenas a conferência de caminhos e a mudança de comportamento da cópia em 12/11/2026.
