@@ -70,7 +70,7 @@ with ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=str(r
     pa = page.locator('[data-action="pa"]')
     pa.locator('.action-details > summary').click()
     expect(pa.locator('.criterion[aria-label="C5-B"]')).to_contain_text('Antropometria')
-    expect(pa.locator('.criterion[aria-label="C4-B"]')).to_contain_text('Sinais vitais')
+    expect(pa.locator('.criterion[aria-label="C4-B"]')).to_contain_text('sinais vitais')
     assert pa.locator('.source-link').count() == 4
     pa.locator('.action-details > summary').click()
     page.locator('[data-action="pes"] [data-review]').check()
