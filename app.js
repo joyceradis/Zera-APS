@@ -56,9 +56,21 @@
     const keys = keysFromForm();
     const needsPhase = keys.includes('prenatal');
     $('phase-field').hidden = !needsPhase;
+    $('new-visit').hidden = !keys.length;
+    if (!keys.length) {
+      selected = []; phase = ''; groups = []; reviewed.clear();
+      $('guide').hidden = true; $('copy-dock').hidden = true;
+      $('selection-hint').textContent = 'Marque uma ou mais situações para ver o mapa de cliques.';
+      return;
+    }
     const phaseChoice = document.querySelector('[name="phase"]:checked');
-    $('build-guide').disabled = !keys.length || (needsPhase && !phaseChoice);
-    $('selection-hint').textContent = !keys.length ? 'Selecione pelo menos uma situação para começar.' : needsPhase && !phaseChoice ? 'Escolha pré-natal ou puerpério para separar os percursos.' : 'Tudo pronto para organizar a conferência.';
+    if (needsPhase && !phaseChoice) {
+      $('guide').hidden = true; $('copy-dock').hidden = true;
+      $('selection-hint').textContent = 'Escolha pré-natal ou puerpério para montar também os cliques do C3.';
+      return;
+    }
+    $('selection-hint').textContent = 'Mapa atualizado. Copie o SOAP e confira os campos estruturados no PEC.';
+    buildGuide();
   }
 
   function makeGroups() {
@@ -131,39 +143,42 @@
   }
 
   function updateProgress() {
-    $('review-summary').textContent = `${reviewed.size} de ${groups.length} itens conferidos manualmente`;
+    if ($('review-summary')) $('review-summary').textContent = `${reviewed.size} de ${groups.length} itens conferidos manualmente`;
   }
 
-  function buildGuide(event) {
-    event.preventDefault();
-    if ($('build-guide').disabled) return;
+  function buildGuide() {
     selected = keysFromForm();
-    phase = selected.includes('prenatal') ? document.querySelector('[name="phase"]:checked').value : '';
+    const phaseChoice = document.querySelector('[name="phase"]:checked');
+    phase = selected.includes('prenatal') ? (phaseChoice?.value || '') : '';
     reviewed.clear();
     groups = makeGroups();
     $('search').value = '';
     $('guide-heading').textContent = data.cards.filter(card => selected.includes(card.id)).map(labelFor).join(' + ');
-    $('page-heading').textContent = 'O que preciso conferir nesta consulta?';
-    $('page-description').textContent = 'Siga o roteiro abaixo. Abra apenas o item em que precisar consultar o campo do PEC, o prazo ou o código.';
-    $('guide-context').textContent = selected.includes('prenatal') ? 'Pré-natal: componentes A–H e K. Puerpério: I e J. Confira trimestre, data de desfecho e histórico no PEC; a seleção da fase não confirma elegibilidade.' : selected.includes('mulher') ? 'Confira faixa etária, modalidade do exame e demais critérios em cada item. Selecionar esta situação não confirma elegibilidade.' : 'Situações combinadas compartilham a leitura de algumas ações. Os critérios de cada indicador continuam separados nos detalhes.';
+    $('guide-context').textContent = selected.includes('prenatal')
+      ? (phase === 'puerperio' ? 'Puerpério · confira os registros C3-I e C3-J.' : 'Pré-natal · confira os registros C3-A a C3-H e C3-K.')
+      : 'Use o mapa para localizar o campo estruturado e conferir a janela do indicador.';
     const paIndicators = [selected.includes('has') ? 'C5-B' : '', selected.includes('dm') ? 'C4-B' : ''].filter(Boolean);
-    $('copy-warning').textContent = paIndicators.length ? '⚠️ PA digitada na evolução livre não substitui o campo estruturado ' + paIndicators.join(' / ') + '. Veja o caminho do PEC.' : '⚠️ Use o mapa abaixo para localizar o campo estruturado; a cópia não comprova que o registro foi feito.';
+    $('copy-warning').textContent = paIndicators.length
+      ? '⚠️ PA escrita na evolução não substitui o campo estruturado ' + paIndicators.join(' / ') + '.'
+      : '⚠️ O texto livre não alimenta os campos estruturados. Siga o mapa abaixo.';
     $('base-date').textContent = `Critérios: ${data.reviewed_on || 'não disponível'}. Manual PEC ${data.pec_manual_review?.version || 'não informado'} consultado em ${data.pec_manual_review?.date || 'data não informada'}. Versão: ${data.version || 'não informada'}.`;
-    $('setup').hidden = true; $('guide').hidden = false;
+    $('guide').hidden = false;
+    $('copy-dock').hidden = false;
     renderActions();
-    $('guide-heading').focus();
   }
 
   function resetVisit() {
     $('visit-form').reset();
     selected = []; phase = ''; groups = []; reviewed.clear();
     $('search').value = ''; $('action-list').replaceChildren();
-    $('review-summary').textContent = ''; $('guide-heading').textContent = ''; $('guide-context').textContent = '';
+    if ($('review-summary')) $('review-summary').textContent = '';
+    $('guide-heading').textContent = ''; $('guide-context').textContent = '';
     clearTimeout(toastTimer); $('toast').hidden = true;
-    $('guide').hidden = true; $('setup').hidden = false;
-    $('page-heading').textContent = 'Quem estou atendendo?';
-    $('page-description').textContent = 'Selecione as situações já identificadas. Vou organizar o que conferir no PEC e o que depende da equipe.';
-    updateSelection(); $('page-heading').focus();
+    $('guide').hidden = true; $('copy-dock').hidden = true;
+    $('new-visit').hidden = true;
+    $('selection-hint').textContent = 'Marque uma ou mais situações para ver o mapa de cliques.';
+    $('page-heading').focus();
+    updateSelection();
   }
 
   function buildSoapChecklist() {
@@ -226,14 +241,7 @@
   }
 
   $('visit-form').addEventListener('change', updateSelection);
-  $('visit-form').addEventListener('submit', buildGuide);
   $('new-visit').addEventListener('click', resetVisit);
-  $('edit-visit').addEventListener('click', () => {
-    $('guide').hidden = true; $('setup').hidden = false;
-    $('page-heading').textContent = 'Quem estou atendendo?';
-    $('page-description').textContent = 'Ajuste as situações. Ao montar o roteiro novamente, as marcações anteriores serão apagadas.';
-    $('page-heading').focus();
-  });
   $('search').addEventListener('input', renderActions);
   $('copy-soap-checklist').addEventListener('click', copySoapChecklist);
   $('action-list').addEventListener('change', event => {
@@ -249,5 +257,6 @@
   });
   window.addEventListener('pageshow', event => { if (event.persisted) resetVisit(); });
   $('visit-form').reset();
+  $('new-visit').hidden = true;
   updateSelection();
 })();
