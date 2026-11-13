@@ -114,26 +114,29 @@
     const entries = group.variants.map(({rule, card}) => {
       const parts = [];
       if (group.key === 'consulta') {
-        if (Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length) parts.push('CIAP-2: ' + card.codes.ciap2.join(', '));
-        if (Array.isArray(card.codes?.cid10) && card.codes.cid10.length) parts.push('CID-10 possíveis: ' + card.codes.cid10.join(', '));
-        if (Array.isArray(card.codes?.cid10_examples) && card.codes.cid10_examples.length) parts.push('CID-10 de referência: ' + card.codes.cid10_examples.join(', '));
+        if (Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length) parts.push('<span class="code-chip">CIAP-2 ' + esc(card.codes.ciap2.join(' / ')) + '</span>');
+        const cid = card.codes?.cid10 || card.codes?.cid10_examples || [];
+        if (Array.isArray(cid) && cid.length) {
+          if (cid.length <= 6) parts.push('<span class="code-chip">CID-10 ' + esc(cid.join(' / ')) + '</span>');
+          else parts.push('<details class="all-codes"><summary>CID-10 · ' + cid.length + ' opções</summary><p>' + esc(cid.join(', ')) + '</p></details>');
+        }
       }
-      (rule.codes || []).forEach(code => parts.push(code.system + ': ' + code.value + (code.label ? ' (' + code.label + ')' : '')));
-      return parts.length ? '<li><strong>' + esc(rule.id) + '</strong> · ' + esc(parts.join(' | ')) + '</li>' : '';
+      (rule.codes || []).forEach(code => {
+        parts.push('<span class="code-chip">' + esc(code.system) + ' ' + esc(code.value) + (code.label ? ' · ' + esc(code.label) : '') + '</span>');
+      });
+      return parts.length ? '<div class="code-line"><small>' + esc(rule.id) + '</small><div>' + parts.join('') + '</div></div>' : '';
     }).filter(Boolean);
-    return entries.length ? '<div class="code-summary"><strong>Códigos oficiais de referência</strong><p>Escolha CID/CIAP conforme o diagnóstico confirmado; SIGTAP/ABEX conforme o registro realizado ou solicitado.</p><ul>' + entries.join('') + '</ul></div>' : '';
+    return entries.length ? '<div class="code-summary"><strong>CÓDIGOS</strong>' + entries.join('') + '</div>' : '';
   }
 
   function actionMarkup(group, index) {
     const badges = group.variants.map(({rule}) => rule.id).join(' · ');
-    return `<article class="action ${reviewed.has(group.key) ? 'reviewed' : ''}" data-action="${esc(group.key)}">
-      <div class="action-main"><span class="number" aria-hidden="true">${index + 1}</span><div><h3>${esc(group.title)}</h3><p>${esc(group.instruction)}</p></div></div>
+    const paths = [...new Set(group.variants.map(({rule}) => rule.pec_location))];
+    return `<article class="action">
+      <div class="action-main"><span class="number" aria-hidden="true">${index + 1}</span><div><h3>${esc(group.title)}</h3><p class="action-badges">${esc(badges)}</p></div></div>
+      <div class="click-path"><strong>CLIQUE NO PEC</strong>${paths.map(path => `<p>${esc(path)}</p>`).join('')}</div>
       ${codeSummaryMarkup(group)}
-      <details class="action-details"><summary>Ver campo do PEC e critério de conferência</summary>
-        ${group.variants.length > 1 ? '<p class="merge-note">Ação reunida para facilitar a leitura. Confira cada condição abaixo: um registro não comprova automaticamente dois indicadores.</p>' : ''}
-        ${criteriaMarkup(group)}
-      </details>
-      <label class="review-control"><input type="checkbox" data-review="${esc(group.key)}" ${reviewed.has(group.key) ? 'checked' : ''}> Já conferi este item no PEC <span>${esc(badges)}</span></label>
+      <details class="action-details"><summary>Prazo, responsável e observações</summary>${criteriaMarkup(group)}</details>
     </article>`;
   }
 
@@ -142,18 +145,10 @@
   }
 
   function renderActions() {
-    const query = normalize($('search').value).trim();
-    const filtered = groups.filter(group => !query || searchable(group).includes(query));
-    const lanes = [
-      ['medical', 'Cliques médicos no PEC', 'Campos e códigos dos componentes C4/C5. Selecione códigos somente quando corresponderem ao diagnóstico e ao atendimento.'],
-      ['shared', 'Conferir em conjunto com a equipe', 'Este componente reúne responsabilidades da consulta e da equipe.'],
-      ['team', 'Ações da equipe — não registrar pelo médico', 'Confira com ACS/TACS, enfermagem ou vacinação. O médico não registra uma ação feita por outra pessoa.']
-    ];
-    $('action-list').innerHTML = lanes.map(([lane, title, description]) => {
-      const items = filtered.filter(group => group.lane === lane);
-      return items.length ? `<section class="lane ${lane}" aria-label="${title}"><div class="lane-heading"><h2>${title}</h2><p>${description}</p></div>${items.map(group => actionMarkup(group, groups.indexOf(group))).join('')}</section>` : '';
-    }).join('');
-    $('no-results').hidden = filtered.length > 0;
+    const medical = groups.filter(group => group.lane !== 'team');
+    const team = groups.filter(group => group.lane === 'team');
+    $('action-list').innerHTML = medical.map((group, index) => actionMarkup(group, index)).join('') +
+      (team.length ? `<details class="team-lane"><summary>O que depende da equipe (${team.length})</summary><p>Confira com quem realizou. Não registre ação alheia como realizada pelo médico.</p>${team.map((group, index) => actionMarkup(group, medical.length + index)).join('')}</details>` : '');
     updateProgress();
   }
 
@@ -167,7 +162,7 @@
     phase = selected.includes('prenatal') ? (phaseChoice?.value || '') : '';
     reviewed.clear();
     groups = makeGroups();
-    $('search').value = '';
+
     $('guide-heading').textContent = data.cards.filter(card => selected.includes(card.id)).map(labelFor).join(' + ');
     $('guide-context').textContent = selected.includes('prenatal')
       ? (phase === 'puerperio' ? 'Puerpério · confira os registros C3-I e C3-J.' : 'Pré-natal · confira os registros C3-A a C3-H e C3-K.')
@@ -185,7 +180,7 @@
   function resetVisit() {
     $('visit-form').reset();
     selected = []; phase = ''; groups = []; reviewed.clear();
-    $('search').value = ''; $('action-list').replaceChildren();
+$('action-list').replaceChildren();
     if ($('review-summary')) $('review-summary').textContent = '';
     $('guide-heading').textContent = ''; $('guide-context').textContent = '';
     clearTimeout(toastTimer); $('toast').hidden = true;
@@ -215,16 +210,16 @@
       return lines.join('\n');
     }).join('\n');
     return [
-      'RASCUNHO SOAP — V1 MÉDICA — PREENCHER COM FATOS REAIS',
+      'RASCUNHO SOAP — COMPLETAR ANTES DE SALVAR',
       'S: [Relato real.]',
       'O: [Achados observados e medidas realmente aferidas.]',
       'A: [Avaliação clínica realizada.]',
       'P: [Conduta decidida, orientações e seguimento, se aplicáveis.]',
       '',
-      '⚠️ MAPA DE CLIQUES — TEXTO LIVRE PODE NÃO ALIMENTAR O INDICADOR. USE O CAMPO ESTRUTURADO, CONFIRA HISTÓRICO E JANELA. NÃO REPITA PROCEDIMENTOS SÓ PARA PONTUAR.',
+      'MAPA DE CLIQUES — confira o campo estruturado e o histórico do indicador.',
       checklist,
       '',
-      'Os códigos são referências; use somente os compatíveis com o diagnóstico e os atos realmente realizados. Antes de salvar, retire os lembretes e complete o SOAP. Este mapa não comprova execução.'
+      'Use somente códigos compatíveis com o diagnóstico e o registro real. Apague este mapa antes de salvar a evolução.'
     ].join('\n');
   }
 
@@ -259,7 +254,6 @@
 
   $('visit-form').addEventListener('change', updateSelection);
   $('new-visit').addEventListener('click', resetVisit);
-  $('search').addEventListener('input', renderActions);
   $('copy-soap-checklist').addEventListener('click', copySoapChecklist);
   $('action-list').addEventListener('change', event => {
     const key = event.target.dataset.review;
