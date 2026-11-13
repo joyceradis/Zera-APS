@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#123d33">
   <meta name="description" content="Gere um SOAP curto e confira os cliques estruturados do e-SUS APS.">
   <title>Zera-APS · Meu atendimento no PEC</title>
-  <link rel="stylesheet" href="styles.css?v=0.5.0">
+  <link rel="stylesheet" href="styles.css?v=0.6.0">
 </head>
 <body>
   <header class="topbar">
@@ -17,7 +17,7 @@
     <div class="intro">
       <p class="eyebrow">APOIO À CONFERÊNCIA DO REGISTRO</p>
       <h1 id="page-heading" tabindex="-1">V1 médica · C4 e C5</h1>
-      <p id="page-description">Foco nos indicadores de diabetes e hipertensão: veja o código e o clique do PEC; copie o SOAP curto com o mapa.</p>
+      <p id="page-description">Escolha C4 ou C5. Veja o campo e o código; copie o SOAP com o mapa de cliques.</p>
     </div>
     <section id="setup" aria-labelledby="setup-heading">
       <form id="visit-form" autocomplete="off">
@@ -47,21 +47,19 @@
     </section>
     <section id="guide" hidden aria-labelledby="guide-heading">
       <div class="guide-toolbar"><div><p class="eyebrow">MAPA DE CLIQUES</p><h2 id="guide-heading" tabindex="-1"></h2></div></div>
-      <p id="guide-context" class="context-note"></p>
-      <label class="search-label" for="search">Localizar neste roteiro</label>
-      <input type="search" id="search" placeholder="Ex.: pressão, HbA1c ou código" autocomplete="off">
-      <div id="action-list"></div>
-      <div id="no-results" class="empty" hidden>Nenhum item encontrado neste roteiro. Tente outro termo ou altere as situações selecionadas.</div>
+      
+      <div class="map-intro"><h3>Mapa de cliques e códigos</h3><p id="guide-context" class="context-note"></p></div>
+      <div id="action-list" class="action-list"></div>
       <details class="references"><summary>Sobre os indicadores e as fontes</summary><p>Este guia cobre componentes de qualidade C3 (gestação/puerpério), C4 (diabetes), C5 (hipertensão) e C7 (saúde da mulher). C1 (acesso), C2 (infância) e C6 (pessoa idosa) ainda não estão incluídos.</p><p>Os critérios foram cruzados com as notas metodológicas oficiais e o guia e-SUS APS. A Nota Técnica nº 8/2026 define a apuração do cofinanciamento; o antigo nome “Previne Brasil” não identifica sozinho as regras atuais.</p><p id="base-date"></p><p>Versão local do PEC, elegibilidade, vínculo, histórico, transmissão e processamento no Siaps afetam a apuração. A marcação nesta tela não comprova atendimento nem pontuação.</p><p>Os caminhos ainda não foram testados no PEC da unidade de Vitor Hugo, em Marechal Floriano.</p></details>
     </section>
     <aside id="copy-dock" class="copy-dock" hidden aria-label="Copiar evolução e mapa do e-SUS">
       <p id="copy-warning" class="copy-warning">⚠️ Texto livre não substitui o campo estruturado do indicador.</p>
       <button id="copy-soap-checklist" type="button" class="button primary">Copiar SOAP + mapa do PEC</button>
     </aside>
-    <footer>V1 médica em validação · Versão 0.5.0 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
+    <footer>V1 médica em validação · Versão 0.6.0 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
   </main>
   <div id="toast" role="status" class="toast" hidden></div>
   <script src="data/regras.js?v=0.3.0"></script>
-  <script src="app.js?v=0.5.0"></script>
+  <script src="app.js?v=0.6.0"></script>
 </body>
 </html>
