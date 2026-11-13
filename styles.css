@@ -131,3 +131,28 @@ footer { font-size: 12px; color: #677a6c; margin: 28px 0 0; padding-top: 18px; b
   .review-control span { width: 100%; padding-left: 30px; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* Fluxo rápido: o mapa atualiza ao marcar e a cópia fica sempre à mão. */
+.form-bottom { justify-content: flex-start; }
+.copy-dock {
+  position: fixed;
+  z-index: 20;
+  inset: auto 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 12px max(20px, calc((100vw - 1000px) / 2));
+  background: #fff;
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -6px 24px #1c30291a;
+}
+.copy-warning { max-width: 520px; margin: 0; color: #765e30; font-size: 13px; font-weight: 700; }
+.copy-dock .button { min-height: 50px; white-space: nowrap; font-size: 15px; }
+body:has(.copy-dock:not([hidden])) main { padding-bottom: 150px; }
+@media (max-width: 650px) {
+  .copy-dock { flex-direction: column; align-items: stretch; gap: 7px; padding: 9px 14px calc(9px + env(safe-area-inset-bottom)); }
+  .copy-warning { font-size: 12px; line-height: 1.35; }
+  .copy-dock .button { width: 100%; min-height: 46px; }
+  body:has(.copy-dock:not([hidden])) main { padding-bottom: 170px; }
+}
