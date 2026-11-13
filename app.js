@@ -40,7 +40,6 @@
   let selected = [];
   let phase = '';
   let groups = [];
-  const reviewed = new Set();
   let toastTimer;
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
@@ -58,9 +57,9 @@
     $('phase-field').hidden = !needsPhase;
     $('new-visit').hidden = !keys.length;
     if (!keys.length) {
-      selected = []; phase = ''; groups = []; reviewed.clear();
+      selected = []; phase = ''; groups = [];
       $('guide').hidden = true; $('copy-dock').hidden = true;
-      $('selection-hint').textContent = 'Marque uma ou mais situações para ver o mapa de cliques.';
+      $('selection-hint').textContent = 'Selecione uma ou duas opções.';
       return;
     }
     const phaseChoice = document.querySelector('[name="phase"]:checked');
@@ -69,7 +68,7 @@
       $('selection-hint').textContent = 'Escolha pré-natal ou puerpério para montar também os cliques do C3.';
       return;
     }
-    $('selection-hint').textContent = 'Mapa atualizado. Copie o SOAP e confira os campos estruturados no PEC.';
+    $('selection-hint').textContent = 'Mapa pronto.';
     buildGuide();
   }
 
@@ -140,33 +139,23 @@
     </article>`;
   }
 
-  function searchable(group) {
-    return normalize(JSON.stringify([group.title, group.instruction, group.variants.map(({rule, card}) => [rule, card.title, group.key === 'consulta' ? card.codes : null])]));
-  }
-
   function renderActions() {
     const medical = groups.filter(group => group.lane !== 'team');
     const team = groups.filter(group => group.lane === 'team');
     $('action-list').innerHTML = medical.map((group, index) => actionMarkup(group, index)).join('') +
       (team.length ? `<details class="team-lane"><summary>O que depende da equipe (${team.length})</summary><p>Confira com quem realizou. Não registre ação alheia como realizada pelo médico.</p>${team.map((group, index) => actionMarkup(group, medical.length + index)).join('')}</details>` : '');
-    updateProgress();
-  }
-
-  function updateProgress() {
-    if ($('review-summary')) $('review-summary').textContent = `${reviewed.size} de ${groups.length} itens conferidos manualmente`;
   }
 
   function buildGuide() {
     selected = keysFromForm();
     const phaseChoice = document.querySelector('[name="phase"]:checked');
     phase = selected.includes('prenatal') ? (phaseChoice?.value || '') : '';
-    reviewed.clear();
     groups = makeGroups();
 
     $('guide-heading').textContent = data.cards.filter(card => selected.includes(card.id)).map(labelFor).join(' + ');
     $('guide-context').textContent = selected.includes('prenatal')
       ? (phase === 'puerperio' ? 'Puerpério · confira os registros C3-I e C3-J.' : 'Pré-natal · confira os registros C3-A a C3-H e C3-K.')
-      : 'Use o mapa para localizar o campo estruturado e conferir a janela do indicador.';
+      : 'Siga o campo e confira o prazo nos detalhes.';
     const paIndicators = [selected.includes('has') ? 'C5-B' : '', selected.includes('dm') ? 'C4-B' : ''].filter(Boolean);
     $('copy-warning').textContent = paIndicators.length
       ? '⚠️ PA escrita na evolução não substitui o campo estruturado ' + paIndicators.join(' / ') + '.'
@@ -181,7 +170,6 @@
     $('visit-form').reset();
     selected = []; phase = ''; groups = []; reviewed.clear();
 $('action-list').replaceChildren();
-    if ($('review-summary')) $('review-summary').textContent = '';
     $('guide-heading').textContent = ''; $('guide-context').textContent = '';
     clearTimeout(toastTimer); $('toast').hidden = true;
     $('guide').hidden = true; $('copy-dock').hidden = true;
@@ -246,7 +234,7 @@ $('action-list').replaceChildren();
     const button = event.currentTarget;
     try {
       await writeClipboardText(buildSoapChecklist(), button);
-      $('toast').textContent = 'Rascunho SOAP e checklist copiados. Complete e confira antes de salvar.';
+      $('toast').textContent = 'SOAP e mapa copiados.';
     } catch { $('toast').textContent = 'Cópia indisponível. Revise o rascunho na tela antes de continuar.'; }
     clearTimeout(toastTimer); $('toast').hidden = false;
     toastTimer = setTimeout(() => { $('toast').hidden = true; }, 4500);
@@ -255,13 +243,6 @@ $('action-list').replaceChildren();
   $('visit-form').addEventListener('change', updateSelection);
   $('new-visit').addEventListener('click', resetVisit);
   $('copy-soap-checklist').addEventListener('click', copySoapChecklist);
-  $('action-list').addEventListener('change', event => {
-    const key = event.target.dataset.review;
-    if (!key) return;
-    event.target.checked ? reviewed.add(key) : reviewed.delete(key);
-    event.target.closest('.action').classList.toggle('reviewed', event.target.checked);
-    updateProgress();
-  });
   $('action-list').addEventListener('click', event => {
     const button = event.target.closest('[data-copy]');
     if (button) copyCode(button);
