@@ -156,3 +156,12 @@ body:has(.copy-dock:not([hidden])) main { padding-bottom: 150px; }
   .copy-dock .button { width: 100%; min-height: 46px; }
   body:has(.copy-dock:not([hidden])) main { padding-bottom: 170px; }
 }
+
+.later-indicators { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 6px; }
+.later-indicators > summary { color: #426d4b; }
+.code-summary { margin: 12px 0 4px; padding: 12px 14px; border-left: 3px solid #33805c; background: #f2f7f3; font-size: 13px; overflow-wrap: anywhere; }
+.code-summary > strong { color: #24523a; }
+.code-summary p { margin: 4px 0; color: #5c6d61; font-size: 12px; }
+.code-summary ul { list-style: none; margin: 6px 0 0; padding: 0; }
+.code-summary li + li { margin-top: 5px; }
+.lane.team .lane-heading h2 { color: #765e30; }
