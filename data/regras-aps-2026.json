@@ -1,7 +1,7 @@
 {
   "project": "Zera-APS — roteiro de registro para APS",
-  "version": "0.2.0",
-  "prepared_on": "2026-10-31",
+  "version": "0.3.0",
+  "prepared_on": "2026-11-12",
   "verified_sources": [
     "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/",
     "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia",
@@ -11,7 +11,7 @@
     "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view",
     "https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-tecnica-no-8-2026-deaps-saps-ms"
   ],
-  "scope": "Roteiro documental dos componentes C3, C4, C5 e C7; critérios e caminhos cruzados com fontes públicas em 02/11/2026. Sem validação no PEC da unidade, sem integração e sem cálculo oficial.",
+  "scope": "Roteiro documental dos componentes C3, C4, C5 e C7; critérios metodológicos conferidos em 02/11/2026 e caminhos/campos confrontados com o Manual PEC 5.6 e o guia e-SUS APS em 12/11/2026. Sem validação na instalação local, integração ou cálculo oficial.",
   "security": {
     "offline_first": true,
     "patient_identifiers": false,
@@ -140,7 +140,7 @@
           "goal": "≥1 par de registros no mesmo dia",
           "window": "últimos 12 meses",
           "actor": "profissional habilitado conforme modelo de informação",
-          "pec_location": "SOAP → Objetivo → Antropometria → Peso e Altura",
+          "pec_location": "SOAP → Objetivo → Antropometria, sinais vitais e glicemia capilar → Peso e altura",
           "codes": [
             {
               "system": "SIGTAP",
@@ -175,12 +175,13 @@
           "goal": "≥2 visitas com intervalo ≥30 dias",
           "window": "últimos 12 meses",
           "actor": "ACS/TACS",
-          "pec_location": "Aplicativo e-SUS Território → visita ao cidadão → motivo da visita",
+          "pec_location": "e-SUS Território → Visita ao Cidadão → marcar como realizada e preencher “Motivo da visita”",
           "codes": [],
           "cautions": [
             "Não é tarefa que o médico possa marcar como realizada em nome do ACS.",
             "Sem integração com prontuário, o app apenas informa a regra e não comprova execução.",
-            "A nota metodológica dispensa este componente como condicionante de pontuação para eAP tipo 76. Confirme o tipo da equipe; não presumir essa condição na unidade."
+            "A nota metodológica dispensa este componente como condicionante de pontuação para eAP tipo 76. Confirme o tipo da equipe; não presumir essa condição na unidade.",
+            "A nota considera o registro de Visita ao Cidadão realizado por ACS/TACS, com indicação de visita realizada e preenchimento do motivo; confira a sincronização no fluxo local."
           ],
           "conditionals": [],
           "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-hipertens%C3%A3o",
@@ -234,14 +235,16 @@
           "goal": "≥1 registro",
           "window": "últimos 6 meses",
           "actor": "profissional habilitado",
-          "pec_location": "SOAP → Objetivo → Sinais vitais → PA",
+          "pec_location": "SOAP → Objetivo → Antropometria, sinais vitais e glicemia capilar → Pressão arterial (mmHg)",
           "codes": [
             {
               "system": "SIGTAP",
               "value": "03.01.10.003-9"
             }
           ],
-          "cautions": [],
+          "cautions": [
+            "Registre o valor aferido no campo estruturado; copiar ou inserir somente SIGTAP não substitui a medida."
+          ],
           "conditionals": [],
           "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-diabetes",
           "verification": "cross_checked_methodology_and_pec_guide",
@@ -255,7 +258,7 @@
           "goal": "≥1 par no mesmo dia",
           "window": "últimos 12 meses",
           "actor": "profissional habilitado",
-          "pec_location": "SOAP → Objetivo → Antropometria",
+          "pec_location": "SOAP → Objetivo → Antropometria, sinais vitais e glicemia capilar → Peso e altura",
           "codes": [
             {
               "system": "SIGTAP",
@@ -271,7 +274,9 @@
               "value": "01.01.04.007-5"
             }
           ],
-          "cautions": [],
+          "cautions": [
+            "Peso e altura devem ter a mesma data; o PEC pode inserir automaticamente os códigos SIGTAP ao usar os campos próprios."
+          ],
           "conditionals": [],
           "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-diabetes",
           "verification": "cross_checked_methodology_and_pec_guide",
@@ -285,10 +290,11 @@
           "goal": "≥2 visitas separadas por ≥30 dias",
           "window": "últimos 12 meses",
           "actor": "ACS/TACS",
-          "pec_location": "e-SUS Território → visita ao cidadão",
+          "pec_location": "e-SUS Território → Visita ao Cidadão → marcar como realizada e preencher “Motivo da visita”",
           "codes": [],
           "cautions": [
-            "A nota metodológica dispensa este componente como condicionante de pontuação para eAP tipo 76. Confirme o tipo da equipe; não presumir essa condição na unidade."
+            "A nota metodológica dispensa este componente como condicionante de pontuação para eAP tipo 76. Confirme o tipo da equipe; não presumir essa condição na unidade.",
+            "A nota considera o registro de Visita ao Cidadão realizado por ACS/TACS, com indicação de visita realizada e preenchimento do motivo; confira a sincronização no fluxo local."
           ],
           "conditionals": [],
           "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-pessoa-com-diabetes",
@@ -417,7 +423,7 @@
           "goal": "≥7 aferições documentadas",
           "window": "durante a gestação",
           "actor": "profissional habilitado",
-          "pec_location": "SOAP → Objetivo → Sinais vitais → PA",
+          "pec_location": "SOAP → Objetivo → Antropometria, sinais vitais e glicemia capilar → Pressão arterial (mmHg)",
           "codes": [
             {
               "system": "SIGTAP",
@@ -439,7 +445,7 @@
           "goal": "≥7 registros simultâneos",
           "window": "durante a gestação",
           "actor": "profissional habilitado",
-          "pec_location": "SOAP → Objetivo → Antropometria",
+          "pec_location": "SOAP → Objetivo → Antropometria, sinais vitais e glicemia capilar → Peso e altura",
           "codes": [
             {
               "system": "SIGTAP",
@@ -464,10 +470,11 @@
           "goal": "≥3 visitas após a primeira consulta",
           "window": "gestação",
           "actor": "ACS/TACS",
-          "pec_location": "e-SUS Território → visita ao cidadão",
+          "pec_location": "e-SUS Território → Visita ao Cidadão → marcar como realizada e preencher “Motivo da visita”",
           "codes": [],
           "cautions": [
-            "Para eAP tipo 76, a nota C3 prevê pontuação integral para este componente; confirmar o tipo da equipe."
+            "Para eAP tipo 76, a nota C3 prevê pontuação integral para este componente; confirmar o tipo da equipe.",
+            "A nota considera o registro de Visita ao Cidadão realizado por ACS/TACS, com indicação de visita realizada e preenchimento do motivo; confira a sincronização no fluxo local."
           ],
           "conditionals": [],
           "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-gestante-e-pu%C3%A9rpera",
@@ -596,11 +603,12 @@
           "goal": "≥1 visita domiciliar realizada por ACS/TACS",
           "window": "durante o puerpério",
           "actor": "ACS/TACS",
-          "pec_location": "e-SUS Território → Visita ao Cidadão → motivo da visita e desfecho",
+          "pec_location": "e-SUS Território → Visita ao Cidadão → marcar como realizada, preencher “Motivo da visita” e registrar desfecho",
           "codes": [],
           "cautions": [
             "O registro é do profissional que realizou a visita.",
-            "A nota C3 prevê pontuação integral para E/J em eAP tipo 76; não presumir o tipo da equipe da unidade."
+            "A nota C3 prevê pontuação integral para E/J em eAP tipo 76; não presumir o tipo da equipe da unidade.",
+            "A nota considera o registro de Visita ao Cidadão realizado por ACS/TACS, com indicação de visita realizada e preenchimento do motivo; confira a sincronização no fluxo local."
           ],
           "conditionals": [],
           "phase": "puerperio",
@@ -648,18 +656,39 @@
           "codes": [
             {
               "system": "SIGTAP",
-              "value": "02.03.01.008-6"
+              "value": "02.01.02.003-3",
+              "label": "Coleta de citopatológico de colo uterino"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.03.01.008-6",
+              "label": "Exame citopatológico cérvico-vaginal/microflora — rastreamento"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.03.01.001-9",
+              "label": "Exame citopatológico cérvico-vaginal/microflora"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.01.02.007-6",
+              "label": "Coleta de material do colo do útero para exame molecular de HPV"
+            },
+            {
+              "system": "SIGTAP",
+              "value": "02.01.02.008-4",
+              "label": "Entrega de material de autocoleta para exame molecular de HPV"
             },
             {
               "system": "SIGTAP",
               "value": "02.02.10.025-1",
-              "label": "HPV molecular, janela específica"
+              "label": "Exame molecular de detecção de HPV — janela específica de 60 meses"
             }
           ],
           "cautions": [
             "Critério da ficha técnica 2026: faixa de 25 a 64 anos para o componente.",
-            "A lista de códigos aceitos é mais ampla do que os exemplos.",
-            "A janela de 60 meses é específica do SIGTAP 02.02.10.025-1, considerado a partir da competência janeiro/2026; não aplicar 60 meses a todo teste ou coleta para HPV."
+            "A janela de 60 meses é específica do SIGTAP 02.02.10.025-1, considerado a partir da competência janeiro/2026; não aplicar 60 meses a todo teste ou coleta para HPV.",
+            "A elegibilidade do registro, a modalidade e a habilitação profissional devem ser conferidas na nota metodológica vigente; códigos desta lista não são instrução para solicitar exame."
           ],
           "conditionals": [],
           "source": "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/#cuidado-da-mulher-na-preven%C3%A7%C3%A3o-do-c%C3%A2ncer",
@@ -710,7 +739,7 @@
           "goal": "≥1 exame solicitado ou avaliado",
           "window": "últimos 24 meses; componente 50-69 anos",
           "actor": "médico ou enfermeiro",
-          "pec_location": "SOAP → Plano → Solicitação de exames OU Objetivo → Resultado",
+          "pec_location": "SOAP → Plano → Solicitação de exames/procedimentos OU SOAP → Objetivo → Resultados de exames",
           "codes": [
             {
               "system": "SIGTAP",
@@ -823,5 +852,20 @@
     "method": "Cruzamento documental das notas metodológicas C3/C4/C5/C7 (versões publicadas no portal oficial) e guia e-SUS APS 2026. Nota Técnica 8/2026 consultada para distinguir registro de apuração.",
     "not_local_pec_validation": true,
     "not_official_calculator": true
+  },
+  "pec_manual_review": {
+    "version": "5.6",
+    "date": "2026-11-12",
+    "status": "revisao_documental_sem_validacao_local",
+    "sources": [
+      "https://sisaps.saude.gov.br/sistemas/esusaps/blog/versao-5-6/",
+      "https://sisaps.saude.gov.br/sistemas/esusaps/docs/manual/PEC/PEC_10_acompanhamento_condicoes_saude/",
+      "https://sisaps.saude.gov.br/sistemas/esusaps/docs/guias-preenchimento%20Atual/equipeaps/"
+    ],
+    "limitations": [
+      "A revisão documental não valida rótulos, permissões, fluxos ou configuração da instalação municipal.",
+      "As seleções do aplicativo não confirmam diagnóstico, elegibilidade, histórico, indicação clínica, execução ou processamento no Siaps.",
+      "O rascunho SOAP contém campos em branco; lembretes do checklist não são evidência de execução e devem ser removidos do registro clínico após conferência."
+    ]
   }
 }
