@@ -3,63 +3,87 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#123d33">
-  <meta name="description" content="Gere um SOAP curto e confira os cliques estruturados do e-SUS APS.">
-  <title>Zera-APS · Meu atendimento no PEC</title>
-  <link rel="stylesheet" href="styles.css?v=0.6.0">
+  <meta name="theme-color" content="#f5f7fb">
+  <meta name="description" content="Mapa rápido de campos e códigos do e-SUS APS para a versão médica do Zera-APS.">
+  <title>Zera-APS · Cola médica do PEC</title>
+  <link rel="stylesheet" href="styles.css?v=0.7.0">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#inicio"><span aria-hidden="true">Z+</span><strong>Zera-APS</strong><small>Versão médica · C4/C5</small></a>
-    <button type="button" id="new-visit" class="button secondary">Novo atendimento</button>
+    <a class="brand" href="#inicio"><span aria-hidden="true">Z</span><strong>Zera-APS</strong><small>e-SUS APS</small></a>
+    <button type="button" id="new-visit" class="button secondary" hidden>Limpar seleção</button>
   </header>
   <main id="inicio">
-    <div class="intro">
-      <p class="eyebrow">APOIO À CONFERÊNCIA DO REGISTRO</p>
-      <h1 id="page-heading" tabindex="-1">V1 médica · C4 e C5</h1>
-      <p id="page-description">Escolha C4 ou C5. Veja o campo e o código; copie o SOAP com o mapa de cliques.</p>
-    </div>
+    <section class="intro" aria-labelledby="page-heading">
+      <p class="eyebrow">COLA MÉDICA · VERSÃO 1</p>
+      <h1 id="page-heading" tabindex="-1">Qual indicador você precisa fechar?</h1>
+      <p id="page-description">Escolha diabetes ou hipertensão. O caminho do PEC aparece na hora.</p>
+    </section>
     <section id="setup" aria-labelledby="setup-heading">
       <form id="visit-form" autocomplete="off">
         <fieldset>
-          <legend id="setup-heading">Indicadores prioritários para o médico</legend>
-          <p class="hint">Selecione diabetes, hipertensão ou ambos. Sem dados de identificação.</p>
+          <legend id="setup-heading">Indicadores prioritários</legend>
           <div class="conditions">
-            <label class="condition"><input type="checkbox" name="condition" value="has"><span><strong>Hipertensão</strong><small>C5 · HAS</small></span></label>
-            <label class="condition"><input type="checkbox" name="condition" value="dm"><span><strong>Diabetes</strong><small>C4 · DM</small></span></label>
+            <label class="condition">
+              <input type="checkbox" name="condition" value="dm">
+              <span class="condition-copy"><strong>Diabetes</strong><small>C4 · HbA1c · exame dos pés</small></span>
+              <span class="condition-code">C4</span>
+            </label>
+            <label class="condition">
+              <input type="checkbox" name="condition" value="has">
+              <span class="condition-copy"><strong>Hipertensão</strong><small>C5 · pressão · peso e altura</small></span>
+              <span class="condition-code">C5</span>
+            </label>
           </div>
-          <details class="later-indicators"><summary>Outros indicadores · C3 e C7</summary>
-            <div class="conditions">
-            <label class="condition"><input type="checkbox" name="condition" value="prenatal"><span><strong>Gestação ou puerpério</strong><small>C3 · Pré-natal e puerpério</small></span></label>
-            <label class="condition"><input type="checkbox" name="condition" value="mulher"><span><strong>Saúde da mulher</strong><small>C7 · Rastreamentos e saúde sexual</small></span></label>
+          <details class="secondary-indicators">
+            <summary>Outros indicadores</summary>
+            <div class="conditions secondary-grid">
+              <label class="condition">
+                <input type="checkbox" name="condition" value="prenatal">
+                <span class="condition-copy"><strong>Pré-natal / puerpério</strong><small>C3</small></span>
+                <span class="condition-code">C3</span>
+              </label>
+              <label class="condition">
+                <input type="checkbox" name="condition" value="mulher">
+                <span class="condition-copy"><strong>Saúde da mulher</strong><small>C7</small></span>
+                <span class="condition-code">C7</span>
+              </label>
             </div>
-            <p class="hint">Módulos secundários da versão médica; o foco inicial está em C4 e C5.</p>
           </details>
-
         </fieldset>
         <fieldset id="phase-field" hidden>
-          <legend>Em qual fase?</legend>
-          <div class="phase-options"><label><input type="radio" name="phase" value="gestacao"> Pré-natal</label><label><input type="radio" name="phase" value="puerperio"> Puerpério</label></div>
+          <legend>Fase</legend>
+          <div class="phase-options">
+            <label><input type="radio" name="phase" value="gestacao"> Pré-natal</label>
+            <label><input type="radio" name="phase" value="puerperio"> Puerpério</label>
+          </div>
         </fieldset>
-        <div class="form-bottom"><p id="selection-hint" role="status">Marque uma ou mais situações para ver o mapa de cliques.</p></div>
+        <p id="selection-hint" class="selection-hint" role="status">Selecione uma ou duas opções.</p>
       </form>
-      <details class="scope-note"><summary>Escopo e limites</summary><p>O Zera não acessa o PEC nem confirma diagnóstico, elegibilidade, execução ou pontuação. Use os campos estruturados do sistema; o texto copiado é um rascunho.</p></details>
     </section>
     <section id="guide" hidden aria-labelledby="guide-heading">
-      <div class="guide-toolbar"><div><p class="eyebrow">MAPA DE CLIQUES</p><h2 id="guide-heading" tabindex="-1"></h2></div></div>
-      
-      <div class="map-intro"><h3>Mapa de cliques e códigos</h3><p id="guide-context" class="context-note"></p></div>
+      <div class="guide-heading">
+        <div><p class="eyebrow">CAMPO + CÓDIGO</p><h2 id="guide-heading" tabindex="-1"></h2></div>
+      </div>
+      <p id="guide-context" class="context-note"></p>
       <div id="action-list" class="action-list"></div>
-      <details class="references"><summary>Sobre os indicadores e as fontes</summary><p>Este guia cobre componentes de qualidade C3 (gestação/puerpério), C4 (diabetes), C5 (hipertensão) e C7 (saúde da mulher). C1 (acesso), C2 (infância) e C6 (pessoa idosa) ainda não estão incluídos.</p><p>Os critérios foram cruzados com as notas metodológicas oficiais e o guia e-SUS APS. A Nota Técnica nº 8/2026 define a apuração do cofinanciamento; o antigo nome “Previne Brasil” não identifica sozinho as regras atuais.</p><p id="base-date"></p><p>Versão local do PEC, elegibilidade, vínculo, histórico, transmissão e processamento no Siaps afetam a apuração. A marcação nesta tela não comprova atendimento nem pontuação.</p><p>Os caminhos ainda não foram testados no PEC da unidade de Vitor Hugo, em Marechal Floriano.</p></details>
+      <details class="references">
+        <summary>Fontes e limites</summary>
+        <p>Referências oficiais do Ministério da Saúde e do guia e-SUS APS. Os caminhos ainda precisam ser conferidos na instalação local.</p>
+        <p>O Zera não acessa o PEC nem confirma diagnóstico, execução, elegibilidade ou pontuação. Complete o SOAP com fatos reais.</p>
+        <p id="base-date"></p>
+      </details>
     </section>
-    <aside id="copy-dock" class="copy-dock" hidden aria-label="Copiar evolução e mapa do e-SUS">
-      <p id="copy-warning" class="copy-warning">⚠️ Texto livre não substitui o campo estruturado do indicador.</p>
-      <button id="copy-soap-checklist" type="button" class="button primary">Copiar SOAP + mapa do PEC</button>
+    <aside id="copy-dock" class="copy-dock" hidden aria-label="Copiar evolução e mapa do PEC">
+      <div class="copy-dock-inner">
+        <p id="copy-warning" class="copy-warning">O texto livre não substitui os campos estruturados do PEC.</p>
+        <button id="copy-soap-checklist" type="button" class="button primary">Copiar SOAP + mapa</button>
+      </div>
     </aside>
-    <footer>V1 médica em validação · Versão 0.6.0 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
+    <footer><span>V1 médica · em validação</span><span>Sem dados de pacientes salvos</span></footer>
   </main>
   <div id="toast" role="status" class="toast" hidden></div>
   <script src="data/regras.js?v=0.3.0"></script>
-  <script src="app.js?v=0.6.0"></script>
+  <script src="app.js?v=0.7.0"></script>
 </body>
 </html>
