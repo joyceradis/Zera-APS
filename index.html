@@ -6,30 +6,36 @@
   <meta name="theme-color" content="#123d33">
   <meta name="description" content="Gere um SOAP curto e confira os cliques estruturados do e-SUS APS.">
   <title>Zera-APS · Meu atendimento no PEC</title>
-  <link rel="stylesheet" href="styles.css?v=0.4.0">
+  <link rel="stylesheet" href="styles.css?v=0.5.0">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#inicio"><span aria-hidden="true">Z+</span><strong>Zera-APS</strong><small>Meu atendimento no PEC</small></a>
+    <a class="brand" href="#inicio"><span aria-hidden="true">Z+</span><strong>Zera-APS</strong><small>Versão médica · C4/C5</small></a>
     <button type="button" id="new-visit" class="button secondary">Novo atendimento</button>
   </header>
   <main id="inicio">
     <div class="intro">
       <p class="eyebrow">APOIO À CONFERÊNCIA DO REGISTRO</p>
-      <h1 id="page-heading" tabindex="-1">Monte sua cola de cliques</h1>
-      <p id="page-description">Marque uma ou mais situações. O mapa do e-SUS aparece na hora; o botão fixo copia o SOAP curto e os campos para conferir.</p>
+      <h1 id="page-heading" tabindex="-1">V1 médica · C4 e C5</h1>
+      <p id="page-description">Foco nos indicadores de diabetes e hipertensão: veja o código e o clique do PEC; copie o SOAP curto com o mapa.</p>
     </div>
     <section id="setup" aria-labelledby="setup-heading">
       <form id="visit-form" autocomplete="off">
         <fieldset>
-          <legend id="setup-heading">Selecione o cuidado desta consulta</legend>
-          <p class="hint">Marque tudo que se aplica. Não digite dados do paciente.</p>
+          <legend id="setup-heading">Indicadores prioritários para o médico</legend>
+          <p class="hint">Selecione diabetes, hipertensão ou ambos. Sem dados de identificação.</p>
           <div class="conditions">
-            <label class="condition"><input type="checkbox" name="condition" value="has"><span><strong>Hipertensão</strong><small>HAS · C5</small></span></label>
-            <label class="condition"><input type="checkbox" name="condition" value="dm"><span><strong>Diabetes</strong><small>DM · C4</small></span></label>
+            <label class="condition"><input type="checkbox" name="condition" value="has"><span><strong>Hipertensão</strong><small>C5 · HAS</small></span></label>
+            <label class="condition"><input type="checkbox" name="condition" value="dm"><span><strong>Diabetes</strong><small>C4 · DM</small></span></label>
+          </div>
+          <details class="later-indicators"><summary>Outros indicadores · C3 e C7</summary>
+            <div class="conditions">
             <label class="condition"><input type="checkbox" name="condition" value="prenatal"><span><strong>Gestação ou puerpério</strong><small>C3 · Pré-natal e puerpério</small></span></label>
             <label class="condition"><input type="checkbox" name="condition" value="mulher"><span><strong>Saúde da mulher</strong><small>C7 · Rastreamentos e saúde sexual</small></span></label>
-          </div>
+            </div>
+            <p class="hint">Módulos secundários da versão médica; o foco inicial está em C4 e C5.</p>
+          </details>
+
         </fieldset>
         <fieldset id="phase-field" hidden>
           <legend>Em qual fase?</legend>
@@ -52,10 +58,10 @@
       <p id="copy-warning" class="copy-warning">⚠️ Texto livre não substitui o campo estruturado do indicador.</p>
       <button id="copy-soap-checklist" type="button" class="button primary">Copiar SOAP + mapa do PEC</button>
     </aside>
-    <footer>Versão 0.4.0 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
+    <footer>V1 médica em validação · Versão 0.5.0 · Sem nome, CPF, CNS ou histórico salvo. Ao iniciar outro atendimento ou recarregar, as escolhas são apagadas.</footer>
   </main>
   <div id="toast" role="status" class="toast" hidden></div>
   <script src="data/regras.js?v=0.3.0"></script>
-  <script src="app.js?v=0.4.0"></script>
+  <script src="app.js?v=0.5.0"></script>
 </body>
 </html>
