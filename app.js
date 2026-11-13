@@ -212,8 +212,8 @@
         const procedureCodes = (rule.codes || []).map(code => code.system + ' ' + code.value + (code.label ? ' (' + code.label + ')' : ''));
         if (procedureCodes.length) lines.push('   CÓDIGO(S) DO REGISTRO: ' + procedureCodes.join('; '));
       });
-      return lines.join('\\n');
-    }).join('\\n');
+      return lines.join('\n');
+    }).join('\n');
     return [
       'RASCUNHO SOAP — V1 MÉDICA — PREENCHER COM FATOS REAIS',
       'S: [Relato real.]',
@@ -225,7 +225,7 @@
       checklist,
       '',
       'Os códigos são referências; use somente os compatíveis com o diagnóstico e os atos realmente realizados. Antes de salvar, retire os lembretes e complete o SOAP. Este mapa não comprova execução.'
-    ].join('\\n');
+    ].join('\n');
   }
 
   async function writeClipboardText(value, button) {
