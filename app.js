@@ -146,7 +146,7 @@
     $('page-heading').textContent = 'O que preciso conferir nesta consulta?';
     $('page-description').textContent = 'Siga o roteiro abaixo. Abra apenas o item em que precisar consultar o campo do PEC, o prazo ou o código.';
     $('guide-context').textContent = selected.includes('prenatal') ? 'Pré-natal: componentes A–H e K. Puerpério: I e J. Confira trimestre, data de desfecho e histórico no PEC; a seleção da fase não confirma elegibilidade.' : selected.includes('mulher') ? 'Confira faixa etária, modalidade do exame e demais critérios em cada item. Selecionar esta situação não confirma elegibilidade.' : 'Situações combinadas compartilham a leitura de algumas ações. Os critérios de cada indicador continuam separados nos detalhes.';
-    $('base-date').textContent = `Revisão documental: ${data.reviewed_on || 'não disponível'}. Versão: ${data.version || 'não informada'}.`;
+    $('base-date').textContent = `Critérios: ${data.reviewed_on || 'não disponível'}. Manual PEC ${data.pec_manual_review?.version || 'não informado'} consultado em ${data.pec_manual_review?.date || 'data não informada'}. Versão: ${data.version || 'não informada'}.`;
     $('setup').hidden = true; $('guide').hidden = false;
     renderActions();
     $('guide-heading').focus();
@@ -164,20 +164,66 @@
     updateSelection(); $('page-heading').focus();
   }
 
+  function buildSoapChecklist() {
+    const checklist = groups.flatMap(group => group.variants.map(({rule, card}) => {
+      const lines = [
+        '- [ ] ' + rule.id + ' — ' + labelFor(card) + ': ' + rule.title,
+        '   Conferir: ' + group.instruction,
+        '   Critério informativo: ' + rule.goal + '; janela: ' + rule.window,
+        '   Caminho de conferência: ' + rule.pec_location,
+        '   Responsável indicado: ' + rule.actor
+      ];
+      if (['C4-A', 'C5-A'].includes(rule.id) && Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length) {
+        lines.push('   CIAP-2 de referência: ' + card.codes.ciap2.join(', ') + ' — registrar somente se corresponder à condição clinicamente avaliada; a seleção no Zera-APS não confirma diagnóstico.');
+      }
+      (rule.cautions || []).forEach(caution => lines.push('   Atenção: ' + caution));
+      return lines.join('\n');
+    })).join('\n');
+    return [
+      'RASCUNHO DE EVOLUÇÃO SOAP — COMPLETAR E REVISAR ANTES DE SALVAR',
+      '',
+      'S — Subjetivo: [Preencher apenas com o relato real da pessoa atendida.]',
+      'O — Objetivo: [Registrar somente achados observados e medidas efetivamente aferidas; usar os valores reais nos campos estruturados.]',
+      'A — Avaliação: [Registrar a avaliação clínica e as condições realmente avaliadas neste atendimento.]',
+      'P — Plano:',
+      '- Conduta: [Registrar somente o que foi decidido ou realizado neste atendimento.]',
+      '- Prescrições e orientações: [Incluir apenas se realmente indicadas, discutidas ou realizadas.]',
+      '- Seguimento: [Registrar o plano combinado, se aplicável.]',
+      '',
+      'CHECKLIST OPERACIONAL DO PEC/EQUIPE — LEMBRETES DE CONFERÊNCIA, NÃO SÃO REGISTRO CLÍNICO NEM PROVA DE EXECUÇÃO:',
+      checklist,
+      '',
+      'Antes de salvar: completar os campos em branco; conferir cada item diretamente no e-SUS; remover do texto clínico os lembretes concluídos, não aplicáveis ou ainda pendentes. Não registrar diagnóstico, exame, medida, orientação ou conduta que não tenha ocorrido ou não tenha sido clinicamente avaliada.'
+    ].join('\n');
+  }
+
+  async function writeClipboardText(value, button) {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(value);
+    else {
+      const field = document.createElement('textarea');
+      field.value = value; field.className = 'clipboard-field';
+      document.body.append(field); field.select();
+      const ok = document.execCommand('copy'); field.remove(); button?.focus();
+      if (!ok) throw new Error('copy unavailable');
+    }
+  }
   async function copyCode(button) {
     try {
-      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(button.dataset.copy);
-      else {
-        const field = document.createElement('textarea');
-        field.value = button.dataset.copy; field.className = 'clipboard-field';
-        document.body.append(field); field.select();
-        const ok = document.execCommand('copy'); field.remove(); button.focus();
-        if (!ok) throw new Error('copy unavailable');
-      }
+      await writeClipboardText(button.dataset.copy, button);
       $('toast').textContent = 'Código copiado. O registro é feito no PEC.';
     } catch { $('toast').textContent = 'Cópia indisponível. Selecione o código ao lado do botão.'; }
     clearTimeout(toastTimer); $('toast').hidden = false;
     toastTimer = setTimeout(() => { $('toast').hidden = true; }, 3000);
+  }
+
+  async function copySoapChecklist(event) {
+    const button = event.currentTarget;
+    try {
+      await writeClipboardText(buildSoapChecklist(), button);
+      $('toast').textContent = 'Rascunho SOAP e checklist copiados. Complete e confira antes de salvar.';
+    } catch { $('toast').textContent = 'Cópia indisponível. Revise o rascunho na tela antes de continuar.'; }
+    clearTimeout(toastTimer); $('toast').hidden = false;
+    toastTimer = setTimeout(() => { $('toast').hidden = true; }, 4500);
   }
 
   $('visit-form').addEventListener('change', updateSelection);
@@ -190,6 +236,7 @@
     $('page-heading').focus();
   });
   $('search').addEventListener('input', renderActions);
+  $('copy-soap-checklist').addEventListener('click', copySoapChecklist);
   $('action-list').addEventListener('change', event => {
     const key = event.target.dataset.review;
     if (!key) return;
