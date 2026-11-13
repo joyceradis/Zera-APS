@@ -1,26 +1,21 @@
-# Validação do roteiro interativo
+# Validação da interface 0.8.0
 
-A verificação técnica demonstra funcionamento da interface; não valida critérios normativos, uso assistencial ou apuração de indicadores.
+A suíte `test_ui.py` acompanha a seleção automática de indicadores e valida:
 
-## Cenários automatizados
+- Critérios, caminhos e fontes distintos de HAS e diabetes, reunidos sem perda de informação.
+- Busca por código e texto; estado vazio; ações da equipe acessíveis durante a busca.
+- Conferência manual preservada ao filtrar e apagada quando o cenário muda.
+- Prévia SOAP, cópia de códigos/rascunho e alternativa visível quando a cópia falha.
+- Pré-natal e puerpério, multimorbidade, limpeza, recarregamento e teclado.
+- Ausência de rolagem horizontal em 320, 390 e 768 px, inclusive com detalhes e prévia.
+- Ausência de erros JavaScript, persistência e requisições externas durante o fluxo.
 
-- Nenhuma condição selecionada inicialmente; roteiro indisponível até escolha válida.
-- HAS + diabetes com seis ações, separando registro do atendimento e equipe.
-- Regras C4/C5 preservam cada campo PEC, prazo, fonte e ressalva, mesmo agrupadas.
-- Busca restrita às situações do roteiro, com suporte a acentos e códigos.
-- Marcação manual preservada ao filtrar e apagada ao montar outro roteiro.
-- Cópia entrega apenas o código; o teste usa uma API simulada e não comprova a área de transferência do dispositivo final.
-- Novo atendimento remove escolhas, fase, busca, roteiro, mensagem e marcações.
-- Pré-natal e puerpério mutuamente exclusivos, sem fundir seus critérios com HAS.
-- Saúde da mulher mantém os alertas de elegibilidade, sem assumir faixa etária ou indicação.
-- Navegação por teclado nos controles nativos.
-- Layout sem transbordamento horizontal a 320 e 390 px.
-- Carregamento dos arquivos reais por HTTP local, sem requisições a serviços externos nem erros JavaScript.
+Executar com Python + Playwright e Chromium instalados:
 
-## Pendências identificadas
+```sh
+pip install playwright==1.56.0
+python -m playwright install chromium
+ZERA_REVIEW_DIR=review python tests/test_ui.py
+```
 
-- Manutenção da revisão documental dos critérios quando houver alterações oficiais. Revisão realizada em 02/11/2026, com rastreabilidade em docs/REVISAO-FONTES-2026-11-02.md.
-- Validação dos caminhos na versão do PEC da unidade e de eventuais fluxos municipais.
-- Validação de usabilidade pela médica em cenários fictícios, sem dados identificáveis.
-- Teste da área de transferência e do navegador do computador da unidade.
-- Confirmação institucional de qualquer futura integração com PEC/histórico.
+`CHROMIUM_EXECUTABLE` permite indicar um Chromium já instalado. O workflow da PR executa a mesma suíte e guarda capturas por 7 dias. A base clínica não foi alterada; os testes de interface não validam critérios clínicos nem a instalação municipal do PEC.
