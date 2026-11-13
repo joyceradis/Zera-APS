@@ -146,6 +146,7 @@
     $('page-heading').textContent = 'O que preciso conferir nesta consulta?';
     $('page-description').textContent = 'Siga o roteiro abaixo. Abra apenas o item em que precisar consultar o campo do PEC, o prazo ou o código.';
     $('guide-context').textContent = selected.includes('prenatal') ? 'Pré-natal: componentes A–H e K. Puerpério: I e J. Confira trimestre, data de desfecho e histórico no PEC; a seleção da fase não confirma elegibilidade.' : selected.includes('mulher') ? 'Confira faixa etária, modalidade do exame e demais critérios em cada item. Selecionar esta situação não confirma elegibilidade.' : 'Situações combinadas compartilham a leitura de algumas ações. Os critérios de cada indicador continuam separados nos detalhes.';
+    $('copy-warning').textContent = selected.includes('has') || selected.includes('dm') ? '⚠️ PA digitada na evolução livre não substitui o campo estruturado exigido para conferir C4/C5. Veja abaixo o caminho do PEC.' : '⚠️ Use o mapa abaixo para localizar o campo estruturado; a cópia não comprova que o registro foi feito.';
     $('base-date').textContent = `Critérios: ${data.reviewed_on || 'não disponível'}. Manual PEC ${data.pec_manual_review?.version || 'não informado'} consultado em ${data.pec_manual_review?.date || 'data não informada'}. Versão: ${data.version || 'não informada'}.`;
     $('setup').hidden = true; $('guide').hidden = false;
     renderActions();
@@ -166,34 +167,31 @@
 
   function buildSoapChecklist() {
     const checklist = groups.flatMap(group => group.variants.map(({rule, card}) => {
+      const ids = group.variants.map(item => item.rule.id).join(' / ');
+      const first = group.variants[0].rule.id === rule.id;
+      if (!first) return '';
       const lines = [
-        '- [ ] ' + rule.id + ' — ' + labelFor(card) + ': ' + rule.title,
-        '   Conferir: ' + group.instruction,
-        '   Critério informativo: ' + rule.goal + '; janela: ' + rule.window,
-        '   Caminho de conferência: ' + rule.pec_location,
-        '   Responsável indicado: ' + rule.actor
+        '⚠️ ' + ids + ' — ' + group.title,
+        '   CLIQUE/CAMPO: ' + rule.pec_location,
+        '   CONFERIR: ' + rule.goal + ' (' + rule.window + ').'
       ];
+      if (group.lane === 'team') lines.push('   RESPONSÁVEL: ' + rule.actor + '; confira com a equipe, não registre em nome de quem executou.');
       if (['C4-A', 'C5-A'].includes(rule.id) && Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length) {
-        lines.push('   CIAP-2 de referência: ' + card.codes.ciap2.join(', ') + ' — registrar somente se corresponder à condição clinicamente avaliada; a seleção no Zera-APS não confirma diagnóstico.');
+        lines.push('   CIAP-2 de referência: ' + card.codes.ciap2.join(', ') + ' — somente se corresponder à condição clinicamente avaliada.');
       }
-      (rule.cautions || []).forEach(caution => lines.push('   Atenção: ' + caution));
       return lines.join('\n');
-    })).join('\n');
+    })).filter(Boolean).join('\n');
     return [
-      'RASCUNHO DE EVOLUÇÃO SOAP — COMPLETAR E REVISAR ANTES DE SALVAR',
+      'RASCUNHO SOAP — PREENCHER E REVISAR',
+      'S: [Relato real.]',
+      'O: [Achados observados e medidas realmente aferidas.]',
+      'A: [Avaliação clínica realizada.]',
+      'P: [Conduta decidida, orientações e seguimento, se aplicáveis.]',
       '',
-      'S — Subjetivo: [Preencher apenas com o relato real da pessoa atendida.]',
-      'O — Objetivo: [Registrar somente achados observados e medidas efetivamente aferidas; usar os valores reais nos campos estruturados.]',
-      'A — Avaliação: [Registrar a avaliação clínica e as condições realmente avaliadas neste atendimento.]',
-      'P — Plano (conduta e lembretes de trabalho):',
-      '- Conduta: [Registrar somente o que foi decidido ou realizado neste atendimento.]',
-      '- Prescrições e orientações: [Incluir apenas se realmente indicadas, discutidas ou realizadas.]',
-      '- Seguimento: [Registrar o plano combinado, se aplicável.]',
-      '',
-      '- LEMBRETES OPERACIONAIS DO PEC/EQUIPE — NÃO SÃO REGISTRO CLÍNICO NEM PROVA DE EXECUÇÃO:',
+      '⚠️ MAPA DE CLIQUES — TEXTO LIVRE NA EVOLUÇÃO PODE NÃO ALIMENTAR O INDICADOR. CONFIRA O CAMPO ESTRUTURADO, O HISTÓRICO E A JANELA; NÃO REPITA PROCEDIMENTO SÓ PARA PREENCHER.',
       checklist,
       '',
-      'Antes de salvar: completar os campos em branco; conferir cada item diretamente no e-SUS; remover do texto clínico os lembretes concluídos, não aplicáveis ou ainda pendentes. Não registrar diagnóstico, exame, medida, orientação ou conduta que não tenha ocorrido ou não tenha sido clinicamente avaliada.'
+      'Este mapa é lembrete, não prova de execução. Antes de salvar, remova os lembretes e confirme cada registro no e-SUS. Não mantenha no prontuário campos em branco nem ações não realizadas.'
     ].join('\n');
   }
 
