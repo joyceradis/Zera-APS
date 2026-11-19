@@ -616,6 +616,16 @@
     $("dialog-copy-status").textContent = "";
     if (!$("soap-dialog").open) $("soap-dialog").showModal();
   }
+  $("#topic-search").addEventListener("input", (event) => {
+    const query = normalize(event.target.value.trim());
+    let visible = 0;
+    document.querySelectorAll("[data-topic-card]").forEach((card) => {
+      const matches = !query || normalize(card.textContent).includes(query);
+      card.hidden = !matches;
+      if (matches) visible++;
+    });
+    $("#topic-no-results").hidden = visible > 0;
+  });
   $(".quick-grid").addEventListener("click", (event) => {
     if (!event.target.closest(".quick-topic")) return;
     window.setTimeout(() => {
