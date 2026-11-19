@@ -616,7 +616,7 @@
     $("dialog-copy-status").textContent = "";
     if (!$("soap-dialog").open) $("soap-dialog").showModal();
   }
-  $("#topic-search").addEventListener("input", (event) => {
+  $("topic-search").addEventListener("input", (event) => {
     const query = normalize(event.target.value.trim());
     let visible = 0;
     document.querySelectorAll("[data-topic-card]").forEach((card) => {
@@ -624,7 +624,7 @@
       card.hidden = !matches;
       if (matches) visible++;
     });
-    $("#topic-no-results").hidden = visible > 0;
+    $("topic-no-results").hidden = visible > 0;
   });
   function showScreen(name) {
     document.querySelectorAll(".site-screen").forEach((screen) => {
@@ -644,18 +644,18 @@
     if (!button) return;
     const key = button.dataset.homeTopic;
     const input = document.querySelector('[name="condition"][value="' + key + '"]');
-    if (key === "prenatal") $(".secondary-indicators").open = true;
+    if (key === "prenatal") document.querySelector(".secondary-indicators").open = true;
     if (input && !input.checked) {
       input.checked = true;
       input.dispatchEvent(new Event("change", { bubbles: true }));
     }
     showScreen("guides");
     window.setTimeout(() => {
-      const target = !$("#guide").hidden ? $("#guide") : $("#phase-field");
+      const target = !$("guide").hidden ? $("#guide") : $("phase-field");
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 250);
   });
-  $("#topic-search").addEventListener("input", (event) => {
+  $("topic-search").addEventListener("input", (event) => {
     const query = normalize(event.target.value.trim());
     let visible = 0;
     document.querySelectorAll("[data-topic-card]").forEach((card) => {
@@ -663,7 +663,7 @@
       card.hidden = !matches;
       if (matches) visible++;
     });
-    $("#topic-no-results").hidden = visible > 0;
+    $("topic-no-results").hidden = visible > 0;
   });
   $("visit-form").addEventListener("submit", (event) => event.preventDefault());
   $("visit-form").addEventListener("change", updateSelection);
