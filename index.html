@@ -10,7 +10,7 @@
     />
     <title>Zera APS · Acesso rápido à APS</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1.0.0" />\n    <link rel="stylesheet" href="styles.css?v=0.8.0" />
-    <link rel="stylesheet" href="home.css?v=1.2.1" />
+    <link rel="stylesheet" href="home.css?v=1.3.0" />
   </head>
   <body>
     <a class="skip-link" href="#workspace">Ir para o roteiro</a>
@@ -19,7 +19,7 @@
         ><span aria-hidden="true">z<span class="brand-dot">.</span></span
         ><strong>Zera<span>APS</span></strong></a
       >
-      <nav class="site-nav" aria-label="Navegação principal"><button type="button" data-screen-target="home" aria-current="page">Início</button><button type="button" data-screen-target="guides">Roteiros</button><button type="button" data-screen-target="management">Gestão</button><button type="button" data-screen-target="sources">Fontes oficiais</button></nav>
+      <nav class="site-nav" aria-label="Navegação principal"><button type="button" data-screen-target="home" aria-current="page">Início</button><button type="button" data-screen-target="guides">Roteiros</button><button type="button" data-screen-target="has">HAS · C5</button><button type="button" data-screen-target="management">Gestão</button><button type="button" data-screen-target="sources">Fontes oficiais</button></nav>
       <div class="topbar-actions">
         <span class="privacy-pill"
           ><i aria-hidden="true"></i>Sem dados salvos</span
@@ -67,9 +67,9 @@
           <div class="hub-section-title"><div><p class="eyebrow">ROTEIROS DISPONÍVEIS</p><h2>Escolha uma linha de cuidado</h2></div><span>Atualização e limites da fonte em cada roteiro</span></div>
           <div class="quick-grid">
             <button type="button" class="quick-topic" data-topic-card data-home-topic="dm"><span class="topic-icon">C4</span><span><strong>Diabetes</strong><small>HbA1c · exame dos pés · cuidado</small></span><b aria-hidden="true">→</b></button>
-            <button type="button" class="quick-topic" data-topic-card data-home-topic="has"><span class="topic-icon">C5</span><span><strong>Hipertensão</strong><small>Pressão arterial · antropometria</small></span><b aria-hidden="true">→</b></label>
-            <button type="button" class="quick-topic" data-topic-card data-home-topic="prenatal"><span class="topic-icon">C3</span><span><strong>Gestação e puerpério</strong><small>Acompanhamento materno</small></span><b aria-hidden="true">→</b></label>
-            <button type="button" class="quick-topic" data-topic-card data-home-topic="mulher"><span class="topic-icon">C7</span><span><strong>Saúde da mulher</strong><small>Prevenção do câncer</small></span><b aria-hidden="true">→</b></label>
+            <button type="button" class="quick-topic" data-topic-card data-home-topic="has"><span class="topic-icon">C5</span><span><strong>Hipertensão</strong><small>Pressão arterial · antropometria</small></span><b aria-hidden="true">→</b></button>
+            <button type="button" class="quick-topic" data-topic-card data-home-topic="prenatal"><span class="topic-icon">C3</span><span><strong>Gestação e puerpério</strong><small>Acompanhamento materno</small></span><b aria-hidden="true">→</b></button>
+            <button type="button" class="quick-topic" data-topic-card data-home-topic="mulher"><span class="topic-icon">C7</span><span><strong>Saúde da mulher</strong><small>Prevenção do câncer</small></span><b aria-hidden="true">→</b></button>
           </div>
           <p id="topic-no-results" class="topic-no-results" hidden>Nenhum tema encontrado. Tente outro termo.</p>
         </div>
@@ -280,6 +280,36 @@
       </aside>
       </section>
 
+      <section id="screen-has" class="site-screen has-screen" aria-label="Hipertensão e indicador C5" hidden>
+        <div class="has-hero">
+          <div><p class="eyebrow">HIPERTENSÃO · INDICADOR C5</p><h1>HAS na APS,<br><em>sem perder o fio.</em></h1><p>Conferência rápida das boas práticas de acompanhamento e atalhos para o risco cardiovascular.</p></div>
+          <div class="has-version"><span>REFERÊNCIA OFICIAL</span><strong>Atualizada em out/nov 2026</strong><small>Nota C5 · Nota Informativa 3/2026</small></div>
+        </div>
+        <div class="has-widgets">
+          <article class="has-widget">
+            <div class="widget-kicker">CHECKLIST DE ACOMPANHAMENTO</div><h2>Quatro itens para revisar</h2>
+            <p class="widget-intro">Marque o que foi conferido para organizar a equipe. A marcação não calcula pontuação nem comprova registro no PEC.</p>
+            <div class="c5-list">
+              <label><input type="checkbox" data-c5-check><span><strong>Consulta presencial ou remota</strong><small>Médico(a) ou enfermeiro(a) · últimos 6 meses</small></span><b>C5-A</b></label>
+              <label><input type="checkbox" data-c5-check><span><strong>Pressão arterial aferida</strong><small>Registro estruturado · últimos 6 meses</small></span><b>C5-B</b></label>
+              <label><input type="checkbox" data-c5-check><span><strong>Peso e altura na mesma avaliação</strong><small>Registro simultâneo · últimos 12 meses</small></span><b>C5-C</b></label>
+              <label><input type="checkbox" data-c5-check><span><strong>Visitas domiciliares por ACS/TACS</strong><small>Ao menos 2 nos últimos 12 meses · intervalo mínimo de 30 dias</small></span><b>C5-D</b></label>
+            </div>
+            <div class="c5-progress"><span id="c5-check-count" aria-live="polite">0 de 4 conferidos</span><progress id="c5-progress" max="4" value="0" aria-label="Itens C5 conferidos"></progress></div>
+            <button type="button" class="has-action" data-open-has-guide>Abrir roteiro e mapa de campos no PEC <b>→</b></button>
+            <small class="memory-note">As marcações ficam apenas nesta aba e não são salvas.</small>
+          </article>
+          <article class="has-widget risk-widget">
+            <div class="widget-kicker">RISCO CARDIOVASCULAR · HEARTS / OPAS</div><h2>Estratifique com uma ferramenta validada</h2>
+            <p class="widget-intro">Estime o risco cardiovascular em 10 anos e veja recomendações HEARTS. Os dados são inseridos diretamente na ferramenta oficial da OPAS.</p>
+            <div class="risk-callout"><strong>PEC e-SUS APS 5.6</strong><span>O manual informa que a estratificação HEARTS pode ser calculada no prontuário para pessoas de 40 a 74 anos. Confira a disponibilidade na versão da sua unidade.</span></div>
+            <a class="has-action external-action" href="https://www.paho.org/cardioapp/web/#/cvrisk" target="_blank" rel="noopener">Abrir calculadora HEARTS da OPAS <b>↗</b></a>
+            <a class="manual-link" href="https://sisaps.saude.gov.br/sistemas/esusaps/docs/manual/PEC/PEC_05_atendimentos/" target="_blank" rel="noopener">Ver orientação no manual do PEC e-SUS APS 5.6 ↗</a>
+            <small class="memory-note">O Zera APS não recebe nem armazena os dados usados na calculadora externa.</small>
+          </article>
+        </div>
+        <div class="has-sources"><span>FONTES</span><a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c5-cuidado-da-pessoa-com-hipertensao/view" target="_blank" rel="noopener">Nota Metodológica C5 ↗</a><a href="https://sisaps.saude.gov.br/sistemas/materialtecnico/arquivos/Nota_Informativa_3.pdf" target="_blank" rel="noopener">Nota Informativa 3/2026 ↗</a></div>
+      </section>
       <section id="screen-management" class="site-screen management-screen" aria-label="Área de gestão" hidden>
         <div class="page-heading"><p class="eyebrow">GESTÃO MUNICIPAL</p><h1>Regra clara.<br><em>Equipe alinhada.</em></h1><p>Use as notas técnicas como referência comum para orientar equipes, revisar rotinas e identificar o que precisa ser validado no município.</p></div>
         <div class="management-grid">
@@ -338,6 +368,6 @@
     </dialog>
     <div id="toast" role="status" class="toast" hidden></div>
     <script src="data/regras.js?v=0.3.0"></script>
-    <script src="app.js?v=1.0.1"></script>
+    <script src="app.js?v=1.1.0"></script>
   </body>
 </html>
