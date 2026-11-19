@@ -6,10 +6,11 @@
     <meta name="theme-color" content="#f5f7f6" />
     <meta
       name="description"
-      content="Campos, códigos e critérios do e-SUS APS organizados para consulta durante o atendimento médico."
+      content="Acesso rápido a roteiros, critérios e referências para equipes de Saúde da Família e gestão municipal."
     />
-    <title>Zera-APS · Roteiro do PEC</title>
+    <title>Zera APS · Acesso rápido à APS</title>
     <link rel="stylesheet" href="styles.css?v=0.8.0" />
+    <link rel="stylesheet" href="home.css?v=1.0.0" />
   </head>
   <body>
     <a class="skip-link" href="#workspace">Ir para o roteiro</a>
@@ -18,7 +19,7 @@
         ><span aria-hidden="true">z<span class="brand-dot">.</span></span
         ><strong>Zera<span>APS</span></strong></a
       >
-      <span class="topbar-label">APOIO AO REGISTRO NO PEC</span>
+      <span class="topbar-label">INFORMAÇÃO PRÁTICA PARA A APS</span>
       <div class="topbar-actions">
         <span class="privacy-pill"
           ><i aria-hidden="true"></i>Sem dados salvos</span
@@ -30,16 +31,29 @@
     <main id="inicio">
       <section class="intro" aria-labelledby="page-heading">
         <div>
-          <p class="eyebrow">SEU ROTEIRO DE REGISTRO</p>
+          <p class="eyebrow">CONSULTA RÁPIDA · ESF E GESTÃO MUNICIPAL</p>
           <h1 id="page-heading" tabindex="-1">
-            Menos procura.<br class="mobile-break" />
-            Mais atenção ao cuidado.
+            Encontre a orientação.<br class="mobile-break" />
+            Chegue ao próximo passo.
           </h1>
           <p id="page-description">
-            Campos, códigos e critérios do PEC, no mesmo lugar.
+            Roteiros de registro, critérios e referências organizados para a rotina da Atenção Primária.
           </p>
         </div>
-        <span class="version-tag">VERSÃO MÉDICA <span>Em validação</span></span>
+        <span class="version-tag">DIRETRIZES E ROTINAS <span>Acesso por tema</span></span>
+      </section>
+      <section class="home-quick" aria-labelledby="quick-heading">
+        <div class="home-section-heading">
+          <div><p class="eyebrow">COMECE PELO ASSUNTO</p><h2 id="quick-heading">O que você precisa consultar?</h2></div>
+          <p>Abra um roteiro e encontre campos, critérios e pontos para conferir com a equipe.</p>
+        </div>
+        <div class="quick-grid">
+          <label class="quick-topic" for="topic-dm"><span class="topic-icon">DM</span><span><strong>Diabetes</strong><small>HbA1c · avaliação dos pés</small></span><b aria-hidden="true">↗</b></label>
+          <label class="quick-topic" for="topic-has"><span class="topic-icon">PA</span><span><strong>Hipertensão</strong><small>Pressão · peso e altura</small></span><b aria-hidden="true">↗</b></label>
+          <label class="quick-topic" for="topic-prenatal"><span class="topic-icon">+</span><span><strong>Pré-natal e puerpério</strong><small>Acompanhamento materno</small></span><b aria-hidden="true">↗</b></label>
+          <label class="quick-topic" for="topic-mulher"><span class="topic-icon">♀</span><span><strong>Saúde da mulher</strong><small>Rastreamento e prevenção</small></span><b aria-hidden="true">↗</b></label>
+        </div>
+        <div class="home-promise"><span aria-hidden="true">✓</span><p><strong>Para a equipe toda.</strong> Consulte o roteiro individualmente e use os pontos de conferência com a ESF e a gestão municipal.</p><span class="promise-links">Campos PEC <i>·</i> Critérios <i>·</i> Fontes</span></div>
       </section>
       <div class="workspace-layout">
         <aside class="sidebar">
@@ -55,14 +69,14 @@
                 </p>
                 <div class="conditions">
                   <label class="condition"
-                    ><input type="checkbox" name="condition" value="dm" /><span
+                    ><input type="checkbox" name="condition" id="topic-dm" value="dm" /><span
                       class="condition-copy"
                       ><strong>Diabetes</strong
                       ><small>HbA1c · exame dos pés</small></span
                     ><span class="condition-code">C4</span></label
                   >
                   <label class="condition"
-                    ><input type="checkbox" name="condition" value="has" /><span
+                    ><input type="checkbox" name="condition" id="topic-has" value="has" /><span
                       class="condition-copy"
                       ><strong>Hipertensão</strong
                       ><small>Pressão · peso e altura</small></span
@@ -76,6 +90,7 @@
                       ><input
                         type="checkbox"
                         name="condition"
+                        id="topic-prenatal"
                         value="prenatal"
                       /><span class="condition-copy"
                         ><strong>Pré-natal / puerpério</strong
@@ -86,6 +101,7 @@
                       ><input
                         type="checkbox"
                         name="condition"
+                        id="topic-mulher"
                         value="mulher"
                       /><span class="condition-copy"
                         ><strong>Saúde da mulher</strong
