@@ -643,6 +643,7 @@
     const button = event.target.closest("[data-home-topic]");
     if (!button) return;
     const key = button.dataset.homeTopic;
+    if (key === "has") { showScreen("has"); return; }
     const input = document.querySelector('[name="condition"][value="' + key + '"]');
     if (key === "prenatal") document.querySelector(".secondary-indicators").open = true;
     if (input && !input.checked) {
@@ -651,7 +652,7 @@
     }
     showScreen("guides");
     window.setTimeout(() => {
-      const target = !$("guide").hidden ? $("#guide") : $("phase-field");
+      const target = !$("guide").hidden ? $("guide") : $("phase-field");
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 250);
   });
@@ -664,6 +665,23 @@
       if (matches) visible++;
     });
     $("topic-no-results").hidden = visible > 0;
+  });
+  const c5Checks = document.querySelectorAll("[data-c5-check]");
+  function updateC5Checklist() {
+    const done = [...c5Checks].filter((check) => check.checked).length;
+    $("c5-check-count").textContent = done + " de 4 conferidos";
+    $("c5-progress").value = done;
+  }
+  c5Checks.forEach((check) => check.addEventListener("change", updateC5Checklist));
+  updateC5Checklist();
+  document.querySelector("[data-open-has-guide]").addEventListener("click", () => {
+    const input = document.querySelector('[name="condition"][value="has"]');
+    if (input && !input.checked) {
+      input.checked = true;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    showScreen("guides");
+    window.setTimeout(() => $("guide").scrollIntoView({ behavior: "smooth", block: "start" }), 250);
   });
   $("visit-form").addEventListener("submit", (event) => event.preventDefault());
   $("visit-form").addEventListener("change", updateSelection);
