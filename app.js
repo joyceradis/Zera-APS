@@ -626,13 +626,44 @@
     });
     $("#topic-no-results").hidden = visible > 0;
   });
-  $(".quick-grid").addEventListener("click", (event) => {
-    if (!event.target.closest(".quick-topic")) return;
+  function showScreen(name) {
+    document.querySelectorAll(".site-screen").forEach((screen) => {
+      screen.hidden = screen.id !== "screen-" + name;
+    });
+    document.querySelectorAll("[data-screen-target]").forEach((button) => {
+      if (button.tagName === "BUTTON" && button.closest(".site-nav"))
+        button.setAttribute("aria-current", button.dataset.screenTarget === name ? "page" : "false");
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.querySelectorAll("[data-screen-target]").forEach((button) => {
+    button.addEventListener("click", () => showScreen(button.dataset.screenTarget));
+  });
+  document.querySelector(".quick-grid").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-home-topic]");
+    if (!button) return;
+    const key = button.dataset.homeTopic;
+    const input = document.querySelector('[name="condition"][value="' + key + '"]');
+    if (key === "prenatal") $(".secondary-indicators").open = true;
+    if (input && !input.checked) {
+      input.checked = true;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    showScreen("guides");
     window.setTimeout(() => {
-      const destination =
-        document.querySelector("#guide:not([hidden])") || $("#setup");
-      destination.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 0);
+      const target = !$("#guide").hidden ? $("#guide") : $("#phase-field");
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+  });
+  $("#topic-search").addEventListener("input", (event) => {
+    const query = normalize(event.target.value.trim());
+    let visible = 0;
+    document.querySelectorAll("[data-topic-card]").forEach((card) => {
+      const matches = !query || normalize(card.textContent).includes(query);
+      card.hidden = !matches;
+      if (matches) visible++;
+    });
+    $("#topic-no-results").hidden = visible > 0;
   });
   $("visit-form").addEventListener("submit", (event) => event.preventDefault());
   $("visit-form").addEventListener("change", updateSelection);
