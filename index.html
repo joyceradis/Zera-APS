@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f5f7f6" />
+    <meta name="theme-color" content="#005BAB" />
     <meta
       name="description"
       content="Acesso rápido a roteiros, critérios e referências para equipes de Saúde da Família e gestão municipal."
     />
     <title>Zera APS · Acesso rápido à APS</title>
     <link rel="stylesheet" href="styles.css?v=0.8.0" />
-    <link rel="stylesheet" href="home.css?v=1.1.0" />
+    <link rel="stylesheet" href="home.css?v=1.2.0" />
   </head>
   <body>
     <a class="skip-link" href="#workspace">Ir para o roteiro</a>
@@ -19,7 +19,7 @@
         ><span aria-hidden="true">z<span class="brand-dot">.</span></span
         ><strong>Zera<span>APS</span></strong></a
       >
-      <span class="topbar-label">INFORMAÇÃO PRÁTICA PARA A APS</span>
+      <nav class="site-nav" aria-label="Navegação principal"><button type="button" data-screen-target="home" aria-current="page">Início</button><button type="button" data-screen-target="guides">Roteiros</button><button type="button" data-screen-target="management">Gestão</button><button type="button" data-screen-target="sources">Fontes oficiais</button></nav>
       <div class="topbar-actions">
         <span class="privacy-pill"
           ><i aria-hidden="true"></i>Sem dados salvos</span
@@ -42,6 +42,7 @@
         </div>
         <span class="version-tag">DIRETRIZES E ROTINAS <span>Acesso por tema</span></span>
       </section>
+<section id="screen-home" class="site-screen" aria-label="Página inicial">
       <section class="home-hub" aria-labelledby="hub-heading">
         <div class="hub-hero">
           <div class="hub-copy">
@@ -65,25 +66,17 @@
         <div class="hub-topics">
           <div class="hub-section-title"><div><p class="eyebrow">ROTEIROS DISPONÍVEIS</p><h2>Escolha uma linha de cuidado</h2></div><span>Atualização e limites da fonte em cada roteiro</span></div>
           <div class="quick-grid">
-            <label class="quick-topic" for="topic-dm" data-topic-card><span class="topic-icon">C4</span><span><strong>Diabetes</strong><small>HbA1c · exame dos pés · cuidado</small></span><b aria-hidden="true">→</b></label>
-            <label class="quick-topic" for="topic-has" data-topic-card><span class="topic-icon">C5</span><span><strong>Hipertensão</strong><small>Pressão arterial · antropometria</small></span><b aria-hidden="true">→</b></label>
-            <label class="quick-topic" for="topic-prenatal" data-topic-card><span class="topic-icon">C3</span><span><strong>Gestação e puerpério</strong><small>Acompanhamento materno</small></span><b aria-hidden="true">→</b></label>
-            <label class="quick-topic" for="topic-mulher" data-topic-card><span class="topic-icon">C7</span><span><strong>Saúde da mulher</strong><small>Prevenção do câncer</small></span><b aria-hidden="true">→</b></label>
+            <button type="button" class="quick-topic" data-topic-card data-home-topic="dm"><span class="topic-icon">C4</span><span><strong>Diabetes</strong><small>HbA1c · exame dos pés · cuidado</small></span><b aria-hidden="true">→</b></button>
+            <button type="button" class="quick-topic" data-topic-card data-home-topic="has"><span class="topic-icon">C5</span><span><strong>Hipertensão</strong><small>Pressão arterial · antropometria</small></span><b aria-hidden="true">→</b></label>
+            <button type="button" class="quick-topic" data-topic-card data-home-topic="prenatal"><span class="topic-icon">C3</span><span><strong>Gestação e puerpério</strong><small>Acompanhamento materno</small></span><b aria-hidden="true">→</b></label>
+            <button type="button" class="quick-topic" data-topic-card data-home-topic="mulher"><span class="topic-icon">C7</span><span><strong>Saúde da mulher</strong><small>Prevenção do câncer</small></span><b aria-hidden="true">→</b></label>
           </div>
           <p id="topic-no-results" class="topic-no-results" hidden>Nenhum tema encontrado. Tente outro termo.</p>
         </div>
-        <details id="official-sources" class="hub-sources">
-          <summary>Referências oficiais e notas metodológicas <span>abrir fontes citadas</span></summary>
-          <div class="source-grid">
-            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view" target="_blank" rel="noopener">C4 · Cuidado da pessoa com diabetes <b>↗</b></a>
-            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c5-cuidado-da-pessoa-com-hipertensao/view" target="_blank" rel="noopener">C5 · Cuidado da pessoa com hipertensão <b>↗</b></a>
-            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view" target="_blank" rel="noopener">C3 · Gestação e puerpério <b>↗</b></a>
-            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view" target="_blank" rel="noopener">C7 · Prevenção do câncer na saúde da mulher <b>↗</b></a>
-            <a href="https://sisaps.saude.gov.br/sistemas/esusaps/blog/versao-5-6/" target="_blank" rel="noopener">e-SUS APS · Notas da versão 5.6 <b>↗</b></a>
-          </div>
-        </details>
+        <button type="button" class="all-sources-link" data-screen-target="sources">Ver todas as fontes oficiais <span>→</span></button>
       </section>
-      <div class="workspace-layout">
+</section>
+      <section id="screen-guides" class="site-screen" aria-label="Roteiros de atendimento" hidden><div class="workspace-layout">
         <aside class="sidebar">
           <section id="setup" aria-labelledby="setup-heading">
             <form id="visit-form" autocomplete="off">
@@ -285,6 +278,29 @@
           </div>
         </div>
       </aside>
+      </section>
+
+      <section id="screen-management" class="site-screen management-screen" aria-label="Área de gestão" hidden>
+        <div class="page-heading"><p class="eyebrow">GESTÃO MUNICIPAL</p><h1>Regra clara.<br><em>Equipe alinhada.</em></h1><p>Use as notas técnicas como referência comum para orientar equipes, revisar rotinas e identificar o que precisa ser validado no município.</p></div>
+        <div class="management-grid">
+          <article><span>01 · ACOMPANHAR</span><h2>Veja os critérios por linha de cuidado</h2><p>Consulte os roteiros C3, C4, C5 e C7. Periodicidade, registro e responsabilidades aparecem dentro de cada item do roteiro.</p><button type="button" data-screen-target="guides">Abrir roteiros <b>→</b></button></article>
+          <article><span>02 · VALIDAR</span><h2>Compare com a orientação oficial</h2><p>As referências oficiais ficam organizadas por indicador. A revisão documental não substitui a validação do fluxo e da configuração local.</p><button type="button" data-screen-target="sources">Consultar fontes <b>→</b></button></article>
+        </div>
+        <div class="management-notice"><strong>Transparência da base</strong><p>PEC e-SUS APS 5.6 consultado em 12 nov 2026 · Critérios revisados em 2 nov 2026. Fluxos da instalação municipal ainda precisam de validação local.</p></div>
+      </section>
+      <section id="screen-sources" class="site-screen sources-screen" aria-label="Fontes oficiais" hidden>
+        <div class="page-heading"><p class="eyebrow">FONTES OFICIAIS</p><h1>Consulte a origem<br><em>de cada orientação.</em></h1><p>Atalhos para notas metodológicas do Ministério da Saúde e materiais do e-SUS APS usados como referência nos roteiros.</p></div>
+                <section class="hub-sources">
+          <h2>Referências oficiais e notas metodológicas</h2>
+          <div class="source-grid">
+            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view" target="_blank" rel="noopener">C4 · Cuidado da pessoa com diabetes <b>↗</b></a>
+            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c5-cuidado-da-pessoa-com-hipertensao/view" target="_blank" rel="noopener">C5 · Cuidado da pessoa com hipertensão <b>↗</b></a>
+            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view" target="_blank" rel="noopener">C3 · Gestação e puerpério <b>↗</b></a>
+            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view" target="_blank" rel="noopener">C7 · Prevenção do câncer na saúde da mulher <b>↗</b></a>
+            <a href="https://sisaps.saude.gov.br/sistemas/esusaps/blog/versao-5-6/" target="_blank" rel="noopener">e-SUS APS · Notas da versão 5.6 <b>↗</b></a>
+          </div>
+        </section>
+      </section>
       <footer>
         <span
           >Zera APS <span class="footer-divider">/</span> Apoio à atenção
@@ -320,6 +336,6 @@
     </dialog>
     <div id="toast" role="status" class="toast" hidden></div>
     <script src="data/regras.js?v=0.3.0"></script>
-    <script src="app.js?v=0.9.0"></script>
+    <script src="app.js?v=1.0.0"></script>
   </body>
 </html>
