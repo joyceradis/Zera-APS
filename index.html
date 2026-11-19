@@ -29,9 +29,9 @@
       </div>
     </header>
     <main id="inicio">
-      <section class="intro" aria-labelledby="page-heading">
+      <section class="intro" aria-labelledby="page-heading" hidden>
         <div>
-          <p class="eyebrow">CONSULTA RÁPIDA · ESF E GESTÃO MUNICIPAL</p>
+          <p class="eyebrow"></p>
           <h1 id="page-heading" tabindex="-1">
             Encontre a orientação.<br class="mobile-break" />
             Chegue ao próximo passo.
@@ -42,18 +42,46 @@
         </div>
         <span class="version-tag">DIRETRIZES E ROTINAS <span>Acesso por tema</span></span>
       </section>
-      <section class="home-quick" aria-labelledby="quick-heading">
-        <div class="home-section-heading">
-          <div><p class="eyebrow">COMECE PELO ASSUNTO</p><h2 id="quick-heading">O que você precisa consultar?</h2></div>
-          <p>Abra um roteiro e encontre campos, critérios e pontos para conferir com a equipe.</p>
+      <section class="home-hub" aria-labelledby="hub-heading">
+        <div class="hub-hero">
+          <div class="hub-copy">
+            <p class="eyebrow">ZERA APS · CENTRAL DE CONSULTA</p>
+            <h1 id="hub-heading">A regra mudou?<br><em>Encontre o que fazer.</em></h1>
+            <p>Orientações do SUS traduzidas em caminhos práticos para registrar, acompanhar e conferir o cuidado na Atenção Primária.</p>
+            <label class="hub-search"><span aria-hidden="true">⌕</span><input id="topic-search" type="search" placeholder="Busque por tema: diabetes, pré-natal, pressão..." aria-label="Buscar assunto" autocomplete="off"></label>
+            <small class="hub-search-hint">Pesquise um tema ou escolha um acesso abaixo.</small>
+          </div>
+          <aside class="hub-status" aria-label="Situação da base de consulta">
+            <span class="status-mark">● BASE DOCUMENTAL</span>
+            <strong>Revisão com data e fonte visíveis</strong>
+            <p>PEC e-SUS APS 5.6 consultado em 12 nov 2026. Critérios revisados em 2 nov 2026.</p>
+            <small>Revisão documental; fluxos da instalação municipal ainda precisam de validação local.</small>
+          </aside>
         </div>
-        <div class="quick-grid">
-          <label class="quick-topic" for="topic-dm"><span class="topic-icon">DM</span><span><strong>Diabetes</strong><small>HbA1c · avaliação dos pés</small></span><b aria-hidden="true">↗</b></label>
-          <label class="quick-topic" for="topic-has"><span class="topic-icon">PA</span><span><strong>Hipertensão</strong><small>Pressão · peso e altura</small></span><b aria-hidden="true">↗</b></label>
-          <label class="quick-topic" for="topic-prenatal"><span class="topic-icon">+</span><span><strong>Pré-natal e puerpério</strong><small>Acompanhamento materno</small></span><b aria-hidden="true">↗</b></label>
-          <label class="quick-topic" for="topic-mulher"><span class="topic-icon">♀</span><span><strong>Saúde da mulher</strong><small>Rastreamento e prevenção</small></span><b aria-hidden="true">↗</b></label>
+        <div class="hub-pathways">
+          <a class="pathway pathway-primary" href="#setup"><span class="pathway-number">01 · ESF</span><strong>Preciso registrar um atendimento</strong><span>Abra o roteiro por condição e localize campo, código e critério no PEC.</span><b>Ir aos roteiros <i aria-hidden="true">→</i></b></a>
+          <a class="pathway" href="#official-sources"><span class="pathway-number">02 · GESTÃO</span><strong>Preciso conferir a regra e a fonte</strong><span>Acesse notas metodológicas e referências oficiais usadas na base.</span><b>Ver fontes oficiais <i aria-hidden="true">→</i></b></a>
         </div>
-        <div class="home-promise"><span aria-hidden="true">✓</span><p><strong>Para a equipe toda.</strong> Consulte o roteiro individualmente e use os pontos de conferência com a ESF e a gestão municipal.</p><span class="promise-links">Campos PEC <i>·</i> Critérios <i>·</i> Fontes</span></div>
+        <div class="hub-topics">
+          <div class="hub-section-title"><div><p class="eyebrow">ROTEIROS DISPONÍVEIS</p><h2>Escolha uma linha de cuidado</h2></div><span>Atualização e limites da fonte em cada roteiro</span></div>
+          <div class="quick-grid">
+            <label class="quick-topic" for="topic-dm" data-topic-card><span class="topic-icon">C4</span><span><strong>Diabetes</strong><small>HbA1c · exame dos pés · cuidado</small></span><b aria-hidden="true">→</b></label>
+            <label class="quick-topic" for="topic-has" data-topic-card><span class="topic-icon">C5</span><span><strong>Hipertensão</strong><small>Pressão arterial · antropometria</small></span><b aria-hidden="true">→</b></label>
+            <label class="quick-topic" for="topic-prenatal" data-topic-card><span class="topic-icon">C3</span><span><strong>Gestação e puerpério</strong><small>Acompanhamento materno</small></span><b aria-hidden="true">→</b></label>
+            <label class="quick-topic" for="topic-mulher" data-topic-card><span class="topic-icon">C7</span><span><strong>Saúde da mulher</strong><small>Prevenção do câncer</small></span><b aria-hidden="true">→</b></label>
+          </div>
+          <p id="topic-no-results" class="topic-no-results" hidden>Nenhum tema encontrado. Tente outro termo.</p>
+        </div>
+        <details id="official-sources" class="hub-sources">
+          <summary>Referências oficiais e notas metodológicas <span>abrir fontes citadas</span></summary>
+          <div class="source-grid">
+            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c4-cuidado-da-pessoa-com-diabetes/view" target="_blank" rel="noopener">C4 · Cuidado da pessoa com diabetes <b>↗</b></a>
+            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c5-cuidado-da-pessoa-com-hipertensao/view" target="_blank" rel="noopener">C5 · Cuidado da pessoa com hipertensão <b>↗</b></a>
+            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c3-cuidado-na-gestacao-e-puerperio/view" target="_blank" rel="noopener">C3 · Gestação e puerpério <b>↗</b></a>
+            <a href="https://www.gov.br/saude/pt-br/composicao/saps/publicacoes/fichas-tecnicas/equipe-de-atencao-primaria-e-saude-da-familia/nota-metodologica-c7-cuidado-da-mulher-na-prevencao-do-cancer/view" target="_blank" rel="noopener">C7 · Prevenção do câncer na saúde da mulher <b>↗</b></a>
+            <a href="https://sisaps.saude.gov.br/sistemas/esusaps/blog/versao-5-6/" target="_blank" rel="noopener">e-SUS APS · Notas da versão 5.6 <b>↗</b></a>
+          </div>
+        </details>
       </section>
       <div class="workspace-layout">
         <aside class="sidebar">
