@@ -616,6 +616,14 @@
     $("dialog-copy-status").textContent = "";
     if (!$("soap-dialog").open) $("soap-dialog").showModal();
   }
+  $(".quick-grid").addEventListener("click", (event) => {
+    if (!event.target.closest(".quick-topic")) return;
+    window.setTimeout(() => {
+      const destination =
+        document.querySelector("#guide:not([hidden])") || $("#setup");
+      destination.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  });
   $("visit-form").addEventListener("submit", (event) => event.preventDefault());
   $("visit-form").addEventListener("change", updateSelection);
   $("search").addEventListener("input", (event) => {
