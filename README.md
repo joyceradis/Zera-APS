@@ -1,14 +1,7 @@
-# Zera-APS — cola médica do PEC
+# Zera APS — consulta rápida do PEC
 
-Versão 0.8.0. A tela prioriza a conferência dos componentes C4 (diabetes) e C5 (hipertensão). Escolha um ou ambos para ver o campo do PEC, os códigos relacionados e os critérios em detalhes. O botão fixo copia um SOAP em branco com o mapa.
+Versão 0.9.0 (refatoração em revisão). Uma tela: busca por registro/código, seleção de condições, tabela de critérios e caminhos, detalhes de referência. C3/C4/C5/C7; sem C1/C2/C6. A seleção não estabelece elegibilidade. Marcação manual por critério, preservada durante a seleção e apagada ao limpar consulta. Não comprova execução ou pontuação.
 
-C3/C7 estão em “Outros indicadores”. Ações de ACS/TACS, vacinação ou outros profissionais ficam separadas da lista médica. A versão de enfermagem será um fluxo próprio depois da validação da V1 médica.
+Cópias separadas: SOAP em branco para preenchimento real; roteiro exclusivamente para consulta operacional. Não colar roteiro no prontuário. Não acessa o PEC, não armazena pacientes e não calcula indicadores. A base normativa foi preservada sem alteração; validar as fontes vigentes e a instalação local.
 
-CID-10/CIAP-2 devem corresponder ao diagnóstico confirmado; SIGTAP/ABEX, ao registro solicitado ou realizado. A ferramenta não acessa o PEC, não guarda dados de pacientes, não calcula pontuação e não confirma execução. Valide os caminhos na instalação municipal antes de congelar a V1.
-
-Arquivos: `index.html`, `app.js`, `styles.css` e a base estática em `data/regras.js`.
-
-
-A interface oferece seleção lateral, busca por campo/exame/código, conferência manual em memória e prévia do rascunho SOAP. Mudar os indicadores limpa as marcações. A conferência não representa execução nem pontuação. Layout adaptado para computador e celular.
-
-Validação: consulte `tests/QA.md`.
+Executar `python tests/test_ui.py` com Playwright 1.56 e Chromium. A interface usa index.html, consulta.css, app.js e data/regras.js. Os estilos antigos continuam no repositório para a página de novidades e histórico.

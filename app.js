@@ -1,15 +1,9 @@
-/* Roteiro em memória: nenhuma consulta ao PEC, persistência ou cálculo de pontuação. */
+/* Consulta de referência; nenhuma escrita no PEC, persistência ou apuração. */
 (() => {
-  "use strict";
-  const $ = (id) => document.getElementById(id);
-  const data = window.ZERA_APS_DATA;
-  if (!Array.isArray(data?.cards)) {
-    $("setup").textContent =
-      "Não foi possível carregar a base. Reabra o aplicativo com a pasta data disponível.";
-    return;
-  }
-
-  // Apenas organização editorial. Critérios, códigos, caminhos e ressalvas vêm da base.
+"use strict";
+const $=id=>document.getElementById(id);
+const data=window.ZERA_APS_DATA;
+if(!Array.isArray(data?.cards)){ $("empty").textContent="Base indisponível."; return; }
   const actions = {
     "C5-A": [
       "consulta",
@@ -163,561 +157,92 @@
     ],
   };
 
-  let selected = [];
-  let phase = "";
-  let groups = [];
-  let toastTimer;
-  const reviewed = new Set();
-  let query = "";
-  let teamOpen = false;
 
-  const esc = (value) =>
-    String(value ?? "").replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
-  const normalize = (value) =>
-    String(value ?? "")
-      .toLocaleLowerCase("pt-BR")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-  const sourceLink = (value) => {
-    try {
-      const url = new URL(value);
-      return url.protocol === "https:" ? url.href : "";
-    } catch {
-      return "";
-    }
-  };
-  const labelFor = (card) =>
-    card.id === "prenatal"
-      ? phase === "puerperio"
-        ? "Puerpério"
-        : "Pré-natal"
-      : card.title;
-  const keysFromForm = () =>
-    Array.from(
-      document.querySelectorAll('[name="condition"]:checked'),
-      (el) => el.value,
-    );
-
-  function updateSelection() {
-    const keys = keysFromForm();
-    reviewed.clear();
-    query = "";
-    teamOpen = false;
-    $("search").value = "";
-    $("soap-dialog").close();
-    clearTimeout(toastTimer);
-    $("toast").hidden = true;
-    const needsPhase = keys.includes("prenatal");
-    $("phase-field").hidden = !needsPhase;
-    $("new-visit").hidden = !keys.length;
-    if (!keys.length) {
-      selected = [];
-      phase = "";
-      groups = [];
-      $("guide").hidden = true;
-      $("copy-dock").hidden = true;
-      $("selection-hint").textContent = "Selecione um ou mais indicadores.";
-      $("empty-state").hidden = false;
-      $("empty-heading").textContent = "Seu roteiro começa aqui.";
-      $("empty-description").textContent =
-        "Selecione um indicador para ver onde registrar, quais códigos consultar e o que conferir.";
-      $("action-list").replaceChildren();
-      return;
-    }
-    const phaseChoice = document.querySelector('[name="phase"]:checked');
-    if (needsPhase && !phaseChoice) {
-      $("guide").hidden = true;
-      $("copy-dock").hidden = true;
-      selected = [];
-      phase = "";
-      groups = [];
-      $("action-list").replaceChildren();
-      $("empty-state").hidden = false;
-      $("empty-heading").textContent = "Qual é a fase do acompanhamento?";
-      $("empty-description").textContent =
-        "Escolha pré-natal ou puerpério nos indicadores para montar o roteiro.";
-      $("selection-hint").textContent =
-        "Escolha pré-natal ou puerpério para continuar.";
-      return;
-    }
-    $("selection-hint").textContent =
-      "Roteiro atualizado. Você pode combinar outros indicadores.";
-    $("empty-state").hidden = true;
-    buildGuide();
-  }
-
-  function makeGroups() {
-    const map = new Map();
-    data.cards
-      .filter((card) => selected.includes(card.id))
-      .forEach((card) => {
-        (card.rules || []).forEach((rule) => {
-          if (card.id === "prenatal" && rule.phase !== phase) return;
-          const [key, title, instruction, lane] = actions[rule.id] || [
-            rule.id,
-            rule.title,
-            "Confira o registro e as condições de aplicação na base.",
-            "medical",
-          ];
-          if (!map.has(key))
-            map.set(key, { key, title, instruction, lane, variants: [] });
-          map.get(key).variants.push({ rule, card });
-        });
-      });
-    const laneOrder = { medical: 0, shared: 1, team: 2 };
-    return Array.from(map.values()).sort(
-      (a, b) => laneOrder[a.lane] - laneOrder[b.lane],
-    );
-  }
-
-  function criteriaMarkup(group) {
-    // Cada regra conserva seu próprio caminho, prazo, código, profissional, fonte e ressalvas.
-    return group.variants
-      .map(({ rule, card }) => {
-        const link = sourceLink(rule.source);
-        const methodology = sourceLink(rule.methodology_source);
-        const diagnosticCodes =
-          group.key === "consulta"
-            ? Object.entries(card.codes || {}).flatMap(([system, codes]) =>
-                codes.map((value) => ({
-                  system:
-                    system === "cid10"
-                      ? "CID-10"
-                      : system === "ciap2"
-                        ? "CIAP-2"
-                        : system,
-                  value,
-                  label:
-                    "Referência diagnóstica: selecionar somente se corresponder ao diagnóstico.",
-                })),
-              )
-            : [];
-        const codes = [...(rule.codes || []), ...diagnosticCodes];
-        return `<section class="criterion" aria-label="${esc(rule.id)}">
-        <h4>${esc(labelFor(card))} <span>${esc(rule.id)}</span></h4>
-        <dl><dt>Critério da ficha do indicador</dt><dd>${esc(rule.goal)} · ${esc(rule.window)}</dd>
-        <dt>Campo no PEC / sistema da equipe</dt><dd>${esc(rule.pec_location)}</dd>
-        <dt>Profissional indicado na base</dt><dd>${esc(rule.actor)}</dd></dl>
-        ${(rule.cautions || []).length ? `<div class="cautions"><strong>Cuidados para este item</strong><ul>${rule.cautions.map((c) => `<li>${esc(c)}</li>`).join("")}</ul></div>` : ""}
-        ${codes.length ? `<details class="codes"><summary>Códigos de referência — somente se aplicáveis</summary><p>Copiar não registra o atendimento. Confira os campos estruturados antes de acrescentar procedimentos.</p>${codes.map((code) => `<div class="code-row"><span><small>${esc(code.system)}</small><code>${esc(code.value)}</code>${code.label ? `<small>${esc(code.label)}</small>` : ""}</span><button type="button" class="button secondary copy-button" data-copy="${esc(code.value)}" aria-label="Copiar ${esc(code.value)}">Copiar</button></div>`).join("")}</details>` : ""}
-        ${link ? `<a class="source-link" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Fonte indicada na base ↗</a>` : "<p>Fonte específica não disponível.</p>"}
-        ${methodology ? `<a class="source-link" href="${esc(methodology)}" target="_blank" rel="noopener noreferrer">Nota metodológica oficial ↗</a>` : ""}
-      </section>`;
-      })
-      .join("");
-  }
-
-  function codeSummaryMarkup(group) {
-    const entries = group.variants
-      .map(({ rule, card }) => {
-        const parts = [];
-        if (group.key === "consulta") {
-          if (Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length)
-            parts.push(
-              '<span class="code-chip">CIAP-2 ' +
-                esc(card.codes.ciap2.join(" / ")) +
-                "</span>",
-            );
-          const cid = card.codes?.cid10 || card.codes?.cid10_examples || [];
-          if (Array.isArray(cid) && cid.length) {
-            if (cid.length <= 6)
-              parts.push(
-                '<span class="code-chip">CID-10 ' +
-                  esc(cid.join(" / ")) +
-                  "</span>",
-              );
-            else
-              parts.push(
-                '<details class="all-codes"><summary>CID-10 · ' +
-                  cid.length +
-                  " opções</summary><p>" +
-                  esc(cid.join(", ")) +
-                  "</p></details>",
-              );
-          }
-        }
-        (rule.codes || []).forEach((code) => {
-          parts.push(
-            '<span class="code-chip">' +
-              esc(code.system) +
-              " " +
-              esc(code.value) +
-              (code.label ? " · " + esc(code.label) : "") +
-              "</span>",
-          );
-        });
-        return parts.length
-          ? '<div class="code-line"><small>' +
-              esc(rule.id) +
-              "</small><div>" +
-              parts.join("") +
-              "</div></div>"
-          : "";
-      })
-      .filter(Boolean);
-    return entries.length
-      ? '<div class="code-summary"><strong>CÓDIGOS</strong>' +
-          entries.join("") +
-          "</div>"
-      : "";
-  }
-
-  function actionMarkup(group, index) {
-    const badges = group.variants.map(({ rule }) => rule.id).join(" · ");
-    const paths = [
-      ...new Set(group.variants.map(({ rule }) => rule.pec_location)),
-    ];
-    return `<article class="action${reviewed.has(group.key) ? " is-reviewed" : ""}" data-action="${esc(group.key)}">
-      <div class="action-main"><span class="number" aria-hidden="true">${index + 1}</span><div><h3>${esc(group.title)}</h3><p class="action-badges">${esc(badges)}</p></div><label class="review-control"><input type="checkbox" data-review="${esc(group.key)}" aria-label="Conferir ${esc(group.title)}" ${reviewed.has(group.key) ? "checked" : ""}><span>Conferido</span></label></div>
-      <div class="click-path"><strong>CLIQUE NO PEC</strong>${paths.map((path) => `<p>${esc(path)}</p>`).join("")}</div>
-      ${codeSummaryMarkup(group)}
-      <details class="action-details"><summary>Prazo, responsável e observações</summary>${criteriaMarkup(group)}</details>
-    </article>`;
-  }
-
-  function updateProgress() {
-    $("review-summary").textContent =
-      `${reviewed.size} de ${groups.length} itens conferidos`;
-    $("review-progress").max = Math.max(groups.length, 1);
-    $("review-progress").value = reviewed.size;
-  }
-
-  function renderActions() {
-    const matching = groups.filter(
-      (group) =>
-        !query ||
-        normalize(
-          [
-            group.title,
-            group.instruction,
-            ...group.variants.map(({ rule, card }) =>
-              JSON.stringify({
-                rule,
-                title: labelFor(card),
-                diagnosticCodes:
-                  group.key === "consulta" ? card.codes : undefined,
-              }),
-            ),
-          ].join(" "),
-        ).includes(query),
-    );
-    const medical = matching.filter((group) => group.lane !== "team");
-    const team = matching.filter((group) => group.lane === "team");
-    $("action-list").innerHTML =
-      (medical.length
-        ? '<p class="lane-label">REGISTROS DO ATENDIMENTO</p>'
-        : "") +
-      medical
-        .map((group) => actionMarkup(group, groups.indexOf(group)))
-        .join("") +
-      (team.length
-        ? `<details class="team-lane" ${query || teamOpen ? "open" : ""}><summary>Conferir com a equipe <span>(${team.length})</span></summary><p>Confira com quem realizou. Não registre ação alheia como realizada pelo médico.</p>${team.map((group) => actionMarkup(group, groups.indexOf(group))).join("")}</details>`
-        : "");
-    $("no-results").hidden = matching.length > 0;
-    $("search-count").textContent = query
-      ? `${matching.length} de ${groups.length}`
-      : "";
-    const teamDetails = document.querySelector(".team-lane");
-    if (teamDetails)
-      teamDetails.addEventListener("toggle", () => {
-        if (!query) teamOpen = teamDetails.open;
-      });
-    updateProgress();
-  }
-
-  function buildGuide() {
-    selected = keysFromForm();
-    const phaseChoice = document.querySelector('[name="phase"]:checked');
-    phase = selected.includes("prenatal") ? phaseChoice?.value || "" : "";
-    groups = makeGroups();
-
-    $("item-count").textContent = `${groups.length} itens`;
-    $("guide-heading").textContent = data.cards
-      .filter((card) => selected.includes(card.id))
-      .map(labelFor)
-      .join(" + ");
-    $("guide-context").textContent = selected.includes("prenatal")
-      ? phase === "puerperio"
-        ? "Puerpério · confira os registros C3-I e C3-J."
-        : "Pré-natal · confira os registros C3-A a C3-H e C3-K."
-      : selected.includes("mulher")
-        ? "Confira os campos, o histórico e os critérios. A seleção não confirma elegibilidade."
-        : "Localize o campo, consulte os códigos e confira os critérios de cada item.";
-    const paIndicators = [
-      selected.includes("has") ? "C5-B" : "",
-      selected.includes("dm") ? "C4-B" : "",
-    ].filter(Boolean);
-    $("copy-warning").textContent = paIndicators.length
-      ? "PA na evolução não substitui o campo estruturado " +
-        paIndicators.join(" / ") +
-        "."
-      : "O texto livre não substitui os campos estruturados do PEC.";
-    $("base-date").textContent =
-      `Critérios: ${data.reviewed_on || "não disponível"}. Manual PEC ${data.pec_manual_review?.version || "não informado"} consultado em ${data.pec_manual_review?.date || "data não informada"}. Versão: ${data.version || "não informada"}.`;
-    $("guide").hidden = false;
-    $("copy-dock").hidden = false;
-    renderActions();
-  }
-
-  function resetVisit() {
-    $("visit-form").reset();
-    selected = [];
-    phase = "";
-    groups = [];
-    $("action-list").replaceChildren();
-    $("guide-heading").textContent = "";
-    $("guide-context").textContent = "";
-    clearTimeout(toastTimer);
-    $("toast").hidden = true;
-    $("guide").hidden = true;
-    $("copy-dock").hidden = true;
-    $("new-visit").hidden = true;
-    $("selection-hint").textContent =
-      "Marque uma ou mais situações para ver o mapa de cliques.";
-    $("visit-form").querySelector("input").focus();
-    updateSelection();
-  }
-
-  function buildSoapChecklist() {
-    const checklist = groups
-      .map((group) => {
-        const lines = [
-          "⚠️ " +
-            group.variants.map(({ rule }) => rule.id).join(" / ") +
-            " — " +
-            group.title,
-        ];
-        const paths = [
-          ...new Set(group.variants.map(({ rule }) => rule.pec_location)),
-        ];
-        paths.forEach((path) => lines.push("   CLIQUE/CAMPO: " + path));
-        group.variants.forEach(({ rule, card }) => {
-          lines.push(
-            "   " + rule.id + ": " + rule.goal + " (" + rule.window + ").",
-          );
-          if (group.lane === "team")
-            lines.push(
-              "   RESPONSÁVEL: " +
-                rule.actor +
-                "; conferir com a equipe, sem registrar em nome de quem executou.",
-            );
-          if (group.key === "consulta") {
-            if (Array.isArray(card.codes?.ciap2) && card.codes.ciap2.length)
-              lines.push(
-                "   CIAP-2 de referência: " +
-                  card.codes.ciap2.join(", ") +
-                  " — selecione apenas o correspondente ao diagnóstico.",
-              );
-            const cid = card.codes?.cid10 || card.codes?.cid10_examples || [];
-            if (Array.isArray(cid) && cid.length)
-              lines.push(
-                "   CID-10 de referência: " +
-                  cid.join(", ") +
-                  " — selecione apenas o correspondente ao diagnóstico.",
-              );
-          }
-          const procedureCodes = (rule.codes || []).map(
-            (code) =>
-              code.system +
-              " " +
-              code.value +
-              (code.label ? " (" + code.label + ")" : ""),
-          );
-          if (procedureCodes.length)
-            lines.push(
-              "   CÓDIGO(S) DO REGISTRO: " + procedureCodes.join("; "),
-            );
-        });
-        return lines.join("\n");
-      })
-      .join("\n");
-    return [
-      "RASCUNHO SOAP — COMPLETAR ANTES DE SALVAR",
-      "S: [Relato real.]",
-      "O: [Achados observados e medidas realmente aferidas.]",
-      "A: [Avaliação clínica realizada.]",
-      "P: [Conduta decidida, orientações e seguimento, se aplicáveis.]",
-      "",
-      "MAPA DE CLIQUES — confira o campo estruturado e o histórico do indicador.",
-      checklist,
-      "",
-      "Use somente códigos compatíveis com o diagnóstico e o registro real. Apague este mapa antes de salvar a evolução.",
-    ].join("\n");
-  }
-
-  async function writeClipboardText(value, button) {
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(value);
-        return;
-      } catch {
-        /* Tenta seleção local quando a permissão de clipboard não está disponível. */
-      }
-    }
-    {
-      const field = document.createElement("textarea");
-      field.value = value;
-      field.className = "clipboard-field";
-      ($("soap-dialog").open ? $("soap-dialog") : document.body).append(field);
-      field.select();
-      const ok = document.execCommand("copy");
-      field.remove();
-      button?.focus();
-      if (!ok) throw new Error("copy unavailable");
-    }
-  }
-  async function copyCode(button) {
-    try {
-      await writeClipboardText(button.dataset.copy, button);
-      $("toast").textContent = "Código copiado. O registro é feito no PEC.";
-    } catch {
-      $("toast").textContent =
-        "Cópia indisponível. Selecione o código ao lado do botão.";
-    }
-    clearTimeout(toastTimer);
-    $("toast").hidden = false;
-    toastTimer = setTimeout(() => {
-      $("toast").hidden = true;
-    }, 3000);
-  }
-
-  async function copySoapChecklist(event) {
-    const button = event.currentTarget;
-    try {
-      await writeClipboardText(buildSoapChecklist(), button);
-      $("toast").textContent = "SOAP e mapa copiados. Revise antes de salvar.";
-      $("dialog-copy-status").textContent = "Rascunho copiado.";
-    } catch {
-      openPreview();
-      const message =
-        "Cópia indisponível. Selecione e copie o texto da prévia.";
-      $("toast").textContent = message;
-      $("dialog-copy-status").textContent = message;
-    }
-    clearTimeout(toastTimer);
-    $("toast").hidden = false;
-    toastTimer = setTimeout(() => {
-      $("toast").hidden = true;
-    }, 4500);
-  }
-
-  function openPreview() {
-    $("soap-preview").textContent = buildSoapChecklist();
-    $("dialog-copy-status").textContent = "";
-    if (!$("soap-dialog").open) $("soap-dialog").showModal();
-  }
-  $("topic-search").addEventListener("input", (event) => {
-    const query = normalize(event.target.value.trim());
-    let visible = 0;
-    document.querySelectorAll("[data-topic-card]").forEach((card) => {
-      const matches = !query || normalize(card.textContent).includes(query);
-      card.hidden = !matches;
-      if (matches) visible++;
-    });
-    $("topic-no-results").hidden = visible > 0;
-  });
-  function showScreen(name) {
-    document.querySelectorAll(".site-screen").forEach((screen) => {
-      screen.hidden = screen.id !== "screen-" + name;
-    });
-    document.querySelectorAll("[data-screen-target]").forEach((button) => {
-      if (button.tagName === "BUTTON" && button.closest(".site-nav"))
-        button.setAttribute("aria-current", button.dataset.screenTarget === name ? "page" : "false");
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-  document.querySelectorAll("[data-screen-target]").forEach((button) => {
-    button.addEventListener("click", () => showScreen(button.dataset.screenTarget));
-  });
-  document.querySelector(".quick-grid").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-home-topic]");
-    if (!button) return;
-    const key = button.dataset.homeTopic;
-    if (key === "has") { showScreen("has"); return; }
-    const input = document.querySelector('[name="condition"][value="' + key + '"]');
-    if (key === "prenatal") document.querySelector(".secondary-indicators").open = true;
-    if (input && !input.checked) {
-      input.checked = true;
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-    showScreen("guides");
-    window.setTimeout(() => {
-      const target = !$("guide").hidden ? $("guide") : $("phase-field");
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 250);
-  });
-  $("topic-search").addEventListener("input", (event) => {
-    const query = normalize(event.target.value.trim());
-    let visible = 0;
-    document.querySelectorAll("[data-topic-card]").forEach((card) => {
-      const matches = !query || normalize(card.textContent).includes(query);
-      card.hidden = !matches;
-      if (matches) visible++;
-    });
-    $("topic-no-results").hidden = visible > 0;
-  });
-  const c5Checks = document.querySelectorAll("[data-c5-check]");
-  function updateC5Checklist() {
-    const done = [...c5Checks].filter((check) => check.checked).length;
-    $("c5-check-count").textContent = done + " de 4 conferidos";
-    $("c5-progress").value = done;
-  }
-  c5Checks.forEach((check) => check.addEventListener("change", updateC5Checklist));
-  updateC5Checklist();
-  document.querySelector("[data-open-has-guide]").addEventListener("click", () => {
-    const input = document.querySelector('[name="condition"][value="has"]');
-    if (input && !input.checked) {
-      input.checked = true;
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-    showScreen("guides");
-    window.setTimeout(() => $("guide").scrollIntoView({ behavior: "smooth", block: "start" }), 250);
-  });
-  $("visit-form").addEventListener("submit", (event) => event.preventDefault());
-  $("visit-form").addEventListener("change", updateSelection);
-  $("search").addEventListener("input", (event) => {
-    query = normalize(event.target.value.trim());
-    renderActions();
-  });
-  $("clear-search").addEventListener("click", () => {
-    query = "";
-    $("search").value = "";
-    renderActions();
-    $("search").focus();
-  });
-  $("action-list").addEventListener("change", (event) => {
-    const key = event.target.dataset.review;
-    if (!key) return;
-    if (event.target.checked) reviewed.add(key);
-    else reviewed.delete(key);
-    event.target
-      .closest(".action")
-      .classList.toggle("is-reviewed", event.target.checked);
-    updateProgress();
-  });
-  $("preview-soap").addEventListener("click", openPreview);
-  $("close-preview").addEventListener("click", () => $("soap-dialog").close());
-  $("copy-preview").addEventListener("click", copySoapChecklist);
-  $("new-visit").addEventListener("click", resetVisit);
-  $("copy-soap-checklist").addEventListener("click", copySoapChecklist);
-  $("action-list").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-copy]");
-    if (button) copyCode(button);
-  });
-  window.addEventListener("pageshow", (event) => {
-    if (event.persisted) resetVisit();
-  });
-  $("visit-form").reset();
-  $("new-visit").hidden = true;
-  updateSelection();
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm=v=>String(v??"").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const unique=a=>[...new Set(a)];
+const safeUrl=v=>{try{const u=new URL(v);return u.protocol==="https:"?u.href:"";}catch{return "";}};
+const sources=(rule)=>[["Guia PEC",rule.source],["Nota metodológica",rule.methodology_source]].filter(([,v])=>safeUrl(v));
+const checks=[...document.querySelectorAll(".conditions input")];
+const reviewed=new Set(); let active="",visibleGroups=[];
+const phaseOf=(card,rule)=>card.id==="prenatal"?rule.phase:card.id;
+const selected=()=>checks.filter(c=>c.checked).map(c=>c.value);
+function ruleCodes(rule,card){
+ const list=[...(rule.codes||[])];
+ if(["C4-A","C5-A","C3-A","C3-I"].includes(rule.id)){
+   for(const [key,values] of Object.entries(card.codes||{})) if(Array.isArray(values)) for(const value of values)
+     list.push({system:key==="ciap2"?"CIAP-2":key.startsWith("cid10")?"CID-10":key,value,label:"Referência diagnóstica; confirmar pertinência."});
+ }
+ return list;
+}
+function groupsFor(selection,query){
+ const map=new Map();
+ for(const card of data.cards){
+   if(String(card.status).startsWith("awaiting")) continue;
+   for(const rule of card.rules||[]){
+     if(String(rule.status).startsWith("awaiting")) continue;
+     if(selection.length&&!selection.includes(phaseOf(card,rule))) continue;
+     const [key,title,instruction,lane]=actions[rule.id]||[rule.id,rule.title,"Conferir critério e fonte.","medical"];
+     if(!map.has(key)) map.set(key,{key,title,instruction,lane,variants:[]});
+     map.get(key).variants.push({rule,card});
+   }
+ }
+ return [...map.values()].filter(g=>!query||norm([g.title,g.instruction,...g.variants.map(v=>JSON.stringify(v))].join(" ")).includes(query)).sort((a,b)=>(a.lane==="team")-(b.lane==="team"));
+}
+function codesFor(g){const m=new Map();for(const {rule,card} of g.variants)for(const c of ruleCodes(rule,card))m.set(c.system+"|"+c.value,c);return [...m.values()];}
+function pathText(path){return path.replace(/^Atendimento individual\s*(?:\/|→)\s*/,"").replace(/^SOAP\s*→\s*/,"");}
+function row(g){
+ const paths=unique(g.variants.map(v=>pathText(v.rule.pec_location)));
+ const codes=codesFor(g);
+ const shown=codes.length>4?codes.slice(0,3):codes;
+ const copyButtons=shown.map(c=>'<button class="code-button" type="button" data-copy="'+esc(c.value)+'" aria-label="Copiar '+esc(c.system+" "+c.value)+'" title="'+esc(c.system+" "+(c.label||""))+'">'+esc(c.value)+'</button>').join("");
+ return '<tr data-action="'+esc(g.key)+'"><td><button class="row-title" type="button" data-detail="'+esc(g.key)+'" aria-pressed="'+(active===g.key)+'">'+esc(g.title)+'</button><span class="meta">'+esc(g.variants.map(v=>v.rule.id).join(" / "))+'</span></td><td>'+g.variants.map(({rule})=>'<div class="criterion-short"><strong>'+esc(rule.window)+'</strong><span class="meta">'+esc(rule.goal)+'</span></div>').join("")+'</td><td>'+paths.map(p=>'<div class="criterion-short">'+esc(p)+'</div>').join("")+'</td><td>'+copyButtons+(codes.length>shown.length?'<button class="code-button" data-detail="'+esc(g.key)+'" type="button">+'+(codes.length-shown.length)+' códigos</button>':"")+g.variants.map(({rule})=>'<label class="check"><input type="checkbox" data-review="'+esc(rule.id)+'" '+(reviewed.has(rule.id)?"checked":"")+' aria-label="Conferir '+esc(rule.id)+'"> '+esc(rule.id)+' conferido</label>').join("")+'</td></tr>';
+}
+function showDetail(key,focus=false){
+ const g=visibleGroups.find(v=>v.key===key);
+ active=g?key:"";
+ document.querySelectorAll(".row-title").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.detail===active)));
+ $("close-detail").hidden=!g;
+ $("detail-title").textContent=g?g.title:"Detalhes";
+ $("detail-content").innerHTML=g?'<p>'+esc(g.instruction)+'</p>'+g.variants.map(({rule,card})=>'<section class="criterion"><h3>'+esc(rule.id+" · "+rule.title)+'</h3><p><strong>Critério:</strong> '+esc(rule.goal)+' · '+esc(rule.window)+'</p><p><strong>PEC:</strong> '+esc(rule.pec_location)+'</p><p><strong>Responsável:</strong> '+esc(rule.actor)+'</p>'+((rule.cautions||[]).length?'<ul>'+rule.cautions.map(c=>'<li>'+esc(c)+'</li>').join("")+'</ul>':"")+'<div class="code-list">'+ruleCodes(rule,card).map(c=>'<div><button class="code-button" data-copy="'+esc(c.value)+'" type="button" aria-label="Copiar '+esc(c.system+" "+c.value)+'">'+esc(c.value)+'</button> '+esc(c.system+" · "+(c.label||""))+'</div>').join("")+'</div>'+sources(rule).map(([label,url])=>'<a class="source" href="'+esc(safeUrl(url))+'" target="_blank" rel="noopener noreferrer">'+esc(label)+'</a>').join("")+'</section>').join(""):'<p class="note">Selecione um registro para consultar critérios, códigos, responsabilidades e fontes.</p>';
+ if(g&&focus&&matchMedia("(max-width:900px)").matches){$("detail").scrollIntoView({block:"nearest"});}
+}
+function render(){
+ const selection=selected(),query=norm($("search").value.trim());
+ visibleGroups=selection.length||query?groupsFor(selection,query):[];
+ const has=visibleGroups.length>0;
+ $("results").hidden=!has;$("empty").hidden=has;
+ $("empty").textContent=selection.length||query?"Nenhum registro encontrado.":"Selecione uma condição ou busque qualquer registro.";
+ $("count").textContent=has?visibleGroups.length+" registros":"";
+ $("copy-map").disabled=!has;
+ const medical=visibleGroups.filter(g=>g.lane!=="team"),team=visibleGroups.filter(g=>g.lane==="team");
+ $("rows").innerHTML=medical.map(row).join("")+(team.length?'<tr class="group-separator"><th colspan="4" scope="rowgroup">Conferir com a equipe responsável</th></tr>'+team.map(row).join(""):"");
+ showDetail(active);
+}
+function reset(){
+ checks.forEach(c=>c.checked=false);reviewed.clear();active="";$("search").value="";$("copy-status").textContent="";$("copy-fallback").hidden=true;$("copy-fallback").value="";render();$("search").focus();
+}
+function copyMap(){
+ return ["ROTEIRO DE CONFERÊNCIA — NÃO COLAR NO PRONTUÁRIO","Histórico não verificado. Conferir registro real e elegibilidade.",...visibleGroups.flatMap(g=>[g.title,...g.variants.map(({rule,card})=>rule.id+" | "+rule.goal+" | "+rule.window+" | "+rule.pec_location+" | Responsável: "+rule.actor+" | "+ruleCodes(rule,card).map(c=>c.system+" "+c.value).join("; "))])].join("\n");
+}
+async function copy(text){
+ $("copy-fallback").hidden=true;$("copy-fallback").value="";
+ try{await navigator.clipboard.writeText(text);$("copy-status").textContent="Copiado.";}
+ catch{$("copy-fallback").value=text;$("copy-fallback").hidden=false;$("copy-fallback").select();$("copy-status").textContent="Selecione e copie manualmente.";}
+}
+checks.forEach(c=>c.addEventListener("change",()=>{
+ if(c.checked&&["gestacao","puerperio"].includes(c.value)) checks.filter(other=>other!==c&&["gestacao","puerperio"].includes(other.value)).forEach(other=>other.checked=false);
+ render();
+}));
+$("search").addEventListener("input",render);
+$("new-visit").addEventListener("click",reset);
+$("close-detail").addEventListener("click",()=>showDetail(""));
+$("copy-soap").addEventListener("click",()=>copy("S: \nO: \nA: \nP: "));
+$("copy-map").addEventListener("click",()=>copy(copyMap()));
+document.addEventListener("click",e=>{const b=e.target.closest("[data-copy],[data-detail]");if(!b)return;if(b.dataset.copy)copy(b.dataset.copy);else showDetail(b.dataset.detail,true);});
+$("rows").addEventListener("change",e=>{const id=e.target.dataset.review;if(!id)return;if(e.target.checked)reviewed.add(id);else reviewed.delete(id);});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){showDetail("");}if(e.key==="/"&&!["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName)){e.preventDefault();$("search").focus();}});
+window.addEventListener("pageshow",e=>{if(e.persisted)reset();});
+$("base-date").textContent="Base documental: "+(data.reviewed_on||"data não informada")+" · Manual PEC: "+(data.pec_manual_review?.version||"não informado")+" · Sem acesso ao histórico ou cálculo de pontuação. Valide a instalação local.";
+render();
 })();
