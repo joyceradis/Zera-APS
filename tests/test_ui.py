@@ -19,7 +19,19 @@ with ThreadingHTTPServer(("127.0.0.1", 0), partial(Quiet, directory=str(root))) 
         page=browser.new_page(viewport={"width":width,"height":900})
         page.on("pageerror",lambda e:errors.append(str(e)))
         page.on("request",lambda r:external.append(r.url) if urlsplit(r.url).hostname!="127.0.0.1" else None)
+        page.emulate_media(color_scheme="dark")
         page.goto(f"http://127.0.0.1:{server.server_port}/")
+        expect(page.locator("#access-main")).to_be_visible()
+        assert page.evaluate("getComputedStyle(document.documentElement).colorScheme")=="dark"
+        page.locator("#theme-mode").select_option("light")
+        assert page.evaluate("document.documentElement.dataset.theme")=="light"
+        page.locator("#access-main").click()
+        expect(page).to_have_url(__import__("re").compile(r"/consulta\.html$"))
+        assert page.evaluate("document.documentElement.dataset.theme")=="light"
+        page.locator("#theme-mode").select_option("dark")
+        assert page.evaluate("getComputedStyle(document.documentElement).backgroundColor")=="rgb(23, 29, 35)"
+        page.locator("#theme-mode").select_option("auto")
+        assert page.evaluate("getComputedStyle(document.documentElement).colorScheme")=="dark"
         expect(page.locator("#search")).to_be_visible()
         expect(page.locator("#empty")).to_be_visible()
         page.locator('input[value=has]').check()
@@ -69,8 +81,12 @@ with ThreadingHTTPServer(("127.0.0.1", 0), partial(Quiet, directory=str(root))) 
         if os.environ.get("ZERA_REVIEW_DIR"):
             folder=Path(os.environ["ZERA_REVIEW_DIR"]);folder.mkdir(parents=True,exist_ok=True)
             page.screenshot(path=str(folder/f"consulta-{width}.png"),full_page=True)
+        page.locator("#theme-mode").select_option("dark")
         page.reload()
         expect(page.locator("#empty")).to_be_visible()
+        assert page.evaluate("document.documentElement.dataset.theme")=="dark"
+        assert page.evaluate("Object.keys(localStorage).join()")=="zera-aps-theme"
+        page.locator("#theme-mode").select_option("auto")
         page.close()
     browser.close()
 assert not errors, errors
