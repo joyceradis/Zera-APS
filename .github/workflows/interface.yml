@@ -1,13 +1,8 @@
 name: Interface do Zera APS
 on:
   pull_request:
-    paths:
-      - 'index.html'
-      - 'app.js'
-      - 'styles.css'
-      - 'data/**'
-      - 'tests/**'
-      - '.github/workflows/interface.yml'
+  push:
+    branches: [main, 'refactor/**']
 permissions:
   contents: read
 jobs:
