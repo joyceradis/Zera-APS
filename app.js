@@ -219,7 +219,34 @@ function render(){
  $("rows").innerHTML=medical.map(row).join("")+(team.length?'<tr class="group-separator"><th colspan="4" scope="rowgroup">Conferir com a equipe responsável</th></tr>'+team.map(row).join(""):"");
  showDetail(active);
 }
+// Links da página comercial abrem somente linhas e critérios existentes na base.
+function openLandingSelection() {
+  const params = new URLSearchParams(location.search);
+  const criterion = params.get("criterio");
+  const line = params.get("linha");
+  let selection = line === "cronicos" ? ["has", "dm"] : [line];
+  let detail = "";
+  if (criterion) {
+    for (const card of data.cards) {
+      const rule = card.rules.find(item => item.id === criterion);
+      if (rule && Object.hasOwn(actions, rule.id)) {
+        selection = [phaseOf(card, rule)];
+        detail = actions[rule.id][0];
+        break;
+      }
+    }
+  }
+  checks.forEach(input => { input.checked = selection.includes(input.value); });
+  render();
+  if (detail) showDetail(detail, true);
+}
 function reset(){
+ const url = new URL(location.href);
+ if (url.searchParams.has("criterio") || url.searchParams.has("linha")) {
+   url.searchParams.delete("criterio");
+   url.searchParams.delete("linha");
+   history.replaceState(null, "", url);
+ }
  checks.forEach(c=>c.checked=false);reviewed.clear();active="";$("search").value="";$("copy-status").textContent="";$("copy-fallback").hidden=true;$("copy-fallback").value="";render();$("search").focus();
 }
 function copyMap(){
@@ -244,5 +271,5 @@ $("rows").addEventListener("change",e=>{const id=e.target.dataset.review;if(!id)
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){showDetail("");}if(e.key==="/"&&!["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName)){e.preventDefault();$("search").focus();}});
 window.addEventListener("pageshow",e=>{if(e.persisted)reset();});
 $("base-date").textContent="Base documental: "+(data.reviewed_on||"data não informada")+" · Manual PEC: "+(data.pec_manual_review?.version||"não informado")+" · Sem acesso ao histórico ou cálculo de pontuação. Valide a instalação local.";
-render();
+openLandingSelection();
 })();
