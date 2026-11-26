@@ -20,7 +20,7 @@ C3/C4/C5/C7, 25 regras, seleção de condições, busca global, tabela compacta,
 | docs/ | Roadmap, revisão documental, especificação e referências |
 | AGENTS.md | Regras para colaboradores e agentes |
 
-Os CSS anteriores permanecem por compatibilidade histórica até verificação de dependências. A branch do piloto autenticado não integra a versão pública.
+Os CSS legados sem dependência nas três páginas atuais foram removidos; permanecem disponíveis no histórico do Git. A branch do piloto autenticado não integra a versão pública.
 
 ## Desenvolvimento local
 ```sh

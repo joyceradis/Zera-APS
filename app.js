@@ -175,6 +175,34 @@ function ruleCodes(rule,card){
  }
  return list;
 }
+const searchAliases = {
+  pa: "PA pressão arterial",
+  "peso-altura": "antropometria IMC peso altura",
+  hba1c: "hemoglobina glicada A1c HbA1c",
+  pes: "pé diabético pés monofilamento",
+  consulta: "LPC lista de problemas CID CIAP",
+};
+const compactCode = value => norm(value).replace(/[.\s-]/g, "");
+
+function matchGroups(groups, query) {
+  if (!query) return groups;
+  const compactQuery = compactCode(query);
+  const exact = groups.filter(group =>
+    group.variants.some(({rule}) => compactCode(rule.id) === compactQuery) ||
+    codesFor(group).some(code => compactCode(code.value) === compactQuery)
+  );
+  if (exact.length) return exact;
+  const words = query.split(/\s+/);
+  return groups.filter(group => {
+    const fields = group.variants.flatMap(({rule, card}) => [
+      card.title, rule.title, rule.id, rule.goal, rule.window,
+      rule.pec_location, rule.actor, ...(rule.cautions || [])
+    ]);
+    const codes = codesFor(group).flatMap(code => [code.value, code.system, code.label]);
+    const searchable = norm([group.title, group.instruction, searchAliases[group.key], ...fields, ...codes].join(" "));
+    return words.every(word => searchable.includes(word));
+  });
+}
 function groupsFor(selection,query){
  const map=new Map();
  for(const card of data.cards){
@@ -187,7 +215,7 @@ function groupsFor(selection,query){
      map.get(key).variants.push({rule,card});
    }
  }
- return [...map.values()].filter(g=>!query||norm([g.title,g.instruction,...g.variants.map(v=>JSON.stringify(v))].join(" ")).includes(query)).sort((a,b)=>(a.lane==="team")-(b.lane==="team"));
+ return matchGroups([...map.values()], query).sort((a,b)=>(a.lane==="team")-(b.lane==="team"));
 }
 function codesFor(g){const m=new Map();for(const {rule,card} of g.variants)for(const c of ruleCodes(rule,card))m.set(c.system+"|"+c.value,c);return [...m.values()];}
 function pathText(path){return path.replace(/^Atendimento individual\s*(?:\/|→)\s*/,"").replace(/^SOAP\s*→\s*/,"");}

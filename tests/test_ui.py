@@ -68,6 +68,12 @@ with ThreadingHTTPServer(("127.0.0.1", 0), partial(Quiet, directory=str(root))) 
         expect(page.locator("#detail-content .source").first).to_be_visible()
         page.locator("#search").fill("I10")
         expect(page.locator('[data-action="consulta"]')).to_be_visible()
+        assert page.locator("[data-action]").count() == 1
+        for query, action in (("0301100039", "pa"), ("03.01.10.003-9", "pa"),
+                              ("C4-E", "hba1c"), ("ABEX008", "hba1c"),
+                              ("A1c", "hba1c"), ("hemoglobina glicada", "hba1c")):
+            page.locator("#search").fill(query)
+            expect(page.locator(f'[data-action="{action}"]')).to_be_visible()
         page.locator("#search").fill("não existe 987")
         expect(page.locator("#empty")).to_contain_text("Nenhum")
         page.locator("#search").fill("")

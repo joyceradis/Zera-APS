@@ -1,5 +1,10 @@
 # Changelog
 
+## 26/11/2026 — manutenção da busca
+- Remoção de dois CSS sem dependências nas páginas atuais; preservados no histórico.
+- Busca por campos e códigos específicos de cada regra, incluindo SIGTAP sem pontuação e sinônimos.
+- Revisão estática do backend experimental em docs/AUDITORIA-PILOTO.md.
+
 ## 0.9.1 — 25/11/2026
 - Landing comercial independente, acesso direto a consulta.html.
 - Tema Sistema/Claro/Escuro, preferência visual local.
