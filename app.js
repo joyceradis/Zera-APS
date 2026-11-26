@@ -187,7 +187,15 @@ function groupsFor(selection,query){
      map.get(key).variants.push({rule,card});
    }
  }
- return [...map.values()].filter(g=>!query||norm([g.title,g.instruction,...g.variants.map(v=>JSON.stringify(v))].join(" ")).includes(query)).sort((a,b)=>(a.lane==="team")-(b.lane==="team"));
+ return [...map.values()].filter(g=>{
+  if(!query)return true;
+  const compact=v=>norm(v).replace(/[^a-z0-9]/g,"");
+  const aliases={pa:"pressao arterial pa", "peso-altura":"antropometria imc peso altura",hba1c:"hemoglobina glicada a1c hba1c",pes:"pe diabetico pes monofilamento",consulta:"lpc lista de problemas cid ciap"};
+  const codes=codesFor(g);
+  if(/^[a-z]{0,5}[0-9][a-z0-9.\s-]*$/i.test(query))return codes.some(c=>compact(c.value)===compact(query))||g.variants.some(({rule})=>compact(rule.id)===compact(query));
+  const hay=norm([g.title,g.instruction,aliases[g.key]||"",...g.variants.flatMap(({rule,card})=>[card.title,rule.title,rule.id,rule.goal,rule.window,rule.pec_location,rule.actor,...(rule.cautions||[])]),...codes.flatMap(c=>[c.value,c.system,c.label])].join(" "));
+  return query.split(/\s+/).every(q=>hay.includes(q));
+ }).sort((a,b)=>(a.lane==="team")-(b.lane==="team"));
 }
 function codesFor(g){const m=new Map();for(const {rule,card} of g.variants)for(const c of ruleCodes(rule,card))m.set(c.system+"|"+c.value,c);return [...m.values()];}
 function pathText(path){return path.replace(/^Atendimento individual\s*(?:\/|→)\s*/,"").replace(/^SOAP\s*→\s*/,"");}
