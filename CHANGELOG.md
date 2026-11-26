@@ -1,6 +1,6 @@
 # Changelog
 
-## Em revisão — manutenção
+## 26/11/2026 — manutenção da busca
 - Remoção de dois CSS sem dependências nas páginas atuais; preservados no histórico.
 - Busca por campos e códigos específicos de cada regra, incluindo SIGTAP sem pontuação e sinônimos.
 - Revisão estática do backend experimental em docs/AUDITORIA-PILOTO.md.

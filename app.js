@@ -175,6 +175,34 @@ function ruleCodes(rule,card){
  }
  return list;
 }
+const searchAliases = {
+  pa: "PA pressão arterial",
+  "peso-altura": "antropometria IMC peso altura",
+  hba1c: "hemoglobina glicada A1c HbA1c",
+  pes: "pé diabético pés monofilamento",
+  consulta: "LPC lista de problemas CID CIAP",
+};
+const compactCode = value => norm(value).replace(/[.\s-]/g, "");
+
+function matchGroups(groups, query) {
+  if (!query) return groups;
+  const compactQuery = compactCode(query);
+  const exact = groups.filter(group =>
+    group.variants.some(({rule}) => compactCode(rule.id) === compactQuery) ||
+    codesFor(group).some(code => compactCode(code.value) === compactQuery)
+  );
+  if (exact.length) return exact;
+  const words = query.split(/\s+/);
+  return groups.filter(group => {
+    const fields = group.variants.flatMap(({rule, card}) => [
+      card.title, rule.title, rule.id, rule.goal, rule.window,
+      rule.pec_location, rule.actor, ...(rule.cautions || [])
+    ]);
+    const codes = codesFor(group).flatMap(code => [code.value, code.system, code.label]);
+    const searchable = norm([group.title, group.instruction, searchAliases[group.key], ...fields, ...codes].join(" "));
+    return words.every(word => searchable.includes(word));
+  });
+}
 function groupsFor(selection,query){
  const map=new Map();
  for(const card of data.cards){
@@ -187,15 +215,7 @@ function groupsFor(selection,query){
      map.get(key).variants.push({rule,card});
    }
  }
- return [...map.values()].filter(g=>{
-  if(!query)return true;
-  const compact=v=>norm(v).replace(/[^a-z0-9]/g,"");
-  const aliases={pa:"pressao arterial pa", "peso-altura":"antropometria imc peso altura",hba1c:"hemoglobina glicada a1c hba1c",pes:"pe diabetico pes monofilamento",consulta:"lpc lista de problemas cid ciap"};
-  const codes=codesFor(g);
-  if(/^[a-z]{0,5}[0-9][a-z0-9.\s-]*$/i.test(query))return codes.some(c=>compact(c.value)===compact(query))||g.variants.some(({rule})=>compact(rule.id)===compact(query));
-  const hay=norm([g.title,g.instruction,aliases[g.key]||"",...g.variants.flatMap(({rule,card})=>[card.title,rule.title,rule.id,rule.goal,rule.window,rule.pec_location,rule.actor,...(rule.cautions||[])]),...codes.flatMap(c=>[c.value,c.system,c.label])].join(" "));
-  return query.split(/\s+/).every(q=>hay.includes(q));
- }).sort((a,b)=>(a.lane==="team")-(b.lane==="team"));
+ return matchGroups([...map.values()], query).sort((a,b)=>(a.lane==="team")-(b.lane==="team"));
 }
 function codesFor(g){const m=new Map();for(const {rule,card} of g.variants)for(const c of ruleCodes(rule,card))m.set(c.system+"|"+c.value,c);return [...m.values()];}
 function pathText(path){return path.replace(/^Atendimento individual\s*(?:\/|→)\s*/,"").replace(/^SOAP\s*→\s*/,"");}
@@ -227,7 +247,34 @@ function render(){
  $("rows").innerHTML=medical.map(row).join("")+(team.length?'<tr class="group-separator"><th colspan="4" scope="rowgroup">Conferir com a equipe responsável</th></tr>'+team.map(row).join(""):"");
  showDetail(active);
 }
+// Links da página comercial abrem somente linhas e critérios existentes na base.
+function openLandingSelection() {
+  const params = new URLSearchParams(location.search);
+  const criterion = params.get("criterio");
+  const line = params.get("linha");
+  let selection = line === "cronicos" ? ["has", "dm"] : [line];
+  let detail = "";
+  if (criterion) {
+    for (const card of data.cards) {
+      const rule = card.rules.find(item => item.id === criterion);
+      if (rule && Object.hasOwn(actions, rule.id)) {
+        selection = [phaseOf(card, rule)];
+        detail = actions[rule.id][0];
+        break;
+      }
+    }
+  }
+  checks.forEach(input => { input.checked = selection.includes(input.value); });
+  render();
+  if (detail) showDetail(detail, true);
+}
 function reset(){
+ const url = new URL(location.href);
+ if (url.searchParams.has("criterio") || url.searchParams.has("linha")) {
+   url.searchParams.delete("criterio");
+   url.searchParams.delete("linha");
+   history.replaceState(null, "", url);
+ }
  checks.forEach(c=>c.checked=false);reviewed.clear();active="";$("search").value="";$("copy-status").textContent="";$("copy-fallback").hidden=true;$("copy-fallback").value="";render();$("search").focus();
 }
 function copyMap(){
@@ -252,5 +299,5 @@ $("rows").addEventListener("change",e=>{const id=e.target.dataset.review;if(!id)
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){showDetail("");}if(e.key==="/"&&!["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName)){e.preventDefault();$("search").focus();}});
 window.addEventListener("pageshow",e=>{if(e.persisted)reset();});
 $("base-date").textContent="Base documental: "+(data.reviewed_on||"data não informada")+" · Manual PEC: "+(data.pec_manual_review?.version||"não informado")+" · Sem acesso ao histórico ou cálculo de pontuação. Valide a instalação local.";
-render();
+openLandingSelection();
 })();

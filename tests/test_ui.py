@@ -25,6 +25,25 @@ with ThreadingHTTPServer(("127.0.0.1", 0), partial(Quiet, directory=str(root))) 
         assert page.evaluate("getComputedStyle(document.documentElement).colorScheme")=="dark"
         page.locator("#theme-mode").select_option("light")
         assert page.evaluate("document.documentElement.dataset.theme")=="light"
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+        for example, criterion in (("glicada", "C4-E"), ("pes", "C4-F"), ("visita", "C3-J")):
+            button = page.locator(f'[data-example="{example}"]')
+            button.click()
+            expect(button).to_have_attribute("aria-pressed", "true")
+            page.locator(f"#{example} a").click()
+            expect(page.locator("#detail-content")).to_contain_text(criterion)
+            page.locator("#new-visit").click()
+            expect(page.locator("#empty")).to_be_visible()
+            assert not urlsplit(page.url).query
+            page.go_back()
+        for line, count in (("cronicos", 6), ("gestacao", 9), ("puerperio", 2), ("mulher", 4)):
+            page.locator(f'a[href="consulta.html?linha={line}"]').click()
+            assert page.locator("[data-action]").count() == count
+            page.go_back()
+        if os.environ.get("ZERA_REVIEW_DIR"):
+            folder = Path(os.environ["ZERA_REVIEW_DIR"])
+            folder.mkdir(parents=True, exist_ok=True)
+            page.screenshot(path=str(folder / f"landing-{width}.png"), full_page=True)
         page.locator("#access-main").click()
         expect(page).to_have_url(__import__("re").compile(r"/consulta\.html$"))
         assert page.evaluate("document.documentElement.dataset.theme")=="light"
@@ -49,11 +68,12 @@ with ThreadingHTTPServer(("127.0.0.1", 0), partial(Quiet, directory=str(root))) 
         expect(page.locator("#detail-content .source").first).to_be_visible()
         page.locator("#search").fill("I10")
         expect(page.locator('[data-action="consulta"]')).to_be_visible()
-        assert page.locator("[data-action]").count()==1
-        page.locator("#search").fill("0301100039")
-        expect(page.locator('[data-action="pa"]')).to_be_visible()
-        page.locator("#search").fill("hemoglobina glicada")
-        expect(page.locator('[data-action="hba1c"]')).to_be_visible()
+        assert page.locator("[data-action]").count() == 1
+        for query, action in (("0301100039", "pa"), ("03.01.10.003-9", "pa"),
+                              ("C4-E", "hba1c"), ("ABEX008", "hba1c"),
+                              ("A1c", "hba1c"), ("hemoglobina glicada", "hba1c")):
+            page.locator("#search").fill(query)
+            expect(page.locator(f'[data-action="{action}"]')).to_be_visible()
         page.locator("#search").fill("não existe 987")
         expect(page.locator("#empty")).to_contain_text("Nenhum")
         page.locator("#search").fill("")

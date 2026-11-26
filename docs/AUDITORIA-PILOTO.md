@@ -18,6 +18,6 @@ A busca anterior serializava todo o objeto card em cada regra, trazendo os códi
 - Limite de login usa endereço do socket: validar comportamento atrás de proxy confiável, sem aceitar cabeçalhos de cliente indiscriminadamente; revisar limites de convite/recovery e expiração.
 - Recuperação administrativa, posse de e-mail não verificada, falta de auditoria completa e 2FA: requerem desenho e avaliação antes de expor autenticação.
 - Backup verifica integridade e permissões, mas não demonstra restauração operacional; testar restauração isolada, retenção e revogação de sessões.
-- Sem implantação, custo, contas reais ou armazenamento de informações de pacientes. Não mesclar a branch integralmente.
+- Sem implantação, custo, contas reais ou armazenamento de informações de pacientes. A recuperação seletiva da branch está prevista na [issue #9](https://github.com/joyceradis/Zera-APS/issues/9). O [PR #1](https://github.com/joyceradis/Zera-APS/pull/1) foi encerrado e a branch histórica foi preservada.
 
 Revisão estática dos arquivos server/core.mjs, server/http.mjs, server/backup.mjs, client-auth.js, tests/server.test.mjs e documentação do piloto. Não foram executados testes de backend nem auditoria externa. A revisão normativa continua pendente.

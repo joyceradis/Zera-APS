@@ -1,7 +1,101 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Zera APS: ferramenta independente de consulta rápida aos critérios e campos do e-SUS APS PEC."><title>Zera APS · Menos navegação. Mais atenção ao paciente.</title><link rel="icon" href="favicon.svg"><script src="theme.js?v=0.9.1"></script><link rel="stylesheet" href="theme.css?v=0.9.1"><link rel="stylesheet" href="landing.css?v=0.9.1"></head>
-<body><header class="site-header"><a class="brand" href="index.html">Zera<span>APS</span></a><nav aria-label="Menu"><a href="#como-funciona">Como funciona</a><a href="#escopo">Escopo</a></nav><label class="theme-control" for="theme-mode">Tema <select id="theme-mode" aria-label="Tema"><option value="auto">Sistema</option><option value="light">Claro</option><option value="dark">Escuro</option></select></label><a class="access" id="access-header" href="consulta.html">Acessar</a></header>
-<main><section class="hero"><div class="hero-copy"><p class="eyebrow">FERRAMENTA DE APOIO À ATENÇÃO PRIMÁRIA</p><h1>Menos navegação.<br>Mais atenção ao paciente.</h1><p class="lead">Encontre rapidamente onde registrar, quais critérios conferir e quais códigos consultar no e-SUS APS PEC. Sem substituir seu prontuário.</p><a class="access primary" id="access-main" href="consulta.html">Acessar Zera APS <span aria-hidden="true">→</span></a><p class="small">Acesso direto à versão atual. Sem cadastro nesta etapa.</p></div><div class="preview" aria-label="Exemplo ilustrativo da interface"><div class="preview-title"><strong>Zera APS</strong><span>Modo consulta</span></div><div class="preview-search">Buscar registro, campo ou código</div><p class="preview-conditions">HAS &nbsp; · &nbsp; Diabetes</p><table><thead><tr><th>Registro</th><th>Local no PEC</th></tr></thead><tbody><tr><td>Pressão arterial</td><td>Objetivo · Sinais vitais</td></tr><tr><td>HbA1c</td><td>Plano / Objetivo</td></tr><tr><td>Avaliação dos pés</td><td>Objetivo / Plano</td></tr></tbody></table><p class="small">Exemplo ilustrativo. Histórico individual não verificado.</p></div></section>
-<section id="como-funciona" class="features"><h2>Feito para a rotina da APS</h2><div class="feature-grid"><article><h3>Consulta imediata</h3><p>Busque por exame, código ou condição. Combine linhas de cuidado na mesma tela.</p></article><article><h3>Registro orientado</h3><p>Consulte periodicidade, campo correspondente no PEC e responsabilidades de cada profissional.</p></article><article><h3>Base rastreável</h3><p>Confira critérios, ressalvas e fontes oficiais sem interromper o fluxo para navegar em vários menus.</p></article></div></section>
-<section id="escopo" class="scope"><div><h2>Uma ferramenta auxiliar, não outro prontuário.</h2><p>Referências para C3, C4, C5 e C7. Sem armazenamento de dados de pacientes, integração com o PEC ou cálculo de pontuação. A elegibilidade e os registros devem ser verificados pelo profissional.</p></div><a class="access" href="consulta.html">Acessar consulta</a></section></main>
-<footer><span>Zera APS · Produto independente, sem vínculo institucional com o Ministério da Saúde.</span><a href="novidades-5-6.html">Novidades PEC 5.6</a></footer></body></html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Encontre campos, códigos e critérios do e-SUS APS PEC durante o atendimento. Experimente o Zera APS e peça uma demonstração para sua equipe de atenção primária.">
+  <title>Zera APS | Guia de registro no PEC para equipes de atenção primária</title>
+  <link rel="icon" href="favicon.svg">
+  <script src="theme.js?v=0.9.1"></script>
+  <link rel="stylesheet" href="theme.css?v=0.9.1">
+  <link rel="stylesheet" href="landing.css?v=20261126">
+  <script defer src="landing.js?v=20261126"></script>
+</head>
+<body>
+  <a class="skip" href="#principal">Pular para o conteúdo</a>
+  <header class="masthead">
+    <div class="wrap header-inner">
+      <a class="brand" href="./" aria-label="Zera APS, início"><i class="mark" aria-hidden="true"></i>Zera<span>APS</span></a>
+      <nav aria-label="Principal">
+        <a class="nav-team" href="#equipes">Para equipes</a>
+        <a class="nav-access" id="access-header" href="consulta.html">Acessar ferramenta <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+  <main id="principal">
+    <section class="wrap hero" id="como-funciona" aria-labelledby="headline">
+      <div class="pitch">
+        <p class="kicker"><span class="stroke"></span>Guia de bolso da atenção primária</p>
+        <h1 id="headline">Onde registro<br><em>isso no PEC?</em></h1>
+        <p class="intro">Da hemoglobina glicada à visita do ACS, encontre o campo, o código e o critério de registro enquanto atende na UBS.</p>
+        <div class="actions">
+          <a class="button" href="https://ig.me/m/joyceradis" aria-label="Solicitar demonstração pelo Instagram de Joyce Radis">Solicitar demonstração <span aria-hidden="true">↗</span></a>
+          <a class="text-link" id="access-main" href="consulta.html">Usar agora <span aria-hidden="true">→</span></a>
+        </div>
+        <p class="fine">Consulta aberta, sem cadastro e sem dados de pacientes.</p>
+      </div>
+
+      <div class="specimen" aria-labelledby="sample-title">
+        <div class="sample-top"><h2 id="sample-title">Experimente o guia</h2><span class="book" aria-hidden="true"></span></div>
+        <div class="samples" role="group" aria-label="Escolher exemplo" hidden>
+          <button type="button" data-example="glicada" aria-pressed="true">HbA1c</button>
+          <button type="button" data-example="pes" aria-pressed="false">Exame dos pés</button>
+          <button type="button" data-example="visita" aria-pressed="false">Visita do ACS</button>
+        </div>
+        <div class="sheet" aria-live="polite">
+          <article id="glicada">
+            <p class="folio">Diabetes <span>C4 · E</span></p>
+            <h3>Hemoglobina glicada</h3>
+            <dl><dt>Solicitei o exame</dt><dd>Plano <b>→</b> Solicitação de exames</dd>
+                <dt>Avaliei o resultado</dt><dd>Objetivo <b>→</b> Resultados de exames</dd></dl>
+            <a href="consulta.html?criterio=C4-E">Ver códigos e critério completo <span aria-hidden="true">→</span></a>
+          </article>
+          <article id="pes" hidden>
+            <p class="folio">Diabetes <span>C4 · F</span></p>
+            <h3>Exame dos pés</h3>
+            <dl><dt>Descrevi os achados</dt><dd>Objetivo <b>→</b> Descrição clínica</dd>
+                <dt>Registrei o procedimento</dt><dd>Plano <b>→</b> Intervenções/procedimentos realizados</dd></dl>
+            <a href="consulta.html?criterio=C4-F">Ver código e critério completo <span aria-hidden="true">→</span></a>
+          </article>
+          <article id="visita" hidden>
+            <p class="folio">Puerpério <span>C3 · J</span></p>
+            <h3>Visita puerperal do ACS</h3>
+            <dl><dt>Onde o ACS registra</dt><dd>e-SUS Território <b>→</b> Visita ao Cidadão</dd>
+                <dt>O que conferir</dt><dd>Visita realizada, motivo e desfecho.</dd></dl>
+            <a href="consulta.html?criterio=C3-J">Ver responsável e critério completo <span aria-hidden="true">→</span></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="scope" id="escopo" aria-labelledby="scope-title">
+      <div class="wrap scope-inner">
+        <div>
+          <p class="kicker">Linhas de cuidado</p>
+          <h2 id="scope-title">Qual é o próximo atendimento?</h2>
+          <p>Abra um roteiro com os campos do PEC, os prazos de cada critério e as fontes para conferência.</p>
+        </div>
+        <div class="directory">
+          <a href="consulta.html?linha=cronicos"><span class="ref">C4 / C5</span><span>Hipertensão e diabetes</span><span aria-hidden="true">↗</span></a>
+          <a href="consulta.html?linha=gestacao"><span class="ref">C3</span><span>Pré-natal</span><span aria-hidden="true">↗</span></a>
+          <a href="consulta.html?linha=puerperio"><span class="ref">C3</span><span>Puerpério</span><span aria-hidden="true">↗</span></a>
+          <a href="consulta.html?linha=mulher"><span class="ref">C7</span><span>Saúde da mulher</span><span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap team" id="equipes" aria-labelledby="team-title">
+      <div><p class="kicker"><span class="stroke"></span>Para quem coordena a UBS</p>
+        <h2 id="team-title">Uma referência comum para a equipe.</h2></div>
+      <div><p>Chegou um profissional novo à unidade? Use um atendimento de exemplo para mostrar onde a enfermagem registra um exame, o que fica com o ACS e como conferir a orientação no guia oficial.</p>
+        <a class="button" href="https://ig.me/m/joyceradis">Pedir demonstração para a equipe <span aria-hidden="true">↗</span></a>
+        <p class="fine">Converse com Joyce pelo Instagram · <a href="https://www.instagram.com/joyceradis/">@joyceradis</a></p></div>
+    </section>
+  </main>
+  <footer><div class="wrap foot-inner">
+    <div><strong>Zera APS</strong><p>Guia independente para consulta documental. A equipe confere o histórico e registra o atendimento no PEC.</p></div>
+    <a href="novidades-5-6.html">Referência PEC 5.6</a>
+    <label class="theme-control" for="theme-mode">Tema <select id="theme-mode"><option value="auto">Sistema</option><option value="light">Claro</option><option value="dark">Escuro</option></select></label>
+  </div></footer>
+</body>
+</html>
