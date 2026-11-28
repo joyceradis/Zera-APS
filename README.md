@@ -7,6 +7,8 @@ Ferramenta independente de consulta rápida aos critérios e campos do e-SUS APS
 ## Escopo
 C3/C4/C5/C7, 25 regras, seleção de condições, busca global, tabela compacta, detalhes com fontes e conferência manual efêmera por critério. Sem C1/C2/C6, autenticação, cobrança, prontuário, integração PEC, acesso ao histórico ou cálculo de pontuação. A seleção não estabelece elegibilidade. Não inserir instruções administrativas em prontuário. O tema é a única preferência persistida no navegador.
 
+Para consultar resultados municipais, metas da PAS e contratos, acesse o [painel de gestão do AuditorES](https://joyceradis.github.io/AuditorES/). As portarias de ressarcimento ficam em [Financiamento federal](https://joyceradis.github.io/AuditorES/#financiamento-federal).
+
 ## Estrutura
 | Arquivo | Função |
 |---|---|
